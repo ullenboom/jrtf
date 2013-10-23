@@ -5,7 +5,7 @@ The Basics
 
 Write a simple RTF document to a file:
 
-    Rtf.rtf().p( "Hello World" ).out( new FileWriter("out.rtf") );
+    Rtf.rtf().p( "Hello World" ).out( new FileWriter("out.rtf") );b
 
 Special RTF-characters like "{", "}", "\" are encoded automatically.
 "\t" will stay tab and "\n" will be converted to a new paragraph.
@@ -61,10 +61,9 @@ The declaration of the section method is:
 
 For building paragraphs the `RtfPara` class offers two useful static methods: `p(RtfText...)` and a convenience method `p(Object...)`. So you either build a paragraph with a collection of `RtfText` objects or you pass a sequence of objects which will be converted to Strings (if the type is not already `RtfText`). `null` elements in the sequence will be ignored.
 
-A String can be wrapped in a `RtfText` object via the static method `text(String)` of the `RtfText` class. There is also the vararg method `text(Object...)` with is the foundation for `p(Object...)`. The `text(Object...)` is overloaded and `text(boolean, Object...)` inserts a space if the first argument is `true`.
+A String can be wrapped in a `RtfText` object via the static method `text(String)` of the `RtfText` class. There is also the vararg method `text(Object...)` with is the foundation for `p(Object...)`. [Currently commented out because of ambiguities: The `text(Object...)` is overloaded and `static RtfText text( boolean joinWithSpace, final Object... texts )` inserts a space if the first argument is `true`.]
 
   * `static RtfText text( Object... texts )`
-  * `static RtfText text( boolean joinWithSpace, final Object... texts )`
 
 Beside of using ordinary text there are a couple of special methods like `tab()`, `bullet()`, `currentDateAbbreviated()`, `shortHyphen()` and more.
 
