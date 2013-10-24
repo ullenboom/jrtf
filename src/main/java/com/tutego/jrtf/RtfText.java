@@ -83,50 +83,50 @@ public class RtfText
    */
   public static RtfText text( Object... texts )
   {
-    return text( false, texts );
+    return textComposite( false, texts );
   }
 
 // TODO: Fix 'The method text(Object[]) is ambiguous for the type RtfDocumentDemo'
-//  /**
-//   * Converts every object in the sequence with {@code toString} to a
-//   * String object and wraps it into a RtfText if its not already a
-//   * RtfText object and join every text with a space between if wanted.
-//   * If the argument is {@code null} or no elements are given
-//   * the result is equal to {@code text("")}. If one element of the vararg
-//   * is {@code null} then this element is omitted and no separating space
-//   * will be written too.
-//   * @param joinWithSpace If space character should be set between non {@code null} elements.
-//   * @param texts Sequence of text.
-//   * @return New RtfText object representing this sequence of text.
-//   */
-//  public static RtfText text( boolean joinWithSpace, final Object... texts )
-//  {
-//    if ( texts == null || texts.length == 0 )
-//      return new RtfText( "" );
-//
-//    StringBuilder result = new StringBuilder( 1024 );
-//    for ( int i = 0; i < texts.length; i++ )
-//    {
-//      if ( texts[ i ] == null )
-//        continue;
-//
-//      if ( joinWithSpace )
-//        if ( i > 0 && texts[ i - 1 ] != null )  // if preceding element is null, no space
-//          result.append( ' ' );
-//
-//      try
-//      {
-//        if ( texts[ i ] instanceof RtfText )
-//          ((RtfText) texts[ i ]).rtf( result );
-//        else if ( texts[ i ] instanceof RtfPara )  // check more
-//          throw new RtfException( "RtfPara in method text() is not allowed. There is no sensible toString() method declared" );
-//        else
-//          Rtf.asRtf( result, texts[ i ].toString() );
-//      }
-//      catch ( IOException e ) { throw new RtfException( e ); }
-//    }
-//    return new RtfText( result );
-//  }
+  /**
+   * Converts every object in the sequence with {@code toString} to a
+   * String object and wraps it into a RtfText if its not already a
+   * RtfText object and join every text with a space between if wanted.
+   * If the argument is {@code null} or no elements are given
+   * the result is equal to {@code text("")}. If one element of the vararg
+   * is {@code null} then this element is omitted and no separating space
+   * will be written too.
+   * @param joinWithSpace If space character should be set between non {@code null} elements.
+   * @param texts Sequence of text.
+   * @return New RtfText object representing this sequence of text.
+   */
+  public static RtfText textComposite( boolean joinWithSpace, final Object... texts )
+  {
+    if ( texts == null || texts.length == 0 )
+      return new RtfText( "" );
+
+    StringBuilder result = new StringBuilder( 1024 );
+    for ( int i = 0; i < texts.length; i++ )
+    {
+      if ( texts[ i ] == null )
+        continue;
+
+      if ( joinWithSpace )
+        if ( i > 0 && texts[ i - 1 ] != null )  // if preceding element is null, no space
+          result.append( ' ' );
+
+      try
+      {
+        if ( texts[ i ] instanceof RtfText )
+          ((RtfText) texts[ i ]).rtf( result );
+        else if ( texts[ i ] instanceof RtfPara )  // check more
+          throw new RtfException( "RtfPara in method text() is not allowed. There is no sensible toString() method declared" );
+        else
+          Rtf.asRtf( result, texts[ i ].toString() );
+      }
+      catch ( IOException e ) { throw new RtfException( e ); }
+    }
+    return new RtfText( result );
+  }
 
   /**
    * Wraps a String in a {@link RtfText} object. 
