@@ -34,78 +34,78 @@ package com.tutego.jrtf;
 /**
  * Utility methods around the method {@link RtfText#field(RtfPara, RtfPara)}.
  */
-public class RtfFields
-{
-  /**
-   * Private constructor. The user will not instantiate this class.
-   */
-  private RtfFields() {}
+public class RtfFields {
+    /**
+     * Private constructor. The user will not instantiate this class.
+     */
+    private RtfFields() {
+    }
 
-  /**
-   * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
-   * @param fieldInstructions Field instructions.
-   * @return {@link RtfText} which represents a field.
-   */
-  public static RtfText field( final RtfPara fieldInstructions )
-  {
-    return RtfText.field( fieldInstructions, RtfPara.p( "Refresh 'F9'" ) );
-  }
+    /**
+     * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
+     *
+     * @param fieldInstructions Field instructions.
+     * @return {@link RtfText} which represents a field.
+     */
+    public static RtfText field(final RtfPara fieldInstructions) {
+        return RtfText.field(fieldInstructions, RtfPara.p("Refresh 'F9'"));
+    }
 
-  /**
-   * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
-   * @param fieldInstructions Field instructions.
-   * @return {@link RtfText} which represents a field.
-   */
-  public static RtfText field( String fieldInstructions )
-  {
-    return field( RtfPara.p( fieldInstructions ) );
-  }
+    /**
+     * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
+     *
+     * @param fieldInstructions Field instructions.
+     * @return {@link RtfText} which represents a field.
+     */
+    public static RtfText field(String fieldInstructions) {
+        return field(RtfPara.p(fieldInstructions));
+    }
 
-  /**
-   * Writes out a time field in a given format.
-   * @param format Format of the time, e.g. "HH:MM"
-   * @return {@link RtfText} which represents a field with time.
-   */
-  public static RtfText timeField( String format )
-  {
-    format = "time \\@ \"" + format + "\"";
- 
-    return field( format );
-  }
+    /**
+     * Writes out a time field in a given format.
+     *
+     * @param format Format of the time, e.g. "HH:MM"
+     * @return {@link RtfText} which represents a field with time.
+     */
+    public static RtfText timeField(String format) {
+        format = "time \\@ \"" + format + "\"";
 
-  /**
-   * Writes field for current pages. 
-   * @return {@link RtfText} which represents a field with page number.
-   */
-  public static RtfText pageNumberField()
-  {
-    return field( "PAGE" );
-  }
+        return field(format);
+    }
 
-  /**
-   * Writes field for total number of pages in a section.
-   * @return {@link RtfText} which represents a field with totel page numbers.
-   */
-  public static RtfText sectionPagesField()
-  {
-    return field( "SECTIONPAGES" );
-  }
-  
-  /**
-   * Writes field for the author of this document.
-   * @return {@link RtfText} which represents a field with author.
-   */
-  public static RtfText authorField()
-  {
-    return field( "AUTHOR" );
-  }
+    /**
+     * Writes field for current pages.
+     *
+     * @return {@link RtfText} which represents a field with page number.
+     */
+    public static RtfText pageNumberField() {
+        return field("PAGE");
+    }
 
-  /**
-   * Writes field for table of contents.
-   * @return {@link RtfText} which represents a field with TOC.
-   */
-  public static RtfText tableOfContentsField()
-  {
-    return field( "TOC \\\\f \\\\h \\\\u \\\\o \"1-5\" " );
-  }
+    /**
+     * Writes field for total number of pages in a section.
+     *
+     * @return {@link RtfText} which represents a field with totel page numbers.
+     */
+    public static RtfText sectionPagesField() {
+        return field("SECTIONPAGES");
+    }
+
+    /**
+     * Writes field for the author of this document.
+     *
+     * @return {@link RtfText} which represents a field with author.
+     */
+    public static RtfText authorField() {
+        return field("AUTHOR");
+    }
+
+    /**
+     * Writes field for table of contents.
+     *
+     * @return {@link RtfText} which represents a field with TOC.
+     */
+    public static RtfText tableOfContentsField() {
+        return field("TOC \\\\f \\\\h \\\\u \\\\o \"1-5\" ");
+    }
 }

@@ -34,24 +34,52 @@ package com.tutego.jrtf;
 /**
  * Represents a RTF measurement.
  */
-public enum RtfUnit
-{
-  /** Measurement in twips. A twip is a 1/20 of a point and the internal representation in RTF. */
-  TWIPS { @Override public int toTwips( double v ) { return (int) v; } },
+public enum RtfUnit {
+    /**
+     * Measurement in twips. A twip is a 1/20 of a point and the internal representation in RTF.
+     */
+    TWIPS {
+        @Override
+        public int toTwips(double v) {
+            return (int) v;
+        }
+    },
 
-  /** Measurement in point. One point is 20 twips. */
-  POINT { @Override public int toTwips( double v ) { return (int) (v*20); } },
+    /**
+     * Measurement in point. One point is 20 twips.
+     */
+    POINT {
+        @Override
+        public int toTwips(double v) {
+            return (int) (v * 20);
+        }
+    },
 
-  /** Measurement in inch. One inch is 1440 twips. */
-  INCH { @Override public int toTwips( double v ) { return (int) (v*1440); } },
+    /**
+     * Measurement in inch. One inch is 1440 twips.
+     */
+    INCH {
+        @Override
+        public int toTwips(double v) {
+            return (int) (v * 1440);
+        }
+    },
 
-  /** Measurement in cm. One cm is around 566.9 twips. */
-  CM { @Override public int toTwips( double v ) { return (int) Math.round( v * 566.9f ); } };
+    /**
+     * Measurement in cm. One cm is around 566.9 twips.
+     */
+    CM {
+        @Override
+        public int toTwips(double v) {
+            return (int) Math.round(v * 566.9f);
+        }
+    };
 
-  /**
-   * Converts to twips.
-   * @param v Value to convert to twips.
-   * @return Twips.
-   */
-  public abstract int toTwips( double v );
+    /**
+     * Converts to twips.
+     *
+     * @param v Value to convert to twips.
+     * @return Twips.
+     */
+    public abstract int toTwips(double v);
 }

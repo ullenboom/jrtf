@@ -36,65 +36,66 @@ import java.io.IOException;
 /**
  * Represents a color definition for the RTF header.
  */
-public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderColor>
-{
-  /** Red, Green, Blue. */
-  private int r, g, b;
+public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderColor> {
+    /**
+     * Red, Green, Blue.
+     */
+    private int r, g, b;
 
-  /** Index of the color. */
-  int colorindex;
+    /**
+     * Index of the color.
+     */
+    int colorindex;
 
-  /**
-   * Package visible constructor. The user will not instantiate this class.
-   * @param r  Red.
-   * @param g  Green.
-   * @param b  Blue.
-   */
-  RtfHeaderColor( int r, int g, int b )
-  {
-    this.r = r;
-    this.g = g;
-    this.b = b;
-  }
+    /**
+     * Package visible constructor. The user will not instantiate this class.
+     *
+     * @param r Red.
+     * @param g Green.
+     * @param b Blue.
+     */
+    RtfHeaderColor(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
 
-  /**
-   * Sets a color at a certain index. The index has to be between 0 and 255 otherwise a {@code RtfException}
-   * will be thrown. 
-   * 
-   * @param colorindex Index of the color.
-   * @return {@link RtfHeader}
-   */
-  public RtfHeader at( int colorindex )
-  {
-    if ( colorindex < 0 || colorindex > 255 )
-      throw new RtfException( "Color index " + colorindex  + " ist out of range, has to be between 0 and 255" );
+    /**
+     * Sets a color at a certain index. The index has to be between 0 and 255 otherwise a {@code RtfException}
+     * will be thrown.
+     *
+     * @param colorindex Index of the color.
+     * @return {@link RtfHeader}
+     */
+    public RtfHeader at(int colorindex) {
+        if (colorindex < 0 || colorindex > 255)
+            throw new RtfException("Color index " + colorindex + " ist out of range, has to be between 0 and 255");
 
-    this.colorindex = colorindex;
+        this.colorindex = colorindex;
 
-    return this;
-  }
+        return this;
+    }
 
-  public int compareTo( RtfHeaderColor other )
-  {
-    return this.colorindex - other.colorindex;
-  }
+    public int compareTo(RtfHeaderColor other) {
+        return this.colorindex - other.colorindex;
+    }
 
-  /**
-   * Appends the color definition of one color in RTF format.
-   * @param out Appendable
-   * @throws IOException
-   */
-  void writeColordef( Appendable out ) throws IOException
-  {
+    /**
+     * Appends the color definition of one color in RTF format.
+     *
+     * @param out Appendable
+     * @throws IOException
+     */
+    void writeColordef(Appendable out) throws IOException {
     /*
      * <colordef> := \red ? & \green ? & \blue ? ';'
      */
-    out.append( "\\red" )
-       .append( Integer.toString( r ) )
-       .append( "\\green" )
-       .append( Integer.toString( g ) )
-       .append( "\\blue" )
-       .append( Integer.toString( b ) )
-       .append( ';' );
-  }  
+        out.append("\\red")
+                .append(Integer.toString(r))
+                .append("\\green")
+                .append(Integer.toString(g))
+                .append("\\blue")
+                .append(Integer.toString(b))
+                .append(';');
+    }
 }
