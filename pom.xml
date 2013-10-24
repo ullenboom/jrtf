@@ -1,20 +1,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.tutego</groupId>
-  <artifactId>jrtf</artifactId>
-  <version>0.8</version>
-  <packaging>jar</packaging>
+    <groupId>com.tutego</groupId>
+    <artifactId>jrtf</artifactId>
+    <version>0.9-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-  <name>jrtf</name>
-  <url>http://maven.apache.org</url>
+    <name>jrtf</name>
+    <url>https://github.com/Manjago/jrtf</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <java.compiler.version>1.5</java.compiler.version>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.compiler.version>1.5</java.compiler.version>
+    </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>internal</id>
+            <name>Internal repository</name>
+            <url>dav:http://ci.quorum.ru:8085/artifactory/internal</url>
+        </repository>
+        <snapshotRepository>
+            <id>internal-snapshots</id>
+            <name>Internal snapshots repository</name>
+            <url>dav:http://ci.quorum.ru:8085/artifactory/internal-snapshots</url>
+        </snapshotRepository>
+        <site>
+            <id>site</id>
+            <name>Project Site</name>
+            <url>${site.root.url}\${project.artifactId}</url>
+        </site>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -43,12 +60,12 @@
         </pluginManagement>
     </build>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

@@ -299,6 +299,18 @@ public class Rtf
     return new RtfTemplate( inputStream );
   }
 
+    /**
+     * Opens a RTF template for later variable substitution.
+     * @param  inputStream Source of the RTF file.
+     * @param pattern  regex pattern for inject
+     * @param charsetName charset name for read and write
+     * @return Template object to make the substitutions on.
+     */
+    public static RtfTemplate template( InputStream inputStream, String pattern, String charsetName)
+    {
+        return new RtfTemplate( inputStream, pattern, charsetName );
+    }
+
   /**
    * Writes the complete RTF document.
    */
