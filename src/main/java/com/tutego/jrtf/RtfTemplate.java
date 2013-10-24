@@ -32,8 +32,10 @@
 package com.tutego.jrtf;
 
 import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class is able to make variable substitutions in an
@@ -46,128 +48,148 @@ import java.util.regex.*;
  * </pre>
  * Just use ASCII-keys.
  */
-public class RtfTemplate
-{
-  /** Holds the template file. */
-  private StringBuilder template = new StringBuilder( 8192 );
+public class RtfTemplate {
 
-  /** Map with all variables and substitutions. */
-  private Map<String, Object> map = new HashMap<String, Object>();
+    private static final int DEFAULT_CAPACITY = 8192;
+    /**
+     * Regex pattern for %%VARIABLE%%.
+     */
+    private final Pattern variablePattern;
+    /**
+     * charset name for read and write streams*
+     */
+    private final String charsetName;
+    /**
+     * Holds the template file.
+     */
+    private StringBuilder template = new StringBuilder(DEFAULT_CAPACITY);
+    /**
+     * Map with all variables and substitutions.
+     */
+    private Map<String, Object> map = new HashMap<String, Object>();
 
-  /** Regex pattern for %%VARIABLE%%. */
-  private final static Pattern VARIABLE_PATTERN = Pattern.compile( "%%(\\S+)%%",
-                                                                   Pattern.DOTALL | Pattern.MULTILINE);
+    /**
+     * Reads the template from that {@link InputStream}. The method treats the
+     * bytes in charsetName encoding. After reading the stream will be closed.
+     *
+     * @param inputStream
+     * @param pattern     regex pattern for inject
+     * @param charsetName
+     */
+    RtfTemplate(InputStream inputStream, String pattern, String charsetName) {
+        variablePattern = Pattern.compile(pattern,
+                Pattern.DOTALL | Pattern.MULTILINE);
+        this.charsetName = charsetName;
 
-  /**
-   * Reads the template from that {@link InputStream}. The method treats the
-   * bytes in Windows-1252 encoding. After reading the stream will be closed.
-   * @param inputStream
-   */
-  RtfTemplate( InputStream inputStream )
-  {
-    Reader reader = null;
-    try
-    {
-      if ( ! ( inputStream instanceof BufferedInputStream ) )
-        inputStream = new BufferedInputStream( inputStream );
+        Reader reader = null;
+        try {
+            if (!(inputStream instanceof BufferedInputStream)) {
+                inputStream = new BufferedInputStream(inputStream);
+            }
 
-      reader = new InputStreamReader( inputStream, Rtf.CHARSET1252 );
+            reader = new InputStreamReader(inputStream, charsetName);
 
-      for ( int c; (c = reader.read() )!= -1; )
-        template.append( (char ) c );
-    }
-    catch ( IOException e )
-    {
-      throw new RtfException( e );
-    }
-    finally
-    {
-      if ( reader != null )
-        try { reader.close(); } catch ( IOException e ) { throw new RtfException( e ); }
-    }
-  }
-
-  /**
-   * Adds key/values pairs for a variable substitution. Keep the keys in pure ASCII.
-   * @param map Map with key/value pairs.
-   * @return {@code this} object.
-   */
-  public RtfTemplate inject( Map<String, Object> map )
-  {
-    this.map.putAll( map );  
-    return this;
-  }
-
-  /**
-   * Adds a key/value pair for substitution. Keep the key in pure ASCII.
-   * The value will be converted to String by {@link String#valueOf(Object)}.
-   * @param key   Key.
-   * @param value Value.
-   * @return {@code this} object.
-   */
-  public RtfTemplate inject( String key, Object value )
-  {
-    map.put( key, String.valueOf( value ) );
-    return this;
-  }
-
-  /**
-   * Performs the variable transformation and returns the
-   * transformed RTF document.
-   * @return RTF document after variable substitution.
-   */
-  public String out()
-  {
-    if ( map.isEmpty() )
-      return template.toString();
-
-    StringBuffer result = new StringBuffer( template.length() );
-    Matcher matcher = VARIABLE_PATTERN.matcher( template );
-  
-    while ( matcher.find() )
-    {
-      Object value = map.get( matcher.group( 1 ) );
-  
-      if ( value == null )
-        continue;
-
-      StringBuilder sb = new StringBuilder( 128 );
-      try
-      {
-        RtfText.text( value ).rtf( sb );
-      }
-      catch ( IOException e )
-      {
-        throw new RtfException( e );
-      }
-      matcher.appendReplacement( result, Matcher.quoteReplacement( sb.toString() ) );
+            for (int c; (c = reader.read()) != -1; ) {
+                template.append((char) c);
+            }
+        } catch (IOException e) {
+            throw new RtfException(e);
+        } finally {
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RtfException(e);
+                }
+        }
     }
 
-    matcher.appendTail( result );
-  
-    return result.toString();
-  }
+    /**
+     * Reads the template from that {@link InputStream}. The method treats the
+     * bytes in Windows-1252 encoding. After reading the stream will be closed.
+     *
+     * @param inputStream
+     */
+    RtfTemplate(InputStream inputStream) {
+        this(inputStream, "%%(\\S+)%%", Rtf.CHARSET1252);
+    }
 
-  /**
-   * Performs the variable transformation and writes the RTF document and send
-   * the output to an {@link Appendable}. This method closes the {@link Appendable} 
-   * after writing if its of type {@link Closeable}.
-   * @param out Destination of this RTF output.
-   */
-  public void out( OutputStream out )
-  {
-    try
-    {
-      String out2 = out();
-      out.write( out2.getBytes(Rtf.CHARSET1252 ) );
+    /**
+     * Adds key/values pairs for a variable substitution. Keep the keys in pure ASCII.
+     *
+     * @param map Map with key/value pairs.
+     * @return {@code this} object.
+     */
+    public RtfTemplate inject(Map<String, Object> map) {
+        this.map.putAll(map);
+        return this;
     }
-    catch ( IOException e )
-    {
-      throw new RtfException( e );
+
+    /**
+     * Adds a key/value pair for substitution. Keep the key in pure ASCII.
+     * The value will be converted to String by {@link String#valueOf(Object)}.
+     *
+     * @param key   Key.
+     * @param value Value.
+     * @return {@code this} object.
+     */
+    public RtfTemplate inject(String key, Object value) {
+        map.put(key, String.valueOf(value));
+        return this;
     }
-    finally
-    {
-      try { out.close(); } catch ( IOException e ) { throw new RtfException(e); }
+
+    /**
+     * Performs the variable transformation and returns the
+     * transformed RTF document.
+     *
+     * @return RTF document after variable substitution.
+     */
+    public String out() {
+        if (map.isEmpty())
+            return template.toString();
+
+        StringBuffer result = new StringBuffer(template.length());
+        Matcher matcher = variablePattern.matcher(template);
+
+        while (matcher.find()) {
+            Object value = map.get(matcher.group(1));
+
+            if (value == null)
+                continue;
+
+            StringBuilder sb = new StringBuilder(128);
+            try {
+                RtfText.text(value).rtf(sb);
+            } catch (IOException e) {
+                throw new RtfException(e);
+            }
+            matcher.appendReplacement(result, Matcher.quoteReplacement(sb.toString()));
+        }
+
+        matcher.appendTail(result);
+
+        return result.toString();
     }
-  }
+
+    /**
+     * Performs the variable transformation and writes the RTF document and send
+     * the output to an {@link Appendable}. This method closes the {@link Appendable}
+     * after writing if its of type {@link Closeable}.
+     *
+     * @param out Destination of this RTF output.
+     */
+    public void out(OutputStream out) {
+        try {
+            String out2 = out();
+            out.write(out2.getBytes(charsetName));
+        } catch (IOException e) {
+            throw new RtfException(e);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                throw new RtfException(e);
+            }
+        }
+    }
 }

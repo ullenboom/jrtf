@@ -34,16 +34,18 @@ package com.tutego.jrtf;
 /**
  * Represents meta information about the RTF document like author, title, keywords.
  */
-public class RtfInfo
-{
-  /** RTF result of this info. */
-  String rtf;
+public class RtfInfo {
+    /**
+     * RTF result of this info.
+     */
+    String rtf;
 
-  /** Initializes this object. */
-  private RtfInfo( String rtf )
-  {
-    this.rtf = rtf;
-  }
+    /**
+     * Initializes this object.
+     */
+    private RtfInfo(String rtf) {
+        this.rtf = rtf;
+    }
   
   /*
    * <info> := '{' <title>? &
@@ -74,36 +76,36 @@ public class RtfInfo
    * <time> \yr? \mo? \dy? \hr? \min? \sec?
    */
 
-  /**
-   * Sets the subject of this document.
-   * @param subject Subject.
-   * @return New RtfInfo object.
-   */
-  public static RtfInfo subject( String subject )
-  {
-    // <subject> '{' \subject #PCDATA '}'
-    return new RtfInfo( "{\\subject " + Rtf.asRtf( subject ) + "}" );
-  }
+    /**
+     * Sets the subject of this document.
+     *
+     * @param subject Subject.
+     * @return New RtfInfo object.
+     */
+    public static RtfInfo subject(String subject) {
+        // <subject> '{' \subject #PCDATA '}'
+        return new RtfInfo("{\\subject " + Rtf.asRtf(subject) + "}");
+    }
 
-  /**
-   * Sets the title of this document.
-   * @param title Title.
-   * @return New RtfInfo object.
-   */
-  public static RtfInfo title( String title )
-  {
-    // <title> '{' \title #PCDATA '}'
-    return new RtfInfo( "{\\title " + Rtf.asRtf( title ) + "}" );
-  }
+    /**
+     * Sets the title of this document.
+     *
+     * @param title Title.
+     * @return New RtfInfo object.
+     */
+    public static RtfInfo title(String title) {
+        // <title> '{' \title #PCDATA '}'
+        return new RtfInfo("{\\title " + Rtf.asRtf(title) + "}");
+    }
 
-  /**
-   * Sets the author of this document.
-   * @param author Author.
-   * @return New RtfInfo object.
-   */
-  public static RtfInfo author( String author )
-  {
-    // <author> '{' \author #PCDATA '}'
-    return new RtfInfo( "{\\author " + Rtf.asRtf( author ) + "}" );
-  }
+    /**
+     * Sets the author of this document.
+     *
+     * @param author Author.
+     * @return New RtfInfo object.
+     */
+    public static RtfInfo author(String author) {
+        // <author> '{' \author #PCDATA '}'
+        return new RtfInfo("{\\author " + Rtf.asRtf(author) + "}");
+    }
 }

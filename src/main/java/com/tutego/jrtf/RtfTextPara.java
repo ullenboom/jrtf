@@ -34,8 +34,7 @@ package com.tutego.jrtf;
 /**
  * Represents a RTF paragraph.
  */
-public abstract class RtfTextPara extends RtfPara
-{
+public abstract class RtfTextPara extends RtfPara {
   /*
    * <textpar> := <pn>?
    *              <brdrdef>?
@@ -46,41 +45,49 @@ public abstract class RtfTextPara extends RtfPara
    *              (\subdocument | <char>+)
    *              (\par <para>)?
    */
-  
-  /** Paragraph formattings. */
-  private StringBuilder parfmt = new StringBuilder( 512 );
 
-  /** Tabulator definitions. */
-  private StringBuilder tabdef = new StringBuilder( 512 );
-  
-  /** Border definitions. */
-  private StringBuilder brdrdef = new StringBuilder( 512 );
+    /**
+     * Paragraph formattings.
+     */
+    private StringBuilder parfmt = new StringBuilder(512);
 
-  /** Cell formattings. Not private so it can be accessed by RtfPara (bad design anyway). */
-  StringBuilder cellfmt = new StringBuilder( 32 );
+    /**
+     * Tabulator definitions.
+     */
+    private StringBuilder tabdef = new StringBuilder(512);
 
-  /**
-   * Returns the RTF control words for the <textpar> formattings.
-   * @return
-   */
-  CharSequence textparFormatRtf()
-  {
-    return new StringBuilder( 512 )
-                 .append( brdrdef ).append( parfmt ).append( tabdef );
-  }
+    /**
+     * Border definitions.
+     */
+    private StringBuilder brdrdef = new StringBuilder(512);
 
-  // Paragraph-Formatting Properties
-  // parfmt
-  
-  /**
-   * Resets to default paragraph properties.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara reset()
-  {
-    parfmt.append( "\\pard\n" );
-    return this;
-  }
+    /**
+     * Cell formattings. Not private so it can be accessed by RtfPara (bad design anyway).
+     */
+    StringBuilder cellfmt = new StringBuilder(32);
+
+    /**
+     * Returns the RTF control words for the <textpar> formattings.
+     *
+     * @return
+     */
+    CharSequence textparFormatRtf() {
+        return new StringBuilder(512)
+                .append(brdrdef).append(parfmt).append(tabdef);
+    }
+
+    // Paragraph-Formatting Properties
+    // parfmt
+
+    /**
+     * Resets to default paragraph properties.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara reset() {
+        parfmt.append("\\pard\n");
+        return this;
+    }
 
 //  /**
 //   * Style of this paragraph.
@@ -92,301 +99,295 @@ public abstract class RtfTextPara extends RtfPara
 //    parfmt.append( "\\s" ).append( stylenumber ).append( '\n' );
 //    return this;
 //  }
-  
-  /**
-   * Hyphenation for the paragraph on.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara hyphenationOn()
-  {
-    parfmt.append( "\\hyphpar1\n" );
-    return this;
-  }
 
-  /**
-   * Hyphenation for the paragraph off.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara hyphenationOff()
-  {
-    parfmt.append( "\\hyphpar0\n" );
-    return this;
-  }
-  
-  /**
-   * Paragraph is part of a table.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara partOfTable()
-  {
-    parfmt.append( "\\intbl\n" );
-    return this;
-  }
+    /**
+     * Hyphenation for the paragraph on.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara hyphenationOn() {
+        parfmt.append("\\hyphpar1\n");
+        return this;
+    }
 
-  /**
-   * Keep paragraph intact.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara keep()
-  {
-    parfmt.append( "\\keep\n" );
-    return this;
-  }
+    /**
+     * Hyphenation for the paragraph off.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara hyphenationOff() {
+        parfmt.append("\\hyphpar0\n");
+        return this;
+    }
 
-  /**
-   * No widow/orphan control.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara noWidowOrOrphanControl()
-  {
-    parfmt.append( "\\nowidctlpar\n" );
-    return this;
-  }
+    /**
+     * Paragraph is part of a table.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara partOfTable() {
+        parfmt.append("\\intbl\n");
+        return this;
+    }
 
-  /**
-   * Keep paragraph with the next paragraph.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara keepWithNextParagraph()
-  {
-    parfmt.append( "\\keepn\n" );
-    return this;
-  }
+    /**
+     * Keep paragraph intact.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara keep() {
+        parfmt.append("\\keep\n");
+        return this;
+    }
 
-  /**
-   * Outline level of the paragraph.
-   * @param level Outline level.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara level( int level )
-  {
-    if ( level < 0 )
-      throw new IllegalArgumentException( "Level is not allowed to be negative but is " + level );
+    /**
+     * No widow/orphan control.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara noWidowOrOrphanControl() {
+        parfmt.append("\\nowidctlpar\n");
+        return this;
+    }
 
-    parfmt.append( "\\level" ).append( level ).append( '\n' );
-    return this;
-  }
+    /**
+     * Keep paragraph with the next paragraph.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara keepWithNextParagraph() {
+        parfmt.append("\\keepn\n");
+        return this;
+    }
 
-  /**
-   * No line numbering.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara noLineNumbering()
-  {
-    parfmt.append( "\\noline\n" );
-    return this;
-  }
+    /**
+     * Outline level of the paragraph.
+     *
+     * @param level Outline level.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara level(int level) {
+        if (level < 0)
+            throw new IllegalArgumentException("Level is not allowed to be negative but is " + level);
 
-  /**
-   * Break page before the paragraph.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara breakPageBeforeParagraph()
-  {
-    parfmt.append( "\\pagebb\n" );
-    return this;
-  }
+        parfmt.append("\\level").append(level).append('\n');
+        return this;
+    }
 
-  //
-  // Alignment
-  //
+    /**
+     * No line numbering.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara noLineNumbering() {
+        parfmt.append("\\noline\n");
+        return this;
+    }
 
-  /**
-   * @return {@code this}-object.
-   */
-  public RtfTextPara alignLeft()
-  {
-    parfmt.append( "\\ql\n" );
-    return this;
-  }
+    /**
+     * Break page before the paragraph.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara breakPageBeforeParagraph() {
+        parfmt.append("\\pagebb\n");
+        return this;
+    }
 
-  /**
-   * @return {@code this}-object.
-   */
-  public RtfTextPara alignRight()
-  {
-    parfmt.append( "\\qr\n" );
-    return this;
-  }
+    //
+    // Alignment
+    //
 
-  /**
-   * 
-   * @return {@code this}-object.
-   */
-  public RtfTextPara alignJustified()
-  {
-    parfmt.append( "\\qj\n" );
-    return this;
-  }
+    /**
+     * @return {@code this}-object.
+     */
+    public RtfTextPara alignLeft() {
+        parfmt.append("\\ql\n");
+        return this;
+    }
 
-  /**
-   * 
-   * @return {@code this}-object.
-   */
-  public RtfTextPara alignCentered()
-  {
-    parfmt.append( "\\qc\n" );
-    return this;
-  }
-  
-  //
-  //
-  //
+    /**
+     * @return {@code this}-object.
+     */
+    public RtfTextPara alignRight() {
+        parfmt.append("\\qr\n");
+        return this;
+    }
 
-  /**
-   * First-line indent by given amount.
-   * @param indentation Indentation.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara indentFirstLine( double indentation, RtfUnit unit )
-  {
-    parfmt.append( "\\fi" ).append( unit.toTwips( indentation ) ).append( '\n' );
-    return this;
-  }
+    /**
+     * @return {@code this}-object.
+     */
+    public RtfTextPara alignJustified() {
+        parfmt.append("\\qj\n");
+        return this;
+    }
 
-  /**
-   * Left indent by given amount.
-   * @param indentation Indentation.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara indentLeft( double indentation, RtfUnit unit )
-  {
-    parfmt.append( "\\li" ).append( unit.toTwips( indentation ) ).append( '\n' );
-    return this;
-  }
+    /**
+     * @return {@code this}-object.
+     */
+    public RtfTextPara alignCentered() {
+        parfmt.append("\\qc\n");
+        return this;
+    }
 
-  /**
-   * Right indent by given amount.
-   * @param indentation Indentation.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara indentRight( double indentation, RtfUnit unit )
-  {
-    parfmt.append( "\\ri" ).append( unit.toTwips( indentation ) ).append( '\n' );
-    return this;
-  }
-  
-  //
-  // Spacing
-  //
-  
-  /**
-   * Space before line by given amount. If not set default is 0.
-   * @param space Space.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara spaceBeforeLine( double space, RtfUnit unit )
-  {
-    parfmt.append( "\\sb" ).append( unit.toTwips( space ) ).append( '\n' );
-    return this;
-  }
-  
-  /**
-   * Space after line by given amount. If not set default is 0.
-   * @param space Space.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara spaceAfterLine( double space, RtfUnit unit )
-  {
-    parfmt.append( "\\sa" ).append( unit.toTwips( space ) ).append( '\n' );
-    return this;
-  }
+    //
+    //
+    //
 
-  /**
-   * Space between lines by a given amount. If not set default is 0.
-   * @param space Space. If {@code space} is a positive value, this size is
-   *                     used only if it's taller than the tallest character
-   *                     (otherwise, the tallest character is used).
-   *                     If {@code space} is a negative value, the absolute
-   *                     value of {@code space} is used, even if it is shorter
-   *                     than the tallest character.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara spaceBetweenLines( double space, RtfUnit unit )
-  {
-    space = Math.abs( space );
-    
-    parfmt.append( "\\sl" ).append( unit.toTwips( space ) ).append( '\n' );
-    return this;
-  }
+    /**
+     * First-line indent by given amount.
+     *
+     * @param indentation Indentation.
+     * @param unit        Measurement unit.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara indentFirstLine(double indentation, RtfUnit unit) {
+        parfmt.append("\\fi").append(unit.toTwips(indentation)).append('\n');
+        return this;
+    }
 
-  /**
-   * "At Least" or "exactly" space between lines is a multiple of single line spacing.
-   * If not set default is 0.
-   * @param space Single space between lines.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   * @see #spaceBetweenLines(double, RtfUnit)
-   */
-  public RtfTextPara spaceBetweenLinesMultipleAtLeastOrExactly( double space, RtfUnit unit )
-  {
-    space = Math.abs( space );
+    /**
+     * Left indent by given amount.
+     *
+     * @param indentation Indentation.
+     * @param unit        Measurement unit.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara indentLeft(double indentation, RtfUnit unit) {
+        parfmt.append("\\li").append(unit.toTwips(indentation)).append('\n');
+        return this;
+    }
 
-    parfmt.append( "\\sl" ).append( unit.toTwips( space ) ).append( "\\slmult0\n" );
-    return this;
-  }
+    /**
+     * Right indent by given amount.
+     *
+     * @param indentation Indentation.
+     * @param unit        Measurement unit.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara indentRight(double indentation, RtfUnit unit) {
+        parfmt.append("\\ri").append(unit.toTwips(indentation)).append('\n');
+        return this;
+    }
 
-  /**
-   * Space between lines is a multiple of single line spacing.
-   * If not set default is 0.
-   * @param space Space.
-   * @param unit Measurement unit.
-   * @return {@code this}-object.
-   * @see #spaceBetweenLines(double, RtfUnit)
-   */
-  public RtfTextPara spaceBetweenLinesMultiple( double space, RtfUnit unit )
-  {
-    space = Math.abs( space );
+    //
+    // Spacing
+    //
 
-    parfmt.append( "\\sl" ).append( unit.toTwips( space ) ).append( "\\slmult1\n" );
-    return this;
-  }
+    /**
+     * Space before line by given amount. If not set default is 0.
+     *
+     * @param space Space.
+     * @param unit  Measurement unit.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara spaceBeforeLine(double space, RtfUnit unit) {
+        parfmt.append("\\sb").append(unit.toTwips(space)).append('\n');
+        return this;
+    }
 
-  /**
-   * Line spacing is automatically determined by the tallest character in the line.
-   * The call is equal to {@link #spaceBetweenLines(double, RtfUnit)} with 0 as
-   * first argument.
-   * @return {@code this}-object.
-   * @see #spaceBetweenLines(double, RtfUnit)
-   */
-  public RtfTextPara spaceBetweenLinesAutomatically()
-  {
-    parfmt.append( "\\sl0\n" );
-    return this;
-  }
+    /**
+     * Space after line by given amount. If not set default is 0.
+     *
+     * @param space Space.
+     * @param unit  Measurement unit.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara spaceAfterLine(double space, RtfUnit unit) {
+        parfmt.append("\\sa").append(unit.toTwips(space)).append('\n');
+        return this;
+    }
 
-  
-  //
-  // Bidirectional controls
-  //
-  
-  /**
-   * Text in this paragraph will be displayed with right to left precedence.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara rightToLeft()
-  {
-    parfmt.append( "\\rtlpar\n" );
-    return this;
-  }
-  
-  /**
-   * Text in this paragraph will be displayed with left to right precedence. This is the default.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara leftToRight()
-  {
-    parfmt.append( "\\ltrpar\n" );
-    return this;
-  }  
-  
-  // Tabs
+    /**
+     * Space between lines by a given amount. If not set default is 0.
+     *
+     * @param space Space. If {@code space} is a positive value, this size is
+     *              used only if it's taller than the tallest character
+     *              (otherwise, the tallest character is used).
+     *              If {@code space} is a negative value, the absolute
+     *              value of {@code space} is used, even if it is shorter
+     *              than the tallest character.
+     * @param unit  Measurement unit.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara spaceBetweenLines(double space, RtfUnit unit) {
+        space = Math.abs(space);
+
+        parfmt.append("\\sl").append(unit.toTwips(space)).append('\n');
+        return this;
+    }
+
+    /**
+     * "At Least" or "exactly" space between lines is a multiple of single line spacing.
+     * If not set default is 0.
+     *
+     * @param space Single space between lines.
+     * @param unit  Measurement unit.
+     * @return {@code this}-object.
+     * @see #spaceBetweenLines(double, RtfUnit)
+     */
+    public RtfTextPara spaceBetweenLinesMultipleAtLeastOrExactly(double space, RtfUnit unit) {
+        space = Math.abs(space);
+
+        parfmt.append("\\sl").append(unit.toTwips(space)).append("\\slmult0\n");
+        return this;
+    }
+
+    /**
+     * Space between lines is a multiple of single line spacing.
+     * If not set default is 0.
+     *
+     * @param space Space.
+     * @param unit  Measurement unit.
+     * @return {@code this}-object.
+     * @see #spaceBetweenLines(double, RtfUnit)
+     */
+    public RtfTextPara spaceBetweenLinesMultiple(double space, RtfUnit unit) {
+        space = Math.abs(space);
+
+        parfmt.append("\\sl").append(unit.toTwips(space)).append("\\slmult1\n");
+        return this;
+    }
+
+    /**
+     * Line spacing is automatically determined by the tallest character in the line.
+     * The call is equal to {@link #spaceBetweenLines(double, RtfUnit)} with 0 as
+     * first argument.
+     *
+     * @return {@code this}-object.
+     * @see #spaceBetweenLines(double, RtfUnit)
+     */
+    public RtfTextPara spaceBetweenLinesAutomatically() {
+        parfmt.append("\\sl0\n");
+        return this;
+    }
+
+
+    //
+    // Bidirectional controls
+    //
+
+    /**
+     * Text in this paragraph will be displayed with right to left precedence.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara rightToLeft() {
+        parfmt.append("\\rtlpar\n");
+        return this;
+    }
+
+    /**
+     * Text in this paragraph will be displayed with left to right precedence. This is the default.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfTextPara leftToRight() {
+        parfmt.append("\\ltrpar\n");
+        return this;
+    }
+
+    // Tabs
   
   /*
    * <tabdef>   :=  (<tab> | <bartab>) +
@@ -396,87 +397,143 @@ public abstract class RtfTextPara extends RtfPara
    * <tablead>  :=  \tldot | \tlhyph | \tlul | \tleq
    */
 
-  /**
-   * Different kind of tabs.
-   */
-  public enum TabKind
-  {
-    /** Left tab. Default. */
-    LEFT,
+    /**
+     * Different kind of tabs.
+     */
+    public enum TabKind {
+        /**
+         * Left tab. Default.
+         */
+        LEFT,
 
-    /** Flush-right tab. Align text right. */
-    RIGHT { @Override public String toString() { return "\\tqr"; } },
+        /**
+         * Flush-right tab. Align text right.
+         */
+        RIGHT {
+            @Override
+            public String toString() {
+                return "\\tqr";
+            }
+        },
 
-    /** Centered tab. Align text centered. */
-    CENTER { @Override public String toString() { return "\\tqc"; } },
+        /**
+         * Centered tab. Align text centered.
+         */
+        CENTER {
+            @Override
+            public String toString() {
+                return "\\tqc";
+            }
+        },
 
-    /** Decimal tab. Align text on the decimal character. */
-    DECIMAL { @Override public String toString() { return "\\tqdec"; } }
-  }
+        /**
+         * Decimal tab. Align text on the decimal character.
+         */
+        DECIMAL {
+            @Override
+            public String toString() {
+                return "\\tqdec";
+            }
+        }
+    }
 
-  /**
-   * Leading symbols.
-   */
-  public enum TabLead
-  {
-    /** Leader dots. */
-    DOTS { @Override public String toString() { return "\\tldot"; } },
+    /**
+     * Leading symbols.
+     */
+    public enum TabLead {
+        /**
+         * Leader dots.
+         */
+        DOTS {
+            @Override
+            public String toString() {
+                return "\\tldot";
+            }
+        },
 
-    /** Leader hyphens. */
-    HYPHENS { @Override public String toString() { return "\\tlhyph"; } },
-    
-    /** Leader underline. */
-    UNDERLINE { @Override public String toString() { return "\\tlul"; } },
+        /**
+         * Leader hyphens.
+         */
+        HYPHENS {
+            @Override
+            public String toString() {
+                return "\\tlhyph";
+            }
+        },
 
-    /** Leader thick line.. */
-    THICK_LINE { @Override public String toString() { return "\\tlth"; } },
-    
-    /** Leader equal sign. */
-    EQUALS_SIGN { @Override public String toString() { return "\\tleq"; } }
-  }
+        /**
+         * Leader underline.
+         */
+        UNDERLINE {
+            @Override
+            public String toString() {
+                return "\\tlul";
+            }
+        },
 
-  /**
-   * Defines a tab.
-   * @param tabPostion  Position of the tabulator.
-   * @param unit Measurement.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara tab( double tabPostion, RtfUnit unit )
-  {
-    return tab( null, null, tabPostion, unit );
-  }
+        /**
+         * Leader thick line..
+         */
+        THICK_LINE {
+            @Override
+            public String toString() {
+                return "\\tlth";
+            }
+        },
 
-  /**
-   * Defines a tab.
-   * @param tabKind What kind of tab. Can be {@code null}.
-   * @param tabPostion Position of the tabulator.
-   * @param unit Measurement.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara tab( TabKind tabKind, double tabPostion, RtfUnit unit )
-  {
-    return tab( tabKind, null, tabPostion, unit );
-  }  
+        /**
+         * Leader equal sign.
+         */
+        EQUALS_SIGN {
+            @Override
+            public String toString() {
+                return "\\tleq";
+            }
+        }
+    }
 
-  /**
-   * Defines a tab with an additional tab lead. 
-   * @param tabKind What kind of tab. Can be {@code null}.
-   * @param tabLead Leading characters. Can be {@code null}.
-   * @param tabPostion Position of the tabulator.
-   * @param unit Measurement.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara tab( TabKind tabKind, TabLead tabLead, double tabPostion, RtfUnit unit )
-  {
-    if ( tabKind != null && tabKind != TabKind.LEFT )
-      tabdef.append( tabKind );
+    /**
+     * Defines a tab.
+     *
+     * @param tabPostion Position of the tabulator.
+     * @param unit       Measurement.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara tab(double tabPostion, RtfUnit unit) {
+        return tab(null, null, tabPostion, unit);
+    }
 
-    if ( tabLead != null )
-      tabdef.append( tabLead );
+    /**
+     * Defines a tab.
+     *
+     * @param tabKind    What kind of tab. Can be {@code null}.
+     * @param tabPostion Position of the tabulator.
+     * @param unit       Measurement.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara tab(TabKind tabKind, double tabPostion, RtfUnit unit) {
+        return tab(tabKind, null, tabPostion, unit);
+    }
 
-    tabdef.append( "\\tx" ).append( unit.toTwips( tabPostion ) ).append( '\n' );
-    return this;
-  }  
+    /**
+     * Defines a tab with an additional tab lead.
+     *
+     * @param tabKind    What kind of tab. Can be {@code null}.
+     * @param tabLead    Leading characters. Can be {@code null}.
+     * @param tabPostion Position of the tabulator.
+     * @param unit       Measurement.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara tab(TabKind tabKind, TabLead tabLead, double tabPostion, RtfUnit unit) {
+        if (tabKind != null && tabKind != TabKind.LEFT)
+            tabdef.append(tabKind);
+
+        if (tabLead != null)
+            tabdef.append(tabLead);
+
+        tabdef.append("\\tx").append(unit.toTwips(tabPostion)).append('\n');
+        return this;
+    }
 
 //  /**
 //   * @param tabPostion Position of the tabulator.
@@ -503,9 +560,9 @@ public abstract class RtfTextPara extends RtfPara
 //    return this;
 //  }  
 
-  // Borders
+    // Borders
 
-  // Paragraph Borders
+    // Paragraph Borders
   
   /* 
    * <brdrdef>  := (<brdrseg> <brdr> )+
@@ -520,26 +577,60 @@ public abstract class RtfTextPara extends RtfPara
    *               \brdrnone | \brdrtbl | \brdrnil
    */
 
-  /**
-   * Enumerator for different border styles.
-   */
-  public enum BorderStyle
-  {
-    /** Single-thickness border. */
-    SINGLE  {@Override public String toString() { return "\\brdrs"; } },
+    /**
+     * Enumerator for different border styles.
+     */
+    public enum BorderStyle {
+        /**
+         * Single-thickness border.
+         */
+        SINGLE {
+            @Override
+            public String toString() {
+                return "\\brdrs";
+            }
+        },
 
-    /** Double-thickness border. */
-    DOUBLE_THICKNESS {@Override public String toString() { return "\\\brdrth"; } },
+        /**
+         * Double-thickness border.
+         */
+        DOUBLE_THICKNESS {
+            @Override
+            public String toString() {
+                return "\\\brdrth";
+            }
+        },
 
-    /** Shadowed border. */
-    SHADOWED {@Override public String toString() { return "\\\brdrsh"; } },
+        /**
+         * Shadowed border.
+         */
+        SHADOWED {
+            @Override
+            public String toString() {
+                return "\\\brdrsh";
+            }
+        },
 
-    /** Double border. */
-    DOUBLE {@Override public String toString() { return "\\\brdrdb"; } },
+        /**
+         * Double border.
+         */
+        DOUBLE {
+            @Override
+            public String toString() {
+                return "\\\brdrdb";
+            }
+        },
 
-    /** Dotted border. */
-    DOTTED {@Override public String toString() { return "\\\brdrdot"; } },
-  }
+        /**
+         * Dotted border.
+         */
+        DOTTED {
+            @Override
+            public String toString() {
+                return "\\\brdrdot";
+            }
+        },
+    }
   
   /*
   \brdrdash Dashed border.
@@ -570,74 +661,75 @@ public abstract class RtfTextPara extends RtfPara
   \brspN  Space in twips between borders and the paragraph.
   \brdrnil  No border specified.
    */
-  
-  /**
-   * Border top.
-   * @param borderStyle Style of the border.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara topBorder( BorderStyle borderStyle )
-  {
-    if ( borderStyle == null )
-      throw new IllegalArgumentException( "Border style is missing, can't be null" );
 
-    brdrdef.append( "\\brdrt" ).append( borderStyle );
-    return this;
-  }
-  
-  /**
-   * Border bottom.
-   * @param borderStyle Style of the border.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara bottomBorder( BorderStyle borderStyle )
-  {
-    if ( borderStyle == null )
-      throw new IllegalArgumentException( "Border style is missing, can't be null" );
+    /**
+     * Border top.
+     *
+     * @param borderStyle Style of the border.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara topBorder(BorderStyle borderStyle) {
+        if (borderStyle == null)
+            throw new IllegalArgumentException("Border style is missing, can't be null");
 
-    brdrdef.append( "\\brdrb" ).append( borderStyle );
-    return this;
-  }
-  /**
-   * Border left.
-   * @param borderStyle Style of the border.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara leftBorder( BorderStyle borderStyle )
-  {
-    if ( borderStyle == null )
-      throw new IllegalArgumentException( "Border style is missing, can't be null" );
+        brdrdef.append("\\brdrt").append(borderStyle);
+        return this;
+    }
 
-    brdrdef.append( "\\brdrl" ).append( borderStyle );
-    return this;
-  }
+    /**
+     * Border bottom.
+     *
+     * @param borderStyle Style of the border.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara bottomBorder(BorderStyle borderStyle) {
+        if (borderStyle == null)
+            throw new IllegalArgumentException("Border style is missing, can't be null");
 
-  /**
-   * Border right.
-   * @param borderStyle Style of the border.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara rightBorder( BorderStyle borderStyle )
-  {
-    if ( borderStyle == null )
-      throw new IllegalArgumentException( "Border style is missing, can't be null" );
+        brdrdef.append("\\brdrb").append(borderStyle);
+        return this;
+    }
 
-    brdrdef.append( "\\brdrr" ).append( borderStyle );
-    return this;
-  }
-  
-  /**
-   * Sets the width of a cell if the paragraph is used in a table.
-   * @param width  Width of the cell.
-   * @param unit   Unit of the width.
-   * @return {@code this}-object.
-   */
-  public RtfTextPara cellWidth( double width, RtfUnit unit )
-  {
-    cellfmt.append( "\\clftsWidth3\\clwWidth" )
-          .append( unit.toTwips( Math.abs( width ) ) )
-          .append( '\n' );
+    /**
+     * Border left.
+     *
+     * @param borderStyle Style of the border.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara leftBorder(BorderStyle borderStyle) {
+        if (borderStyle == null)
+            throw new IllegalArgumentException("Border style is missing, can't be null");
 
-    return this;
-  }
+        brdrdef.append("\\brdrl").append(borderStyle);
+        return this;
+    }
+
+    /**
+     * Border right.
+     *
+     * @param borderStyle Style of the border.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara rightBorder(BorderStyle borderStyle) {
+        if (borderStyle == null)
+            throw new IllegalArgumentException("Border style is missing, can't be null");
+
+        brdrdef.append("\\brdrr").append(borderStyle);
+        return this;
+    }
+
+    /**
+     * Sets the width of a cell if the paragraph is used in a table.
+     *
+     * @param width Width of the cell.
+     * @param unit  Unit of the width.
+     * @return {@code this}-object.
+     */
+    public RtfTextPara cellWidth(double width, RtfUnit unit) {
+        cellfmt.append("\\clftsWidth3\\clwWidth")
+                .append(unit.toTwips(Math.abs(width)))
+                .append('\n');
+
+        return this;
+    }
 }

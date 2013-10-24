@@ -34,249 +34,250 @@ package com.tutego.jrtf;
 /**
  * Instances represent document format like page width, margins.
  */
-public class RtfDocfmt
-{
-  /* <document> := <info>? <docfmt>* <section>+ */                 
+public class RtfDocfmt {
+  /* <document> := <info>? <docfmt>* <section>+ */
 
-  /** RTF with format string. */
-  String rtf;
+    /**
+     * RTF with format string.
+     */
+    String rtf;
 
-  /**
-   * Initialize this instance with the RTF control word.
-   * @param rtf
-   */
-  private RtfDocfmt( String rtf )
-  {
-    this.rtf = rtf;
-  }
+    /**
+     * Initialize this instance with the RTF control word.
+     *
+     * @param rtf
+     */
+    private RtfDocfmt(String rtf) {
+        this.rtf = rtf;
+    }
 
-  // General control words
-  
-  /**
-   * Default tab width. If not set the default is 720 twips.
-   * @param width  Width of the tab.
-   * @param unit   Unit of the tab.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt defaultTab( double width, RtfUnit unit )
-  {
-    return new RtfDocfmt( "\\deftab" + unit.toTwips( width ) );
-  }
+    // General control words
 
-  /**
-   * Hyphenation hot zone.
-   * @param width   Amount of space at the right margin in which words
-   *                are hyphenated.
-   * @param unit    Unit of the tab.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt hyphenationHotZone( double width, RtfUnit unit )
-  {
-    return new RtfDocfmt( "\\hyphhotzN" + unit.toTwips( width ) );
-  }
+    /**
+     * Default tab width. If not set the default is 720 twips.
+     *
+     * @param width Width of the tab.
+     * @param unit  Unit of the tab.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt defaultTab(double width, RtfUnit unit) {
+        return new RtfDocfmt("\\deftab" + unit.toTwips(width));
+    }
 
-  // Document Views and Zoom Level
+    /**
+     * Hyphenation hot zone.
+     *
+     * @param width Amount of space at the right margin in which words
+     *              are hyphenated.
+     * @param unit  Unit of the tab.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt hyphenationHotZone(double width, RtfUnit unit) {
+        return new RtfDocfmt("\\hyphhotzN" + unit.toTwips(width));
+    }
 
-  /**
-   * Sets the view mode of the document to page layout.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt pageLayoutView()
-  {
-    return new RtfDocfmt( "\\viewkind1" );
-  }
-  
-  // Footnotes and Endnotes
+    // Document Views and Zoom Level
 
-  /**
-   * Footnotes only or nothing at all (default).
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt footnotesOnly()
-  {
-    return new RtfDocfmt( "\\fet0" );
-  }
+    /**
+     * Sets the view mode of the document to page layout.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt pageLayoutView() {
+        return new RtfDocfmt("\\viewkind1");
+    }
 
-  /**
-   * Endnotes only.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt endnotesOnly()
-  {
-    return new RtfDocfmt( "\\fet1" );
-  }
+    // Footnotes and Endnotes
 
-  /**
-   * Footnotes and endnotes both.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt footnotesEndnotes()
-  {
-    return new RtfDocfmt( "\\fet2" );
-  }
+    /**
+     * Footnotes only or nothing at all (default).
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt footnotesOnly() {
+        return new RtfDocfmt("\\fet0");
+    }
 
-  /**
-   * Footnote numbering - Arabic numbering (1, 2, 3, _).
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt footnoteNumberingArabic()
-  {
-    return new RtfDocfmt( "\\ftnnar" );
-  }
+    /**
+     * Endnotes only.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt endnotesOnly() {
+        return new RtfDocfmt("\\fet1");
+    }
 
-  /**
-   * Footnote numbering - Alphabetic uppercase (A, B, C, _).
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt footnoteNumberingUpperAlphabetic()
-  {
-    return new RtfDocfmt( "\\ftnnauc" );
-  }
+    /**
+     * Footnotes and endnotes both.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt footnotesEndnotes() {
+        return new RtfDocfmt("\\fet2");
+    }
 
-  /**
-   * Footnote numbering - Roman lowercase (i, ii, iii, _).
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt footnoteNumberingUpperRoman()
-  {
-    return new RtfDocfmt( "\\ftnnrlc" );
-  }
+    /**
+     * Footnote numbering - Arabic numbering (1, 2, 3, _).
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt footnoteNumberingArabic() {
+        return new RtfDocfmt("\\ftnnar");
+    }
 
-  // Page information
+    /**
+     * Footnote numbering - Alphabetic uppercase (A, B, C, _).
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt footnoteNumberingUpperAlphabetic() {
+        return new RtfDocfmt("\\ftnnauc");
+    }
 
-  /**
-   * Paper width. Default is 12,240 twips.
-   * @param width  Width of the page.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt paperWidth( double width, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\paperw" + unit.toTwips( width ) );
-  }
+    /**
+     * Footnote numbering - Roman lowercase (i, ii, iii, _).
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt footnoteNumberingUpperRoman() {
+        return new RtfDocfmt("\\ftnnrlc");
+    }
 
-  /**
-   * Paper height. Default is 15,840 twips.
-   * @param height Height of the page.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt paperHeight( double height, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\paperh" + unit.toTwips( height ) );
-  }
+    // Page information
 
-  /**
-   * Paper width and height.
-   * @param width  Height of the page.
-   * @param height Height of the page.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt paper( double width, double height, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\paperw" + unit.toTwips( width ) +
-                          "\\paperh" + unit.toTwips( height) );
-  }
-  
-  /**
-   * Left margin. Default is 1,800 twips.
-   * @param margin Left margin.
-   * @param unit Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt leftMargin( double margin, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\margl" + unit.toTwips( margin ) );
-  }
+    /**
+     * Paper width. Default is 12,240 twips.
+     *
+     * @param width Width of the page.
+     * @param unit  Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt paperWidth(double width, RtfUnit unit) {
+        return new RtfDocfmt("\\paperw" + unit.toTwips(width));
+    }
 
-  /**
-   * Right margin. Default is 1,800 twips.
-   * @param margin Right margin.
-   * @param unit Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt rightMargin( double margin, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\margr" + unit.toTwips( margin ) );
-  }
+    /**
+     * Paper height. Default is 15,840 twips.
+     *
+     * @param height Height of the page.
+     * @param unit   Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt paperHeight(double height, RtfUnit unit) {
+        return new RtfDocfmt("\\paperh" + unit.toTwips(height));
+    }
 
-  /**
-   * Top margin. Default is 1,440 twips.
-   * @param margin Top margin.
-   * @param unit Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt topMargin( double margin, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\margt" + unit.toTwips( margin ) );
-  }
+    /**
+     * Paper width and height.
+     *
+     * @param width  Height of the page.
+     * @param height Height of the page.
+     * @param unit   Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt paper(double width, double height, RtfUnit unit) {
+        return new RtfDocfmt("\\paperw" + unit.toTwips(width) +
+                "\\paperh" + unit.toTwips(height));
+    }
 
-  /**
-   * Bottom margin. Default is 1,440 twips.
-   * @param margin Bottom margin.
-   * @param unit Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt bottomMargin( double margin, RtfUnit unit)
-  {
-    return new RtfDocfmt( "\\margb" + unit.toTwips( margin ) );
-  }
+    /**
+     * Left margin. Default is 1,800 twips.
+     *
+     * @param margin Left margin.
+     * @param unit   Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt leftMargin(double margin, RtfUnit unit) {
+        return new RtfDocfmt("\\margl" + unit.toTwips(margin));
+    }
 
-  /**
-   * Facing pages (activates odd/even headers and gutters).
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt facingPages()
-  {
-    return new RtfDocfmt( "\\facingp" );
-  }
+    /**
+     * Right margin. Default is 1,800 twips.
+     *
+     * @param margin Right margin.
+     * @param unit   Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt rightMargin(double margin, RtfUnit unit) {
+        return new RtfDocfmt("\\margr" + unit.toTwips(margin));
+    }
 
-  /**
-   * Switches margin definitions on left and right pages.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt switchMargin()
-  {
-    return new RtfDocfmt( "\\margmirror" );
-  }
+    /**
+     * Top margin. Default is 1,440 twips.
+     *
+     * @param margin Top margin.
+     * @param unit   Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt topMargin(double margin, RtfUnit unit) {
+        return new RtfDocfmt("\\margt" + unit.toTwips(margin));
+    }
 
-  /**
-   * Landscape format.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt landscape()
-  {
-    return new RtfDocfmt( "\\landscape" );
-  }
+    /**
+     * Bottom margin. Default is 1,440 twips.
+     *
+     * @param margin Bottom margin.
+     * @param unit   Measurement unit.
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt bottomMargin(double margin, RtfUnit unit) {
+        return new RtfDocfmt("\\margb" + unit.toTwips(margin));
+    }
 
-  /**
-   * Enable widow and orphan control.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt widowOrphanControl()
-  {
-    return new RtfDocfmt( "\\widowctrl" );
-  }
-  
-  // Revision marks
+    /**
+     * Facing pages (activates odd/even headers and gutters).
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt facingPages() {
+        return new RtfDocfmt("\\facingp");
+    }
 
-  /**
-   * This document is protected for revisions. The user can edit the document, but revision marking cannot be
-   * disabled.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt revisionProtected()
-  {
-    return new RtfDocfmt( "\\revprot" );
-  }
+    /**
+     * Switches margin definitions on left and right pages.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt switchMargin() {
+        return new RtfDocfmt("\\margmirror");
+    }
 
-  /**
-   * Turns on revision marking.
-   * @return New {@code RtfDocfmt} object.
-   */
-  public static RtfDocfmt revisionMarking()
-  {
-    return new RtfDocfmt( "\\revisions" );
-  }
+    /**
+     * Landscape format.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt landscape() {
+        return new RtfDocfmt("\\landscape");
+    }
+
+    /**
+     * Enable widow and orphan control.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt widowOrphanControl() {
+        return new RtfDocfmt("\\widowctrl");
+    }
+
+    // Revision marks
+
+    /**
+     * This document is protected for revisions. The user can edit the document, but revision marking cannot be
+     * disabled.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt revisionProtected() {
+        return new RtfDocfmt("\\revprot");
+    }
+
+    /**
+     * Turns on revision marking.
+     *
+     * @return New {@code RtfDocfmt} object.
+     */
+    public static RtfDocfmt revisionMarking() {
+        return new RtfDocfmt("\\revisions");
+    }
 }

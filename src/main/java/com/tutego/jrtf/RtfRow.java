@@ -35,37 +35,38 @@ package com.tutego.jrtf;
  * Defines properties of the hole row. The properties for a row, e.g. borders,
  * are assigned to every cell.
  */
-public abstract class RtfRow extends RtfPara
-{
+public abstract class RtfRow extends RtfPara {
   /*
    * <row>   :=  <tbldef> <cell>+ \row
    * <cell>  :=  <textpar>+ \cell
    */
 
-  /** Collects the RTF for the table definitions. */
-  StringBuilder tbldef = new StringBuilder();
+    /**
+     * Collects the RTF for the table definitions.
+     */
+    StringBuilder tbldef = new StringBuilder();
 
-  // Row Formatting
+    // Row Formatting
 
-  //  /**
-  //   * AutoFit is on for the row. No auto fit is the default.
-  //   * @return {@code this}-object.
-  //   */
-  //  public RtfRow autoFit()
-  //  {
-  //    tbldef.append( "\\trautofit1" );
-  //    return this;
-  //  }
+    //  /**
+    //   * AutoFit is on for the row. No auto fit is the default.
+    //   * @return {@code this}-object.
+    //   */
+    //  public RtfRow autoFit()
+    //  {
+    //    tbldef.append( "\\trautofit1" );
+    //    return this;
+    //  }
 
-  /**
-   * Table direction is right to left.
-   * @return {@code this}-object.
-   */
-  public RtfRow rightToLeft()
-  {
-    tbldef.append( "\\taprtl" );
-    return this;
-  }
+    /**
+     * Table direction is right to left.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfRow rightToLeft() {
+        tbldef.append("\\taprtl");
+        return this;
+    }
 
 //  /**
 //   * Default bottom cell margin or padding for the row.
@@ -115,69 +116,69 @@ public abstract class RtfRow extends RtfPara
 //    return this;
 //  }
 
-  // Cell Borders
-  
-  /**
-   * Bottom table cell border.
-   * @return {@code this}-object.
-   */
-  public RtfRow bottomCellBorder()
-  {
-    tbldef.append( "\\clbrdrb\\brdrs" );
-    return this;
-  }
+    // Cell Borders
 
-  /**
-   * Top table cell border.
-   * @return {@code this}-object.
-   */
-  public RtfRow topCellBorder()
-  {
-    tbldef.append( "\\clbrdrt\\brdrs" );
-    return this;
-  }
+    /**
+     * Bottom table cell border.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfRow bottomCellBorder() {
+        tbldef.append("\\clbrdrb\\brdrs");
+        return this;
+    }
 
-  /**
-   * Left table cell border.
-   * @return {@code this}-object.
-   */
-  public RtfRow leftCellBorder()
-  {
-    tbldef.append( "\\clbrdrl\\brdrs" );
-    return this;
-  }
+    /**
+     * Top table cell border.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfRow topCellBorder() {
+        tbldef.append("\\clbrdrt\\brdrs");
+        return this;
+    }
 
-  /**
-   * Right table cell border.
-   * @return {@code this}-object.
-   */
-  public RtfRow rightCellBorder()
-  {
-    tbldef.append( "\\clbrdrr\\brdrs" );
-    return this;
-  }
+    /**
+     * Left table cell border.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfRow leftCellBorder() {
+        tbldef.append("\\clbrdrl\\brdrs");
+        return this;
+    }
 
-  /**
-   * Half the space between the cells of a table row.
-   * @param space Space between cells.
-   * @param unit Measurement.
-   * @return {@code this}-object.
-   */
-  public RtfRow cellSpace( double space, RtfUnit unit )
-  {
-    tbldef.append( "\\trgaph" ).append( unit.toTwips( space ) );
-    return this;
-  }
+    /**
+     * Right table cell border.
+     *
+     * @return {@code this}-object.
+     */
+    public RtfRow rightCellBorder() {
+        tbldef.append("\\clbrdrr\\brdrs");
+        return this;
+    }
 
-  /**
-   * Defines the cell height.
-   * @param height Height of the cell.
-   * @param unit Measurement.
-   * @return {@code this}-object.
-   */
-  public RtfRow cellHeight( double height, RtfUnit unit )
-  {
-    tbldef.append( "\\trrh" ).append( unit.toTwips( height ) );
-    return this;
-  }  
+    /**
+     * Half the space between the cells of a table row.
+     *
+     * @param space Space between cells.
+     * @param unit  Measurement.
+     * @return {@code this}-object.
+     */
+    public RtfRow cellSpace(double space, RtfUnit unit) {
+        tbldef.append("\\trgaph").append(unit.toTwips(space));
+        return this;
+    }
+
+    /**
+     * Defines the cell height.
+     *
+     * @param height Height of the cell.
+     * @param unit   Measurement.
+     * @return {@code this}-object.
+     */
+    public RtfRow cellHeight(double height, RtfUnit unit) {
+        tbldef.append("\\trrh").append(unit.toTwips(height));
+        return this;
+    }
 }

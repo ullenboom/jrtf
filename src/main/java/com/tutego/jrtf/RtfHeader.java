@@ -40,35 +40,35 @@ package com.tutego.jrtf;
  * <li>style sheets (not implemented yet)
  * </ul>
  */
-public abstract class RtfHeader
-{
-  /**
-   * Package visible constructor. The user will not instantiate this class.
-   */
-  RtfHeader() { }
+public abstract class RtfHeader {
+    /**
+     * Package visible constructor. The user will not instantiate this class.
+     */
+    RtfHeader() {
+    }
 
-  /**
-   * Creates a new font definition.
-   * @param fontname  Name of the font.
-   * @return {@link RtfHeaderFont} to configure the font.
-   */
-  public static RtfHeaderFont font( String fontname )
-  {
-    return new RtfHeaderFont( fontname );
-  }
+    /**
+     * Creates a new font definition.
+     *
+     * @param fontname Name of the font.
+     * @return {@link RtfHeaderFont} to configure the font.
+     */
+    public static RtfHeaderFont font(String fontname) {
+        return new RtfHeaderFont(fontname);
+    }
 
-  /**
-   * Creates a new color definition.
-   * From the color values just the last 8 bit are used.
-   * @param r Red.
-   * @param g Green.
-   * @param b Blue.
-   * @return {@link RtfHeaderColor} to set the position of the font.
-   */
-  public static RtfHeaderColor color( int r, int g, int b )
-  {
-    return new RtfHeaderColor( r & 0xFF, g & 0xFF, b & 0xFF );
-  }
+    /**
+     * Creates a new color definition.
+     * From the color values just the last 8 bit are used.
+     *
+     * @param r Red.
+     * @param g Green.
+     * @param b Blue.
+     * @return {@link RtfHeaderColor} to set the position of the font.
+     */
+    public static RtfHeaderColor color(int r, int g, int b) {
+        return new RtfHeaderColor(r & 0xFF, g & 0xFF, b & 0xFF);
+    }
 
 //  
 //  /**
