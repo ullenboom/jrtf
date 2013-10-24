@@ -15,24 +15,6 @@
         <java.compiler.version>1.5</java.compiler.version>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <name>Internal repository</name>
-            <url>dav:http://ci.quorum.ru:8085/artifactory/internal</url>
-        </repository>
-        <snapshotRepository>
-            <id>internal-snapshots</id>
-            <name>Internal snapshots repository</name>
-            <url>dav:http://ci.quorum.ru:8085/artifactory/internal-snapshots</url>
-        </snapshotRepository>
-        <site>
-            <id>site</id>
-            <name>Project Site</name>
-            <url>${site.root.url}\${project.artifactId}</url>
-        </site>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
