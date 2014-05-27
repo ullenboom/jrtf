@@ -5,7 +5,7 @@ The Basics
 
 Write a simple RTF document to a file:
 
-    Rtf.rtf().p( "Hello World" ).out( new FileWriter("out.rtf") );b
+    Rtf.rtf().p( "Hello World" ).out( new FileWriter("out.rtf") );
 
 Special RTF-characters like "{", "}", "\" are encoded automatically.
 "\t" will stay tab and "\n" will be converted to a new paragraph.
