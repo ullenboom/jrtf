@@ -14,8 +14,6 @@
 		<delete dir="dist" />
 		<mkdir dir="build/classes" />
 		<mkdir dir="dist" />
-		<copy file="tutego.css" tofile="javadoc/tutego.css" />
-		<copy file="inherit.gif" tofile="javadoc/resources/inherit.gif" />
 	</target>
 
 	<target name="compile" depends="init">
@@ -23,7 +21,7 @@
 	</target>
 
 	<target name="docs" depends="init">
-		<javadoc access="public" destdir="javadoc" packagenames="com.tutego.jrtf" sourcepath="src/main/java" stylesheetfile="javadoc/tutego.css"/>
+		<javadoc access="public" destdir="javadoc" packagenames="com.tutego.jrtf" sourcepath="src/main/java" />
 	</target>
 
 	<target name="dist" depends="compile,docs">
