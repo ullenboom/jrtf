@@ -236,10 +236,11 @@ public class Rtf
    * Appends a sequence of text in a new paragraph to the RTF document.
    * A convenience method which is equals to {@code section(RtfPara.p(texts));}.
    * @param texts Text to put in paragraph.
+   * @return {@code this}-reference.
    */
-  public void p( Object... texts )
+  public Rtf p( Object... texts )
   {
-    section( RtfPara.p( texts ) );
+    return section( RtfPara.p( texts ) );
   }
 
   /**
