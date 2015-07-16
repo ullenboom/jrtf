@@ -48,7 +48,7 @@ public class RtfDocfmt
   /** A3 paper format. */
   public static final RtfDocfmt A3 = paper( 42.0, 21.0, RtfUnit.CM );
   
-  /** A5 paper format. */
+  /** A4 paper format. */
   public static final RtfDocfmt A4 = paper( 29.7, 21.0, RtfUnit.CM );
   
   /** A5 paper format. */
