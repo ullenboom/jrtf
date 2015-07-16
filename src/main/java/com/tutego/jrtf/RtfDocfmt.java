@@ -36,6 +36,33 @@ package com.tutego.jrtf;
  */
 public class RtfDocfmt
 {
+    /** A0 paper format. */
+  public static final RtfDocfmt A0 = paper( 118.9, 84.1, RtfUnit.CM );
+
+  /** A1 paper format. */
+  public static final RtfDocfmt A1 = paper( 84.1, 59.4, RtfUnit.CM );
+  
+  /** A2 paper format. */
+  public static final RtfDocfmt A2 = paper( 59.4, 42.0, RtfUnit.CM );
+  
+  /** A3 paper format. */
+  public static final RtfDocfmt A3 = paper( 42.0, 21.0, RtfUnit.CM );
+  
+  /** A5 paper format. */
+  public static final RtfDocfmt A4 = paper( 29.7, 21.0, RtfUnit.CM );
+  
+  /** A5 paper format. */
+  public static final RtfDocfmt A5 = paper( 21.0, 14.8, RtfUnit.CM );
+  
+  /** A6 paper format. */
+  public static final RtfDocfmt A6 = paper( 14.8, 10.5, RtfUnit.CM );
+  
+  /** A7 paper format. */
+  public static final RtfDocfmt A7 = paper( 10.5, 7.4, RtfUnit.CM );
+  
+  /** A8 paper format. */
+  public static final RtfDocfmt A8 = paper( 7.4, 5.2, RtfUnit.CM );
+
   /* <document> := <info>? <docfmt>* <section>+ */                 
 
   /** RTF with format string. */
