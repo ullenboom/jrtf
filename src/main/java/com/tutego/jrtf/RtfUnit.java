@@ -45,8 +45,11 @@ public enum RtfUnit
   /** Measurement in inch. One inch is 1440 twips. */
   INCH { @Override public int toTwips( double v ) { return (int) (v*1440); } },
 
-  /** Measurement in cm. One cm is around 566.9 twips. */
-  CM { @Override public int toTwips( double v ) { return (int) Math.round( v * 566.9f ); } };
+  /** Measurement in cm. One cm is 566.9 twips (rounded to 567). */
+  CM { @Override public int toTwips( double v ) { return (int) Math.round( v * 566.9 ); } },
+
+  /** Measurement in mm. One mm is 56.69 twips (rounded to 57). */
+  MM { @Override public int toTwips( double v ) { return (int) Math.round( v * 566.9 / 10. ); } };
 
   /**
    * Converts to twips.
