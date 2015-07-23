@@ -54,8 +54,8 @@ public class Rtf
   /** List of fonts. */
   private List<RtfHeaderFont> headerFonts = new ArrayList<RtfHeaderFont>();
 
-//  /** List of style sheets. */
-//  private List<RtfHeaderStyle> headerStyles = new ArrayList<RtfHeaderStyle>();
+  /** List of style sheets. */
+  private List<RtfHeaderStyle> headerStyles = new ArrayList<RtfHeaderStyle>();
 
   /** Document info. */
   private StringBuilder info = new StringBuilder();
@@ -157,7 +157,21 @@ public class Rtf
 
     return this;
   }
-
+  
+  /**
+   * Writes stylesheet group, which contains information about styles used in the document.
+   * 
+   * @param styles RTF style sheet objects.
+   * @return {@code this}-reference.
+   */
+  public Rtf headerStyles(RtfHeaderStyle... styles) {
+	for (RtfHeaderStyle rtfStyle : styles)
+  	  if (!headerStyles.contains(rtfStyle)) {
+		headerStyles.add(rtfStyle);
+	  }
+  	return this;
+  }
+	
   /**
    * Writes information group, which contains information about the document.
    * This can include the title, author, keywords, comments, and other information
@@ -241,6 +255,18 @@ public class Rtf
   public Rtf p( Object... texts )
   {
     return section( RtfPara.p( texts ) );
+  }
+  
+  /**
+   * Appends a sequence of text in a new paragraph to the RTF document.
+   * A convenience method which is equals to {@code section(RtfPara.p( style, texts));}.
+   * @param style Style sheet to set in paragraph.
+   * @param texts Text to put in paragraph.
+   * @return {@code this}-reference.
+   */
+  public Rtf p( RtfHeaderStyle style,  Object... texts )
+  {
+    return section( RtfPara.p( style, texts ) );
   }
 
   /**
@@ -376,15 +402,15 @@ public class Rtf
      * <stylesheet> := '{' \ stylesheet <style>+ '}'
      */
   
-//    if ( ! headerStyles.isEmpty() )
-//    {
-//      out.append( "\n{\\stylesheet" );
-//      for ( RtfHeaderStyle style : headerStyles )
-//        style.writeStyle( out );
-//      
-//      out.append( '}' );
-//    }
-//    
+    if ( ! headerStyles.isEmpty() )
+    {
+      out.append( "\n{\\stylesheet" );
+      for ( RtfHeaderStyle style : headerStyles )
+    	out.append(style.toString());
+      
+      out.append( '}' );
+    }
+    
     out.append( '\n' );
     
     // Write <info> 

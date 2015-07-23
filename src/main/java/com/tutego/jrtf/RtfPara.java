@@ -75,6 +75,18 @@ public abstract class RtfPara
   {
     return p( RtfText.text( texts ) );
   }
+  
+  /**
+   * Builds a paragraph of objects (with will be converted to Strings) and RtfText.
+   * Convenience method for {@code p(RtfText.text(texts))}.
+   * @param style Style sheet to set in paragraph.
+   * @param texts Text to set in paragraph.
+   * @return New {@code RtfTextPara} object with text.
+   */
+  public static RtfTextPara p(RtfHeaderStyle style, Object... texts )
+  {
+    return p(style, RtfText.text( texts ) );
+  }
 
   /**
    * A paragraph with a collection of text. This paragraph will inherit all
@@ -86,25 +98,42 @@ public abstract class RtfPara
    */
   public static RtfTextPara p( final RtfText... texts )
   {
-    if ( texts == null || texts.length == 0 )
-      return new RtfTextPara() {
-      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-        out.append( "\\par" );
-      }
-    };
-    
-    return new RtfTextPara() {
-      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-        out.append( "{" ); // \\pard
-        out.append( textparFormatRtf() );
-        for ( RtfText rtfText : texts )
-          rtfText.rtf( out );
-        if ( withEndingPar )     // if its in table, withEndingPar will be false
-          out.append( "\\par" );
-        out.append( "}\n" );
-      }
-    };
+	  return p( null , texts );
   }
+
+  /**
+   * A paragraph with a collection of text. This paragraph will inherit all
+   * the settings from the other paragraph. Look for {@link #pard(RtfText...)} if you
+   * look for a method where paragraph attributes are not inherited to the next
+   * paragraph.
+   * @param style Style sheet to set in paragraph.
+   * @param texts Text to set in paragraph.
+   * @return New {@code RtfTextPara} object with text.
+   */
+  public static RtfTextPara p( final RtfHeaderStyle style , final RtfText... texts )
+  {
+	    if ( texts == null || texts.length == 0 )
+	      return new RtfTextPara() {
+	      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
+	        out.append( "\\par" );
+	      }
+	    };
+	    
+	    return new RtfTextPara() {
+	      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
+	        out.append( "{" ); // \\pard
+	        if(style != null) {
+	        	out.append( "\\s" + style.getId());
+	        }
+	        out.append( textparFormatRtf() );
+	        for ( RtfText rtfText : texts )
+	          rtfText.rtf( out );
+	        if ( withEndingPar )     // if its in table, withEndingPar will be false
+	          out.append( "\\par" );
+	        out.append( "}\n" );
+	      }
+	    };
+	  }
 
   /**
    * A paragraph with a collection of text. This paragraph will not inherit the
@@ -116,6 +145,20 @@ public abstract class RtfPara
    */
   public static RtfTextPara pard( final RtfText... texts )
   {
+	  return pard( null , texts );
+  }
+
+  /**
+   * A paragraph with a collection of text. This paragraph will not inherit the
+   * settings from the other paragraph. Look for {@link #p(RtfText...)} if you
+   * look for a method where paragraph attributes are inherited to the next
+   * paragraph.
+   * @param style Style sheet to set in paragraph.
+   * @param texts Text to set in paragraph.
+   * @return New {@code RtfTextPara} object with text.
+   */
+  public static RtfTextPara pard( final RtfHeaderStyle style, final RtfText... texts )
+  {
     if ( texts == null || texts.length == 0 )
       return new RtfTextPara() {
       	@Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
@@ -126,6 +169,9 @@ public abstract class RtfPara
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{\\pard" );
+        if(style != null) {
+        	out.append( "\\s" + style.getId());
+        }
         out.append( textparFormatRtf() );
         for ( RtfText rtfText : texts )
           rtfText.rtf( out );
