@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom 
+ * Copyright (c) 2010-2015 Christian Ullenboom 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -160,16 +160,16 @@ public class Rtf
   
   /**
    * Writes stylesheet group, which contains information about styles used in the document.
-   * 
    * @param styles RTF style sheet objects.
    * @return {@code this}-reference.
    */
-  public Rtf headerStyles(RtfHeaderStyle... styles) {
-	for (RtfHeaderStyle rtfStyle : styles)
-  	  if (!headerStyles.contains(rtfStyle)) {
-		headerStyles.add(rtfStyle);
-	  }
-  	return this;
+  public Rtf headerStyles( RtfHeaderStyle... styles )
+  {
+    for  (RtfHeaderStyle rtfStyle : styles )
+      if ( ! headerStyles.contains( rtfStyle ) )
+        headerStyles.add( rtfStyle );
+
+    return this;
   }
 	
   /**
@@ -406,7 +406,7 @@ public class Rtf
     {
       out.append( "\n{\\stylesheet" );
       for ( RtfHeaderStyle style : headerStyles )
-    	out.append(style.toString());
+    	out.append( style.toString() );
       
       out.append( '}' );
     }
