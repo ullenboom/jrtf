@@ -124,7 +124,7 @@ public abstract class RtfPara
         out.append( "{" ); // \\pard
 
         if ( style != null ) // TODO: rethink if null should be allowed?
-          out.append( "\\s" ).append( style.getId() );
+          out.append( "\\s" ).append( Integer.toString( style.getId() ));
 
         out.append( textparFormatRtf() );
 
@@ -175,7 +175,7 @@ public abstract class RtfPara
         out.append( "{\\pard" );
 
         if ( style != null )  // TODO: should null be allowed?
-          out.append( "\\s" ).append( style.getId() );
+          out.append( "\\s" ).append( Integer.toString( style.getId() ));
 
         out.append( textparFormatRtf() );
 
