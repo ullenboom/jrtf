@@ -217,6 +217,17 @@ public abstract class RtfPara
    */
   public static RtfRow row( RtfText... cells )
   {
+    return row( null, cells );
+  }
+
+  /**
+   * Writes a row with a sequence of text cells.
+   * @param rowBackgroundColor Row background color
+   * @param cells Cells of the row.
+   * @return New row object.
+   */
+  public static RtfRow row( final Integer rowBackgroundColor, RtfText... cells )
+  {
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
 
@@ -225,7 +236,7 @@ public abstract class RtfPara
       paras.add( p(cell) );
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( paras.toArray(parasArray) );
+    return row( rowBackgroundColor, paras.toArray(parasArray) );
   }
 
   /**
@@ -236,6 +247,19 @@ public abstract class RtfPara
    * @return New row object.
    */
   public static RtfRow row( Object... cells )
+  {
+    return row( null, cells );
+  }
+  
+  /**
+   * Writes a row with a sequence of text cells. Every object is
+   * converted to String and wrapped to a paragraph with the
+   * method {@link RtfPara#p(Object...)}.
+   * @param rowBackgroundColor Row background color
+   * @param cells Cells of the row.
+   * @return New row object.
+   */
+  public static RtfRow row( final Integer rowBackgroundColor, Object... cells )
   {
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
@@ -250,7 +274,7 @@ public abstract class RtfPara
     }
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( paras.toArray(parasArray) );
+    return row( rowBackgroundColor, paras.toArray(parasArray) );
   }
 
   /**
@@ -259,6 +283,17 @@ public abstract class RtfPara
    * @return New object for the row.
    */
   public static RtfRow row( final RtfPara... cells )
+  {
+   return row(null, cells );
+  }
+  
+  /**
+   * Writes a row with a sequence of paragraph cells.
+   * @param rowBackgroundColor Row background color
+   * @param cells Cells of the row.
+   * @return New object for the row.
+   */
+  public static RtfRow row(final Integer rowBackgroundColor, final RtfPara... cells )
   {
     /* <row>    := <tbldef> <cell>+ \row
      * <cell>   := <textpar>+ \cell
@@ -272,11 +307,14 @@ public abstract class RtfPara
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{\\trowd\\trautofit1\\intbl\n" );
         for ( int i = 1; i <= cells.length; i++ )
+        {
           out.append( tbldef )
-          .append( (cells[i-1] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" )
-          .append( "\\cellx" )
-             .append( Integer.toString( i ) ).append( "\n" );
-
+          .append( (cells[i-1] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" );          
+          if(rowBackgroundColor != null){
+        	  out.append( "\\clcbpat" ).append(Integer.toString( rowBackgroundColor ));
+          }
+          out.append( "\\cellx" ).append( Integer.toString( i ) ).append( "\n" );
+        }
         for ( RtfPara cell : cells )
         {
           cell.rtf( out, false );
