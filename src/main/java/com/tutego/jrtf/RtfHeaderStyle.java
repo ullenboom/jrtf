@@ -31,74 +31,54 @@ package com.tutego.jrtf;
 /**
  * Represents a style sheet definition for the RTF header.
  */
-public enum RtfHeaderStyle {
+public enum RtfHeaderStyle
+{
+  /** Default style. */
+  NORMAL( 0 ) {
+    @Override public String toString() { return "{\\s0 Normal;}"; }
+  },
 
-	/** Default style */
-	NORMAL(0) {
-		@Override
-		public String toString() {
-			return "{\\s0 Normal;}";
-		}
-	},
+  /** Header 1 Style. */
+  HEADER_1( 1 ) {
+    @Override public String toString() { return "{\\s1 Heading 1;}"; }
+  },
 
-	/** Header 1 Style */
-	HEADER_1(1) {
-		@Override
-		public String toString() {
-			return "{\\s1 Heading 1;}";
-		}
-	},
+  /** Header 2 Style. */
+  HEADER_2( 2 ) {
+    @Override public String toString() { return "{\\s2 Heading 2;}"; }
+  },
 
-	/** Header 2 Style */
-	HEADER_2(2) {
-		@Override
-		public String toString() {
-			return "{\\s2 Heading 2;}";
-		}
-	},
+  /** Header 3 Style. */
+  HEADER_3( 3 ) {
+    @Override public String toString() { return "{\\s3 Heading 3;}"; }
+  },
 
-	/** Header 3 Style */
-	HEADER_3(3) {
-		@Override
-		public String toString() {
-			return "{\\s3 Heading 3;}";
-		}
-	},
+  /** Header 4 Style. */
+  HEADER_4( 4 ) {
+    @Override public String toString() { return "{\\s4 Heading 4;}"; }
+  },
 
-	/** Header 4 Style */
-	HEADER_4(4) {
-		@Override
-		public String toString() {
-			return "{\\s4 Heading 4;}";
-		}
-	},
+  /** Header 5 Style. */
+  HEADER_5( 5 ) {
+    @Override public String toString() { return "{\\s5 Heading 5;}"; }
+  };
 
-	/** Header 5 Style */
-	HEADER_5(5) {
-		@Override
-		public String toString() {
-			return "{\\s5 Heading 5;}";
-		}
-	};
-	
-	/**
-	 * Constructor.
-	 * @param id document style sheet id
-	 */
-	RtfHeaderStyle(int id) {
-		this.id = id;
-	}
-	
-	/**
-	 * Style sheet id.
-	 */
-	private int id;
-	
-	/**
-	 * Returns document style sheet id.
-	 * @return id
-	 */
-	public int getId() {
-		return id;
-	}	
+  /** Style sheet id. */
+  private int id;
+
+  /**
+   * Internal constructor.
+   * @param id document style sheet id
+   */
+  RtfHeaderStyle( int id ) {
+    this.id = id;
+  }
+
+  /**
+   * Returns document style sheet id.
+   * @return id
+   */
+  public int getId() {
+    return id;
+  }	
 }

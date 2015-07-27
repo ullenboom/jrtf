@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom 
+ * Copyright (c) 2010-2015 Christian Ullenboom 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public abstract class RtfPara
   abstract void rtf( Appendable out, boolean withEndingPar ) throws IOException;
 
   /**
-   * Builds a paragraph of objects (with will be converted to Strings) and RtfText.
+   * Builds a paragraph of objects (that will be converted to Strings and {@code RtfText}).
    * Convenience method for {@code p(RtfText.text(texts))}.
    * @param texts Text to set in paragraph.
    * @return New {@code RtfTextPara} object with text.
@@ -77,15 +77,15 @@ public abstract class RtfPara
   }
   
   /**
-   * Builds a paragraph of objects (with will be converted to Strings) and RtfText.
-   * Convenience method for {@code p(RtfText.text(texts))}.
+   * Builds a paragraph of objects (that will be converted to Strings and {@code RtfText}).
+   * Convenience method for {@code p(RtfText.text(texts))} with an associated style.
    * @param style Style sheet to set in paragraph.
    * @param texts Text to set in paragraph.
    * @return New {@code RtfTextPara} object with text.
    */
-  public static RtfTextPara p(RtfHeaderStyle style, Object... texts )
+  public static RtfTextPara p( RtfHeaderStyle style, Object... texts )
   {
-    return p(style, RtfText.text( texts ) );
+    return p( style, RtfText.text( texts ) );
   }
 
   /**
@@ -112,28 +112,32 @@ public abstract class RtfPara
    */
   public static RtfTextPara p( final RtfHeaderStyle style , final RtfText... texts )
   {
-	    if ( texts == null || texts.length == 0 )
-	      return new RtfTextPara() {
-	      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-	        out.append( "\\par" );
-	      }
-	    };
+    if ( texts == null || texts.length == 0 )
+      return new RtfTextPara() {
+        @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
+          out.append( "\\par" );
+        }
+      };
 	    
-	    return new RtfTextPara() {
-	      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-	        out.append( "{" ); // \\pard
-	        if(style != null) {
-	        	out.append( "\\s" + style.getId());
-	        }
-	        out.append( textparFormatRtf() );
-	        for ( RtfText rtfText : texts )
-	          rtfText.rtf( out );
-	        if ( withEndingPar )     // if its in table, withEndingPar will be false
-	          out.append( "\\par" );
-	        out.append( "}\n" );
-	      }
-	    };
-	  }
+    return new RtfTextPara() {
+      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
+        out.append( "{" ); // \\pard
+
+        if ( style != null ) // TODO: rethink if null should be allowed?
+          out.append( "\\s" ).append( style.getId() );
+
+        out.append( textparFormatRtf() );
+
+        for ( RtfText rtfText : texts )
+          rtfText.rtf( out );
+
+        if ( withEndingPar )     // if its in table, withEndingPar will be false
+          out.append( "\\par" );
+
+        out.append( "}\n" );
+      }
+    };
+  }
 
   /**
    * A paragraph with a collection of text. This paragraph will not inherit the
@@ -145,12 +149,12 @@ public abstract class RtfPara
    */
   public static RtfTextPara pard( final RtfText... texts )
   {
-	  return pard( null , texts );
+    return pard( null , texts );
   }
 
   /**
    * A paragraph with a collection of text. This paragraph will not inherit the
-   * settings from the other paragraph. Look for {@link #p(RtfText...)} if you
+   * settings from the other paragraph. See {@link #p(RtfText...)} if you
    * look for a method where paragraph attributes are inherited to the next
    * paragraph.
    * @param style Style sheet to set in paragraph.
@@ -162,21 +166,25 @@ public abstract class RtfPara
     if ( texts == null || texts.length == 0 )
       return new RtfTextPara() {
       	@Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-	        out.append( "\\pard\\par" );
+	  out.append( "\\pard\\par" );
       }
     };
     
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{\\pard" );
-        if(style != null) {
-        	out.append( "\\s" + style.getId());
-        }
+
+        if ( style != null )  // TODO: should null be allowed?
+          out.append( "\\s" ).append( style.getId() );
+
         out.append( textparFormatRtf() );
+
         for ( RtfText rtfText : texts )
           rtfText.rtf( out );
+
         if ( withEndingPar )     // if its in table, withEndingPar will be false
           out.append( "\\par" );
+
         out.append( "}\n" );
       }
     };
@@ -309,9 +317,9 @@ public abstract class RtfPara
         for ( int i = 1; i <= cells.length; i++ )
         {
           out.append( tbldef )
-          .append( (cells[i-1] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" );          
-          if(rowBackgroundColor != null){
-        	  out.append( "\\clcbpat" ).append(Integer.toString( rowBackgroundColor ));
+          .append( ( cells[i-1] instanceof RtfTextPara ) ? (( RtfTextPara ) cells[i-1]).cellfmt : "" );
+          if( rowBackgroundColor != null ){
+             out.append( "\\clcbpat" ).append( Integer.toString( rowBackgroundColor ));
           }
           out.append( "\\cellx" ).append( Integer.toString( i ) ).append( "\n" );
         }
