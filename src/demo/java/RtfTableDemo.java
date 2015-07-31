@@ -24,11 +24,13 @@ public class RtfTableDemo
 
     rtf().header( red, green, blue )
          .section(
-           row( p( "ROW WITHOUT A BACKGROUND COLOR" ) ),
-           row( 0, p( "RED" ).cellWidth( 10, RtfUnit.CM ) ),
+           row( p( "ROW WITHOUT A BACKGROUND COLOR" ) )
+/*           , row( 0, p( "RED" ).cellWidth( 10, RtfUnit.CM ) ),
            row( 1, "GREEN" ),
            row( 2, RtfText.text( "BLUE" ) ),
-           row( 3, p( "COLOR NOT FOUND" ) ) )
+           row( 3, p( "COLOR NOT FOUND" ) )
+*/
+           )
     	.out( new FileWriter( out ) );   			
 
     try
