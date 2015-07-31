@@ -11,7 +11,7 @@ import java.io.*;
 public class RtfTOCDemo
 {
   /**
-   * Start application.
+   * Starts demo application.
    * @param args Program arguments.
    * @throws IOException If something goes wrong during writing.
    */
@@ -19,19 +19,15 @@ public class RtfTOCDemo
   {
     File out = new File( "out-toc.rtf" );
 
-    rtf()
-    	.headerStyles( RtfHeaderStyle.values() )
-    	.section( p( "Table of content\n" ),
-    	          p( tableOfContentsField() ) )
-    	.section(
-    			p( RtfHeaderStyle.HEADER_1, "Style - Header 1" ),
-    			p( RtfHeaderStyle.HEADER_2, "Style - Header 2" ),
-    			p( RtfHeaderStyle.HEADER_3, "Style - Header 3" ),
-    			p( RtfHeaderStyle.HEADER_1, "Style - Header 1" ),
-    			p( RtfHeaderStyle.HEADER_2, "Style - Header 2" )
-    	)
+    rtf().headerStyles( RtfHeaderStyle.values() )
+         .section( p( "Table of content\n" ),
+                   p( tableOfContentsField() ) )
+        .section( p( RtfHeaderStyle.HEADER_1, "Style - Header 1" ),
+                  p( RtfHeaderStyle.HEADER_2, "Style - Header 2" ),
+                  p( RtfHeaderStyle.HEADER_3, "Style - Header 3" ),
+                  p( RtfHeaderStyle.HEADER_1, "Style - Header 1" ),
+                  p( RtfHeaderStyle.HEADER_2, "Style - Header 2" ) )
     	.out( new FileWriter( out ) );
-
     try
     {
       Desktop.getDesktop().open( out );
