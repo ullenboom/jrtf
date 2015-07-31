@@ -90,7 +90,7 @@ public abstract class RtfPara
 
   /**
    * A paragraph with a collection of text. This paragraph will inherit all
-   * the settings from the other paragraph. Look for {@link #pard(RtfText...)} if you
+   * the settings from the other paragraph. See {@link #pard(RtfText...)} if you
    * look for a method where paragraph attributes are not inherited to the next
    * paragraph.
    * @param texts Text to set in paragraph.
@@ -98,12 +98,12 @@ public abstract class RtfPara
    */
   public static RtfTextPara p( final RtfText... texts )
   {
-	  return p( null , texts );
+    return p( null , texts );
   }
 
   /**
    * A paragraph with a collection of text. This paragraph will inherit all
-   * the settings from the other paragraph. Look for {@link #pard(RtfText...)} if you
+   * the settings from the other paragraph. See {@link #pard(RtfText...)} if you
    * look for a method where paragraph attributes are not inherited to the next
    * paragraph.
    * @param style Style sheet to set in paragraph.
@@ -118,13 +118,13 @@ public abstract class RtfPara
           out.append( "\\par" );
         }
       };
-	    
+      
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{" ); // \\pard
 
         if ( style != null ) // TODO: rethink if null should be allowed?
-          out.append( "\\s" ).append( style.getId() );
+          out.append( "\\s" ).append( Integer.toString( style.getId() ) );
 
         out.append( textparFormatRtf() );
 
@@ -141,7 +141,7 @@ public abstract class RtfPara
 
   /**
    * A paragraph with a collection of text. This paragraph will not inherit the
-   * settings from the other paragraph. Look for {@link #p(RtfText...)} if you
+   * settings from the other paragraph. See {@link #p(RtfText...)} if you
    * look for a method where paragraph attributes are inherited to the next
    * paragraph.
    * @param texts Text to set in paragraph.
@@ -165,8 +165,8 @@ public abstract class RtfPara
   {
     if ( texts == null || texts.length == 0 )
       return new RtfTextPara() {
-      	@Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-	  out.append( "\\pard\\par" );
+        @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
+          out.append( "\\pard\\par" );
       }
     };
     
@@ -175,7 +175,7 @@ public abstract class RtfPara
         out.append( "{\\pard" );
 
         if ( style != null )  // TODO: should null be allowed?
-          out.append( "\\s" ).append( style.getId() );
+          out.append( "\\s" ).append( Integer.toString( style.getId() ) );
 
         out.append( textparFormatRtf() );
 
@@ -228,12 +228,12 @@ public abstract class RtfPara
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    List<RtfPara> paras = new ArrayList<RtfPara>();
+    List<RtfPara> paras = new ArrayList<>();
     for ( RtfText cell : cells )
       paras.add( p(cell) );
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( paras.toArray(parasArray) );
+    return row( paras.toArray( parasArray ) );
   }
 
   /**
@@ -245,10 +245,10 @@ public abstract class RtfPara
    */
   public static RtfRow row( Object... cells )
   {
-    if ( cells == null )
+    if ( cells == null || cells.length == 0 )
       throw new RtfException( "There has to be at least one cell in a row" );
-    
-    List<RtfPara> paras = new ArrayList<RtfPara>();
+
+    List<RtfPara> paras = new ArrayList<>();
     for ( Object cell : cells )
     {
       if ( cell instanceof RtfPara )
@@ -258,7 +258,7 @@ public abstract class RtfPara
     }
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( paras.toArray(parasArray) );
+    return row( paras.toArray( parasArray ) );
   }
 
   /**
@@ -281,9 +281,9 @@ public abstract class RtfPara
         out.append( "{\\trowd\\trautofit1\\intbl\n" );
         for ( int i = 1; i <= cells.length; i++ )
           out.append( tbldef )
-             .append( (cells[i-1] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" )
+             .append( (cells[ i - 1 ] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" )
              .append( "\\cellx" )
-             .append( Integer.toString( i ) ).append( "\n" );
+             .append( Integer.toString( i ) ).append( '\n' );
 
         for ( RtfPara cell : cells )
         {
