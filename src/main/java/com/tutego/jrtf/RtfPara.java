@@ -228,7 +228,7 @@ public abstract class RtfPara
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    List<RtfPara> paras = new ArrayList<>();
+    List<RtfPara> paras = new ArrayList<RtfPara>();
     for ( RtfText cell : cells )
       paras.add( p(cell) );
 
@@ -248,7 +248,7 @@ public abstract class RtfPara
     if ( cells == null || cells.length == 0 )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    List<RtfPara> paras = new ArrayList<>();
+    List<RtfPara> paras = new ArrayList<RtfPara>();
     for ( Object cell : cells )
     {
       if ( cell instanceof RtfPara )
