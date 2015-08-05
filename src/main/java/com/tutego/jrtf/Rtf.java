@@ -396,10 +396,9 @@ public class Rtf
       }
       
       out.append( '}' );
-    } else {
+    } else
     	out.append( "\n{\\colortbl;}" );
-    }
-  
+
     /*
      * <stylesheet> := '{' \ stylesheet <style>+ '}'
      */
