@@ -98,7 +98,7 @@ public abstract class RtfPara
    */
   public static RtfTextPara p( final RtfText... texts )
   {
-    return p( null , texts );
+    return p( RtfHeaderStyle.NORMAL , texts );
   }
 
   /**
@@ -121,11 +121,8 @@ public abstract class RtfPara
       
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-        out.append( "{" ); // \\pard
-
-        if ( style != null ) // TODO: rethink if null should be allowed?
-          out.append( "\\s" ).append( Integer.toString( style.getId() ) );
-
+        out.append( "{" );
+        out.append( "\\s" ).append( Integer.toString( style.getId() ) );
         out.append( textparFormatRtf() );
 
         for ( RtfText rtfText : texts )
@@ -149,7 +146,7 @@ public abstract class RtfPara
    */
   public static RtfTextPara pard( final RtfText... texts )
   {
-    return pard( null , texts );
+    return pard( RtfHeaderStyle.NORMAL , texts );
   }
 
   /**
@@ -173,10 +170,7 @@ public abstract class RtfPara
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{\\pard" );
-
-        if ( style != null )  // TODO: should null be allowed?
-          out.append( "\\s" ).append( Integer.toString( style.getId() ) );
-
+        out.append( "\\s" ).append( Integer.toString( style.getId() ) );
         out.append( textparFormatRtf() );
 
         for ( RtfText rtfText : texts )
@@ -225,6 +219,17 @@ public abstract class RtfPara
    */
   public static RtfRow row( RtfText... cells )
   {
+    return row( 0, cells );
+  }
+
+  /**
+   * Writes a row with a sequence of text cells.
+   * @param backgroundColor Row background color.
+   * @param cells Cells of the row.
+   * @return New row object.
+   */
+  public static RtfRow row( Integer backgroundColor, RtfText... cells )
+  {
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
 
@@ -233,7 +238,7 @@ public abstract class RtfPara
       paras.add( p(cell) );
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( paras.toArray( parasArray ) );
+    return row( backgroundColor, paras.toArray( parasArray ) );
   }
 
   /**
@@ -244,6 +249,19 @@ public abstract class RtfPara
    * @return New row object.
    */
   public static RtfRow row( Object... cells )
+  {
+    return row( 0, cells );
+  }
+
+  /**
+   * Writes a row with a sequence of text cells. Every object is
+   * converted to String and wrapped to a paragraph with the
+   * method {@link RtfPara#p(Object...)}.
+   * @param backgroundColor Row background color.
+   * @param cells Cells of the row.
+   * @return New row object.
+   */
+  public static RtfRow row( Integer backgroundColor, Object... cells )
   {
     if ( cells == null || cells.length == 0 )
       throw new RtfException( "There has to be at least one cell in a row" );
@@ -258,15 +276,26 @@ public abstract class RtfPara
     }
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( paras.toArray( parasArray ) );
+    return row( backgroundColor, paras.toArray( parasArray ) );
   }
-
+  
   /**
    * Writes a row with a sequence of paragraph cells.
    * @param cells Cells of the row.
    * @return New object for the row.
    */
-  public static RtfRow row( final RtfPara... cells )
+  public static RtfRow row( RtfPara... cells )
+  {
+	  return row( 0, cells );
+  }
+
+  /**
+   * Writes a row with a sequence of paragraph cells.
+   * @param backgroundColor Row background color.
+   * @param cells Cells of the row.
+   * @return New object for the row.
+   */
+  public static RtfRow row( final Integer backgroundColor, final RtfPara... cells )
   {
     /* <row>    := <tbldef> <cell>+ \row
      * <cell>   := <textpar>+ \cell
@@ -282,6 +311,7 @@ public abstract class RtfPara
         for ( int i = 1; i <= cells.length; i++ )
           out.append( tbldef )
              .append( (cells[ i - 1 ] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" )
+             .append( "\\clcbpat" ).append( Integer.toString( backgroundColor ))
              .append( "\\cellx" )
              .append( Integer.toString( i ) ).append( '\n' );
 

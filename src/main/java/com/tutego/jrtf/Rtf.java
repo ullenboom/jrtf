@@ -396,6 +396,8 @@ public class Rtf
       }
       
       out.append( '}' );
+    } else {
+    	out.append( "\n{\\colortbl;}" );
     }
   
     /*
