@@ -219,16 +219,16 @@ public abstract class RtfPara
    */
   public static RtfRow row( RtfText... cells )
   {
-    return row( 0, cells );
+    return rowWithBackgroundColor( 0, cells );
   }
 
   /**
    * Writes a row with a sequence of text cells.
-   * @param backgroundColor Row background color.
+   * @param colorIndex Row background color.
    * @param cells Cells of the row.
    * @return New row object.
    */
-  public static RtfRow row( Integer backgroundColor, RtfText... cells )
+  public static RtfRow rowWithBackgroundColor( int colorIndex, RtfText... cells )
   {
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
@@ -238,7 +238,7 @@ public abstract class RtfPara
       paras.add( p(cell) );
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( backgroundColor, paras.toArray( parasArray ) );
+    return rowWithBackgroundColor( colorIndex, paras.toArray( parasArray ) );
   }
 
   /**
@@ -250,18 +250,18 @@ public abstract class RtfPara
    */
   public static RtfRow row( Object... cells )
   {
-    return row( 0, cells );
+    return rowWithBackgroundColor( 0, cells );
   }
 
   /**
    * Writes a row with a sequence of text cells. Every object is
    * converted to String and wrapped to a paragraph with the
    * method {@link RtfPara#p(Object...)}.
-   * @param backgroundColor Row background color.
+   * @param colorIndex Row background color.
    * @param cells Cells of the row.
    * @return New row object.
    */
-  public static RtfRow row( Integer backgroundColor, Object... cells )
+  public static RtfRow rowWithBackgroundColor( int colorIndex, Object... cells )
   {
     if ( cells == null || cells.length == 0 )
       throw new RtfException( "There has to be at least one cell in a row" );
@@ -276,7 +276,7 @@ public abstract class RtfPara
     }
 
     RtfPara[] parasArray = new RtfPara[ paras.size() ];
-    return row( backgroundColor, paras.toArray( parasArray ) );
+    return rowWithBackgroundColor( colorIndex, paras.toArray( parasArray ) );
   }
   
   /**
@@ -286,16 +286,16 @@ public abstract class RtfPara
    */
   public static RtfRow row( RtfPara... cells )
   {
-	  return row( 0, cells );
+	  return rowWithBackgroundColor( 0, cells );
   }
 
   /**
    * Writes a row with a sequence of paragraph cells.
-   * @param backgroundColor Row background color.
+   * @param colorIndex Row background color.
    * @param cells Cells of the row.
    * @return New object for the row.
    */
-  public static RtfRow row( final Integer backgroundColor, final RtfPara... cells )
+  public static RtfRow rowWithBackgroundColor( final int colorIndex, final RtfPara... cells )
   {
     /* <row>    := <tbldef> <cell>+ \row
      * <cell>   := <textpar>+ \cell
@@ -311,7 +311,7 @@ public abstract class RtfPara
         for ( int i = 1; i <= cells.length; i++ )
           out.append( tbldef )
              .append( (cells[ i - 1 ] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" )
-             .append( "\\clcbpat" ).append( Integer.toString( backgroundColor ) )
+             .append( "\\clcbpat" ).append( Integer.toString( colorIndex ) )
              .append( "\\cellx" )
              .append( Integer.toString( i ) ).append( '\n' );
 

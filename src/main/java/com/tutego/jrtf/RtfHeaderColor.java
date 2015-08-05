@@ -38,6 +38,12 @@ import java.io.IOException;
  */
 public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderColor>
 {
+  /** Constant for color black. */
+  public static final RtfHeaderColor black = new RtfHeaderColor( 0, 0, 0 );
+
+  /** Constant for color white. */
+  public static final RtfHeaderColor white = new RtfHeaderColor( 255, 255, 255 );
+
   /** Red, Green, Blue. */
   private int r, g, b;
 
@@ -59,7 +65,7 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
 
   /**
    * Sets a color at a certain index. The index has to be between 1 and 255 otherwise a {@code RtfException}
-   * will be thrown. 
+   * will be thrown. Index 0 is reserved for the AUTO color.
    * 
    * @param colorindex Index of the color.
    * @return {@link RtfHeader}

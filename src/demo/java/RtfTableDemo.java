@@ -21,16 +21,18 @@ public class RtfTableDemo
     final RtfHeader red   = RtfHeader.color( 0xff, 0, 0 ).at( 1 );
     final RtfHeader green = RtfHeader.color( 0, 0xff, 0 ).at( 2 );
     final RtfHeader blue  = RtfHeader.color( 0, 0, 0xff ).at( 3 );
+    final RtfHeader black = RtfHeaderColor.black.at( 4 );
 
-    rtf().header( red, green, blue )
+    rtf().header( red, green, blue, black )
          .section(
-           row( p( "ROW WITHOUT A BACKGROUND COLOR" ).cellWidth( 10, RtfUnit.CM ) )
-/*           , row( 0, p( "DEFAULT COLOR (INDEX 0)" ) )
-           , row( 1, p( "RED" ) )
-           , row( 2, "GREEN" )
-           , row( 3, RtfText.text( "BLUE" ) )
-           , row( 4, p( "COLOR NOT FOUND" ) )
-*/           )
+           row( p( "ROW WITHOUT A BACKGROUND COLOR" ).cellWidth( 10, RtfUnit.CM ) ),
+           rowWithBackgroundColor( 0, p( "DEFAULT COLOR (INDEX 0)" ) ),
+           rowWithBackgroundColor( 1, p( "RED" ) ),
+           rowWithBackgroundColor( 2, "GREEN" ),
+           rowWithBackgroundColor( 3, RtfText.text( "BLUE" ) ),
+           rowWithBackgroundColor( 4, RtfText.text( "BLACK" ) ),
+           rowWithBackgroundColor( 5, p( "COLOR NOT FOUND" ) )
+           )
     	.out( new FileWriter( out ) );   			
 
     try
