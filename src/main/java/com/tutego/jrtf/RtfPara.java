@@ -311,7 +311,7 @@ public abstract class RtfPara
         for ( int i = 1; i <= cells.length; i++ )
           out.append( tbldef )
              .append( (cells[ i - 1 ] instanceof RtfTextPara) ? ((RtfTextPara) cells[i-1]).cellfmt : "" )
-             .append( "\\clcbpat" ).append( Integer.toString( backgroundColor ))
+             .append( "\\clcbpat" ).append( Integer.toString( backgroundColor ) )
              .append( "\\cellx" )
              .append( Integer.toString( i ) ).append( '\n' );
 
