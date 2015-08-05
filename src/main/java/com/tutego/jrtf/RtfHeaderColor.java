@@ -58,7 +58,7 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
   }
 
   /**
-   * Sets a color at a certain index. The index has to be between 0 and 255 otherwise a {@code RtfException}
+   * Sets a color at a certain index. The index has to be between 1 and 255 otherwise a {@code RtfException}
    * will be thrown. 
    * 
    * @param colorindex Index of the color.
@@ -66,8 +66,8 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
    */
   public RtfHeader at( int colorindex )
   {
-    if ( colorindex < 0 || colorindex > 255 )
-      throw new RtfException( "Color index " + colorindex  + " ist out of range, has to be between 0 and 255" );
+    if ( colorindex < 1 || colorindex > 255 )
+      throw new RtfException( "Color index " + colorindex  + " ist out of range, has to be between 1 and 255" );
 
     this.colorindex = colorindex;
 
