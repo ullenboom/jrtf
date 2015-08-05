@@ -24,7 +24,7 @@ import com.tutego.jrtf.*;
 public class RtfDocumentDemo
 {
   /**
-   * Start application.
+   * Starts application.
    * @param args Program arguments.
    * @throws IOException If something goes wrong during writing.
    */

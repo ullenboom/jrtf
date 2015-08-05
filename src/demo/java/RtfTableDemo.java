@@ -21,7 +21,7 @@ public class RtfTableDemo
     final RtfHeader red   = RtfHeader.color( 0xff, 0, 0 ).at( 1 );
     final RtfHeader green = RtfHeader.color( 0, 0xff, 0 ).at( 2 );
     final RtfHeader blue  = RtfHeader.color( 0, 0, 0xff ).at( 3 );
-    final RtfHeader black = RtfHeaderColor.black.at( 4 );
+    final RtfHeader black = RtfHeaderColor.BLACK.at( 4 );
 
     rtf().header( red, green, blue, black )
          .section(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom 
+ * Copyright (c) 2010-2015 Christian Ullenboom 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,10 +39,10 @@ import java.io.IOException;
 public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderColor>
 {
   /** Constant for color black. */
-  public static final RtfHeaderColor black = new RtfHeaderColor( 0, 0, 0 );
+  public static final RtfHeaderColor BLACK = new RtfHeaderColor( 0, 0, 0 );
 
   /** Constant for color white. */
-  public static final RtfHeaderColor white = new RtfHeaderColor( 255, 255, 255 );
+  public static final RtfHeaderColor WHITE = new RtfHeaderColor( 255, 255, 255 );
 
   /** Red, Green, Blue. */
   private int r, g, b;
