@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom 
+ * Copyright (c) 2010-2016 Christian Ullenboom 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,12 @@ import java.util.regex.*;
  *    .out( FileOutputStream("out.rtf") );
  * </pre>
  * Just use ASCII-keys.
+ * 
+ * <p>
+ * Variables must be framed in {@code %%} like
+ * <pre>
+ * %%ADDRESSLINE1%%
+ * </pre>
  */
 public class RtfTemplate
 {
