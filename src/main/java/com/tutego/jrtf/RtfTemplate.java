@@ -60,9 +60,10 @@ public class RtfTemplate
   /** Map with all variables and substitutions. */
   private Map<String, Object> map = new HashMap<String, Object>();
 
-  /** Regex pattern for %%VARIABLE%%. */
-  private final static Pattern VARIABLE_PATTERN = Pattern.compile( "%%(\\S+)%%",
-                                                                   Pattern.DOTALL | Pattern.MULTILINE);
+  /** Starting bound of variables. */
+  private String variablePrefix = "%%";
+  /** Ending bound of variables. */
+  private String variableSuffix = "%%";
 
   /**
    * Reads the template from that {@link InputStream}. The method treats the
@@ -91,6 +92,56 @@ public class RtfTemplate
       if ( reader != null )
         try { reader.close(); } catch ( IOException e ) { throw new RtfException( e ); }
     }
+  }
+
+  /**
+   * Set the prefix and suffix for recognizing variables in the input document. By default both prefix and suffix are
+   * {@code %%}, for example {@code %%ADDRESSLINE1%%}.
+   * <p>
+   * For example to use Maven style Properties like <code>${ADDRESSLINE1}</code>:
+   * 
+   * <pre>
+   * Rtf.template( new FileInputStream("template.rtf) )
+   *    .setVariableBounds( "${", "}" )
+   *    .inject( "ADDRESSLINE1", "tutego" )
+   *    .out( FileOutputStream("out.rtf") );
+   * </pre>
+   * <p>
+   * Restrictions for {@code prefix} and {@code suffix}:
+   * <ul>
+   * <li>May not be {@code null}
+   * <li>May not be {@code empty}
+   * <li>May only contain 
+   *     <a href="https://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html#posix">ASCII punctuation characters</a>
+   * </ul>
+   * 
+   * @param prefix starting bound of variables. May not be {@code null} or {@code empty}
+   * @param suffix ending bound of variables. May not be {@code null} or {@code empty}
+   * @return {@code this} object
+   */
+  public RtfTemplate setVariableBounds( String prefix, String suffix )
+  {
+    validateBound(prefix, "Prefix");
+    validateBound(suffix, "Suffix");
+
+    variablePrefix = prefix;
+    variableSuffix = suffix;
+
+    return this;
+  }
+
+  /**
+   * Check that a bound is valid.
+   * @param name for error messages
+   */
+  private void validateBound( String bound, String name ) {
+    if ( bound == null )
+      throw new NullPointerException( name + " may not be null" );
+    if ( bound.isEmpty() )
+      throw new IllegalArgumentException( name + " may not be empty" );
+    if ( !bound.matches("\\p{Punct}+") )
+      throw new IllegalArgumentException( name 
+          + " may only contain ASCII punctuation characters" );
   }
 
   /**
@@ -128,7 +179,7 @@ public class RtfTemplate
       return template.toString();
 
     StringBuffer result = new StringBuffer( template.length() );
-    Matcher matcher = VARIABLE_PATTERN.matcher( template );
+    Matcher matcher = createVariablePattern().matcher( template );
   
     while ( matcher.find() )
     {
@@ -152,6 +203,24 @@ public class RtfTemplate
     matcher.appendTail( result );
   
     return result.toString();
+  }
+
+  /**
+   * Creates a regex for recognizing variables from {@link #variablePrefix} and {@link #variableSuffix}.
+   */
+  private Pattern createVariablePattern()
+  {
+    String prefixQuoted = quote( variablePrefix );
+    String suffixQuoted = quote( variableSuffix );
+    String variablePattern = prefixQuoted + "(\\S+)" + suffixQuoted;
+    return Pattern.compile( variablePattern, Pattern.DOTALL | Pattern.MULTILINE );
+  }
+
+  /**
+   * Quotes text for searching in RTF and for use in regex.
+   */
+  private String quote( String string ) {
+    return Pattern.quote( Rtf.asRtf(string) );
   }
 
   /**
