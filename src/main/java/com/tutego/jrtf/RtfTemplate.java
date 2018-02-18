@@ -106,14 +106,15 @@ public class RtfTemplate
 
   /**
    * Adds a key/value pair for substitution. Keep the key in pure ASCII.
-   * The value will be converted to String by {@link String#valueOf(Object)}.
+   * Null will be replaced by a "null" string. The objects will remain as such and transforme to 
+   * String in the {@link #out()} method.
    * @param key   Key.
    * @param value Value.
    * @return {@code this} object.
    */
   public RtfTemplate inject( String key, Object value )
   {
-    map.put( key, String.valueOf( value ) );
+    map.put( key, (value == null) ? "null" : value ); 
     return this;
   }
 
@@ -140,6 +141,7 @@ public class RtfTemplate
       StringBuilder sb = new StringBuilder( 128 );
       try
       {
+        // Trasnform the object in a rtf string if not already a RtfText object  
         RtfText.text( value ).rtf( sb );
       }
       catch ( IOException e )
