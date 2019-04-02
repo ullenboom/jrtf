@@ -106,4 +106,20 @@ public class RtfInfo
     // <author> '{' \author #PCDATA '}'
     return new RtfInfo( "{\\author " + Rtf.asRtf( author ) + "}" );
   }
+
+  /**
+   * Sets the create time of this document.
+   * @param year Year.
+   * @param month Month.
+   * @param dayOfMonth Day of month.
+   * @param hour Hour.
+   * @param minute Minute.
+   * @param second Second.
+   * @return New RtfInfo object.
+   */
+  public static RtfInfo creatim( int year, int month, int dayOfMonth, int hour, int minute, int second )
+  {
+    // <creatim> '{' \ creatim <time> '}'
+    return new RtfInfo( String.format("{\\creatim \\yr%d \\mo%d \\dy%d \\hr%d \\min%d \\sec%d}", year, month, dayOfMonth, hour, minute, second) );
+  }
 }
