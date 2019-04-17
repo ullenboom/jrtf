@@ -497,6 +497,9 @@ public class Rtf
     }
   }
 
+  /**
+   * Escape character with <code>\'xx</code> type escaping using windows-1252 encoding.
+   */
   static String escapeWindows1252(char c) {
     if(!charsetEncoder.canEncode(c)) {
       return "?";
