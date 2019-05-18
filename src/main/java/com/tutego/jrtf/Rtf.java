@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 Christian Ullenboom 
+ * Copyright (c) 2010-2015 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,11 @@
 package com.tutego.jrtf;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.*;
+import java.nio.charset.*;
 import java.util.*;
+
+import static java.nio.charset.CodingErrorAction.REPORT;
 
 /**
  * Main class to build and stream a RTF document.
@@ -46,7 +49,9 @@ import java.util.*;
 public class Rtf
 {
   /** Charset used for converting chars in the range of 127 < x < 255. */
-  final static String CHARSET1252 = Charset.forName( "Windows-1252" ).name();
+  final static Charset charset = Charset.forName("Windows-1252");
+  final static CharsetEncoder charsetEncoder = charset.newEncoder().onMalformedInput(REPORT).onUnmappableCharacter(REPORT);
+  final static String CHARSET1252 = charset.name();
 
   /** Associates an index with a color. */
   private SortedMap<Integer, RtfHeaderColor> headerColors = new TreeMap<Integer, RtfHeaderColor>();
@@ -90,8 +95,6 @@ public class Rtf
    */
   static void asRtf( Appendable out, String rawText ) throws IOException
   {
-    // we do not need to treat text as CHARSET1252
-
     for ( int i = 0; i < rawText.length(); i++ )
     {
       char c = rawText.charAt( i ); 
@@ -109,7 +112,7 @@ public class Rtf
       else if ( c < 127 )
         out.append( c );
       else   // Use Unicode and ask the char from the String object
-        out.append( "\\u" ).append( Integer.toString( c ) ).append( '?' );
+        out.append( "\\u" ).append( Integer.toString( c ) ).append( escapeWindows1252(c) );
     }
   }
 
@@ -157,7 +160,7 @@ public class Rtf
 
     return this;
   }
-  
+
   /**
    * Writes stylesheet group, which contains information about styles used in the document.
    * @param styles RTF style sheet objects.
@@ -171,7 +174,7 @@ public class Rtf
 
     return this;
   }
-	
+
   /**
    * Writes information group, which contains information about the document.
    * This can include the title, author, keywords, comments, and other information
@@ -233,12 +236,12 @@ public class Rtf
       throw new IllegalArgumentException( "There has to be atleast one paragraph in a section" );
 
     // First add the style
-    
-    if ( secfmtHdrftr != null ) 
+
+    if ( secfmtHdrftr != null )
       secfmtHdrftrs.add( secfmtHdrftr.rtf );
     else
       secfmtHdrftrs.add( null );
-    
+
     // then the paragraphs itself to the second list
 
     sectionParagraphs.add( paragraphs );
@@ -256,7 +259,7 @@ public class Rtf
   {
     return section( RtfPara.p( texts ) );
   }
-  
+
   /**
    * Appends a sequence of text in a new paragraph to the RTF document.
    * A convenience method which is equals to {@code section(RtfPara.p( style, texts));}.
@@ -292,7 +295,7 @@ public class Rtf
     {
       if ( out instanceof Closeable )
         try { ((Closeable) out).close(); } catch ( IOException e ) { throw new RtfException(e); }
-    }    
+    }
   }
 
   /**
@@ -337,12 +340,12 @@ public class Rtf
      * <document> := <info>? <docfmt>* <section>+
      * <section>  := <secfmt>* <hdrftr>? <para>+ ( \sect <section>)?
      */
-    
+
     // Write <header>
-    
+
     /*
      * <header>   := \rtf
-     *               <charset> 
+     *               <charset>
      *               <deffont>
      *               \deff?
      *               <fonttbl>
@@ -361,12 +364,12 @@ public class Rtf
     // character is \ansi = Windows 1252
 
     out.append( "\\rtf1\\ansi\\deff0" );
-    
+
     /*
      * <fonttbl>  := '{' \fonttbl (<fontinfo> | ('{' <fontinfo> '}'))+ '}'
      */
     out.append( "\n{\\fonttbl" );
-    
+
     if ( headerFonts.isEmpty() )
       out.append( "{\\f0 Times New Roman;}" );
     else
@@ -374,16 +377,16 @@ public class Rtf
       for ( RtfHeaderFont font : headerFonts )
         font.writeFontInfo( out );
     }
-    
+
     out.append( '}' );
-  
+
     /*
      * <colortbl> := '{' \colortbl <colordef>+ '}'
      */
     if ( ! headerColors.isEmpty() )
     {
       out.append( "\n{\\colortbl" );
-      
+
       int maxColorIndex = headerColors.lastKey().intValue();
 
       for ( int i = 0; i <= maxColorIndex; i++ )
@@ -394,7 +397,7 @@ public class Rtf
         else
           color.writeColordef( out );
       }
-      
+
       out.append( '}' );
     } else
     	out.append( "\n{\\colortbl;}" );
@@ -402,32 +405,32 @@ public class Rtf
     /*
      * <stylesheet> := '{' \ stylesheet <style>+ '}'
      */
-  
+
     if ( ! headerStyles.isEmpty() )
     {
       out.append( "\n{\\stylesheet" );
       for ( RtfHeaderStyle style : headerStyles )
     	out.append( style.toString() );
-      
+
       out.append( '}' );
     }
-    
+
     out.append( '\n' );
-    
-    // Write <info> 
-    
+
+    // Write <info>
+
     if ( info.length() > 0 )
     {
       out.append( "{\\info" );
       out.append( info );
-      out.append( "}\n" );      
+      out.append( "}\n" );
     }
 
-    // Write <docfmt> 
-    
+    // Write <docfmt>
+
     if ( docfmt.length() > 0 )
       out.append( docfmt );
-    
+
     /*
      * <document> := <info>? <docfmt>* <section>+
      * <section>  := <secfmt>* <hdrftr>? <para>+ ( \sect <section>)?
@@ -439,7 +442,7 @@ public class Rtf
       CharSequence secfmtHdrftr = secfmtHdrftrs.get( sectionCnt );
 
       // <secfmt>* <hdrftr>?
-      
+
       if ( secfmtHdrftr != null )
         out.append( secfmtHdrftr );
 
@@ -447,7 +450,7 @@ public class Rtf
 
       for ( RtfPara rtfPara : paragraphs )
         rtfPara.rtf( out, true );
-        
+
       // write \sect between sections but not at the end
 
       if ( sectionCnt != sectionParagraphs.size() - 1 )
@@ -461,7 +464,7 @@ public class Rtf
     //        {
     //          // Just add \par if the one before is a paragraph too.
     //          // we don't want \par between table rows
-    //          if (    paragraphs[i-1] instanceof RtfTextPara 
+    //          if (    paragraphs[i-1] instanceof RtfTextPara
     //               && paragraphs[ i ] instanceof RtfTextPara )
     //            out.append( "\\par\n" );
     //        }
@@ -470,7 +473,7 @@ public class Rtf
 
     out.append( "}" );
   }
-  
+
   // Internal utility methods
 
   /**
@@ -491,6 +494,26 @@ public class Rtf
     catch ( IOException e )
     {
       throw new RtfException( e );
+    }
+  }
+
+  /**
+   * Escape character with <code>\'xx</code> type escaping using windows-1252 encoding.
+   */
+  static String escapeWindows1252(char c) {
+    if(!charsetEncoder.canEncode(c)) {
+      return "?";
+    }
+
+    try
+    {
+      final ByteBuffer bytes = charsetEncoder.encode(CharBuffer.wrap(String.valueOf(c)));
+      final int unsignedCharByte = bytes.get() & 255; // Treat byte as unsigned
+      return String.format("\\'%02x", unsignedCharByte);
+    }
+    catch (CharacterCodingException err)
+    {
+      throw new RtfException( err );
     }
   }
 }
