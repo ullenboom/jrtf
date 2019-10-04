@@ -106,14 +106,13 @@ public class RtfTemplate
 
   /**
    * Adds a key/value pair for substitution. Keep the key in pure ASCII.
-   * The value will be converted to String by {@link String#valueOf(Object)}.
    * @param key   Key.
    * @param value Value.
    * @return {@code this} object.
    */
   public RtfTemplate inject( String key, Object value )
   {
-    map.put( key, String.valueOf( value ) );
+    map.put( key, value == null ? "null" : value );
     return this;
   }
 
