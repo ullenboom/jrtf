@@ -207,6 +207,10 @@ public abstract class RtfPara
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( s );
         text.rtf( out );
+
+        if ( withEndingPar )
+          out.append( "\\par" );
+
         out.append( '}' );
       }
     };
