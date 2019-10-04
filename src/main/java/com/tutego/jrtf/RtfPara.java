@@ -122,7 +122,7 @@ public abstract class RtfPara
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{" );
-        out.append( "\\s" ).append( Integer.toString( style.getId() ) );
+        out.append( "\\s" ).append( Integer.toString( style.getId() ) ).append( " " );
         out.append( textparFormatRtf() );
 
         for ( RtfText rtfText : texts )
@@ -170,7 +170,7 @@ public abstract class RtfPara
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{\\pard" );
-        out.append( "\\s" ).append( Integer.toString( style.getId() ) );
+        out.append( "\\s" ).append( Integer.toString( style.getId() ) ).append( " " );
         out.append( textparFormatRtf() );
 
         for ( RtfText rtfText : texts )
