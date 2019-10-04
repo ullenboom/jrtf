@@ -89,7 +89,8 @@ public class RtfText
   /**
    * Converts every object in the sequence with {@code toString} to a
    * String object and wraps it into a RtfText if its not already a
-   * RtfText object and join every text with a space between if wanted.
+   * RtfText object. Templates are converted using {@link RtfTemplate#out()}.
+   * Then it joins every text with a space between if wanted.
    * If the argument is {@code null} or no elements are given
    * the result is equal to {@code text("")}. If one element of the vararg
    * is {@code null} then this element is omitted and no separating space
@@ -117,6 +118,8 @@ public class RtfText
       {
         if ( texts[ i ] instanceof RtfText )
           ((RtfText) texts[ i ]).rtf( result );
+        else if ( texts[i] instanceof RtfTemplate )
+          result.append( ((RtfTemplate) texts[ i ]).out() );
         else if ( texts[ i ] instanceof RtfPara )  // check more
           throw new RtfException( "RtfPara in method text() is not allowed. There is no sensible toString() method declared" );
         else
