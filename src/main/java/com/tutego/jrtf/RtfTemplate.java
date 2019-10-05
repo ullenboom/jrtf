@@ -58,7 +58,7 @@ public class RtfTemplate
   private StringBuilder template = new StringBuilder( 8192 );
 
   /** Map with all variables and substitutions. */
-  private Map<String, Object> map = new HashMap<String, Object>();
+  private Map<String, Object> map = new HashMap<>();
 
   /** Regex pattern for %%VARIABLE%%. */
   private final static Pattern VARIABLE_PATTERN = Pattern.compile( "%%(\\S+)%%",
@@ -72,6 +72,7 @@ public class RtfTemplate
   RtfTemplate( InputStream inputStream )
   {
     Reader reader = null;
+    RtfException rtfException = null;
     try
     {
       if ( ! ( inputStream instanceof BufferedInputStream ) )
@@ -84,12 +85,12 @@ public class RtfTemplate
     }
     catch ( IOException e )
     {
-      throw new RtfException( e );
+      throw (rtfException = new RtfException( e ));
     }
     finally
     {
       if ( reader != null )
-        try { reader.close(); } catch ( IOException e ) { throw new RtfException( e ); }
+        try { reader.close(); } catch ( IOException e ) { throw new RtfException( rtfException, e ); }
     }
   }
 
@@ -161,6 +162,7 @@ public class RtfTemplate
    */
   public void out( OutputStream out )
   {
+    RtfException rtfException = null;
     try
     {
       String out2 = out();
@@ -168,11 +170,11 @@ public class RtfTemplate
     }
     catch ( IOException e )
     {
-      throw new RtfException( e );
+      throw (rtfException = new RtfException( e ));
     }
     finally
     {
-      try { out.close(); } catch ( IOException e ) { throw new RtfException(e); }
+      try { out.close(); } catch ( IOException e ) { throw new RtfException( rtfException, e ); }
     }
   }
 }
