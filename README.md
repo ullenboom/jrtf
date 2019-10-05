@@ -157,15 +157,14 @@ In order to use different fonts and colors a header has to precede the section:
 
     rtf()
       .header(
-        color( 0xff, 0, 0 ).at( 0 ),
-        color( 0, 0xff, 0 ).at( 1 ),
-        color( 0, 0, 0xff ).at( 2 ),
-        font( "Calibri" ).at( 0 ) )
-      .section(
-    	p( font( 1, "Second paragraph" ) ),
-    	p( color( 1, "green" ) )
-      )
-    ).out( out );
+        color( 0xff, 0, 0 ).at( 1 ),
+        color( 0, 0xff, 0 ).at( 2 ),
+        color( 0, 0, 0xff ).at( 3 ),
+        font( "Calibri" ).at( 0 )
+      ).section(
+        p( font( 1, "Second paragraph" ) ),
+        p( color( 1, "green" ) )
+      ).out( out );
 
 This header is setting 3 colors and one font. Every color and font is identified by an index. This index is used later to identify this color and font. The numbering starts with 0. If there is no font given, "Times" will be the default font at position 0.
 

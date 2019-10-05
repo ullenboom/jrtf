@@ -72,4 +72,15 @@ public class RtfException extends RuntimeException
   {
     super( cause );
   }
+
+  /**
+   * RTF exception with an additional suppressed exception.
+   * @param cause Reason,
+   * @param suppressed Suppressed.
+   */
+  public RtfException( Throwable cause, Throwable suppressed ) {
+    super( cause );
+    if ( suppressed != null )
+      addSuppressed( suppressed );
+  }
 }
