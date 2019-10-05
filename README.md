@@ -1,8 +1,8 @@
-jRTF is a simple library to generate RTF documents and to fill RTF template files. The syntax is compact and non-verbose which makes it to some kind of DSL (domain specific language) for RTF documents. It's published under the BSD license.
+jRTF is a simple library to generate RTF documents and to fill RTF template files. The syntax is compact and non-verbose which makes it to some kind of DSL (domain specific language) for RTF documents. It's published under the BSD license. The current version is 0.9-SNAPSHOT.
 
 See also:
 * [jrtf in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jrtf%22) (old version)
-* [Javadoc](http://javadoc.io/doc/com.tutego/jrtf/)
+* [Javadoc](http://javadoc.io/doc/com.tutego/jrtf/) (old version)
 
 Someone may upload the current version 0.9-SNAPSHOT to Maven central.
 
