@@ -46,7 +46,7 @@ public class RtfFields
    * @param fieldInstructions Field instructions.
    * @return {@link RtfText} which represents a field.
    */
-  public static RtfText field( final RtfPara fieldInstructions )
+  public static RtfText field( RtfPara fieldInstructions )
   {
     return RtfText.field( fieldInstructions, RtfPara.p( "Refresh 'F9'" ) );
   }

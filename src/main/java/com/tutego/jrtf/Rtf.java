@@ -54,13 +54,13 @@ public class Rtf
   final static String CHARSET1252 = charset.name();
 
   /** Associates an index with a color. */
-  private SortedMap<Integer, RtfHeaderColor> headerColors = new TreeMap<Integer, RtfHeaderColor>();
+  private SortedMap<Integer, RtfHeaderColor> headerColors = new TreeMap<>();
 
   /** List of fonts. */
-  private List<RtfHeaderFont> headerFonts = new ArrayList<RtfHeaderFont>();
+  private List<RtfHeaderFont> headerFonts = new ArrayList<>();
 
   /** List of style sheets. */
-  private List<RtfHeaderStyle> headerStyles = new ArrayList<RtfHeaderStyle>();
+  private List<RtfHeaderStyle> headerStyles = new ArrayList<>();
 
   /** Document info. */
   private StringBuilder info = new StringBuilder();
@@ -69,9 +69,9 @@ public class Rtf
   private StringBuilder docfmt = new StringBuilder();
 
   /** Section data will be stored in 2 lists: One for the section formatting and headers */
-  private List<CharSequence> secfmtHdrftrs = new ArrayList<CharSequence>();
+  private List<CharSequence> secfmtHdrftrs = new ArrayList<>();
   /** and another list for the paragraphs itself. */
-  private List<RtfPara[]> sectionParagraphs = new ArrayList<RtfPara[]>();
+  private List<RtfPara[]> sectionParagraphs = new ArrayList<>();
 
   /**
    * Private constructor. The user will not instantiate this class.
@@ -274,7 +274,7 @@ public class Rtf
 
   /**
    * Writes the RTF document and send the output to an {@link Appendable}.
-   * This method closes the {@link Appendable} after writing if its of type
+   * This method closes the {@link Appendable} after writing if it is of type
    * {@link Closeable}.
    * @param out Destination of this RTF output.
    */
@@ -283,18 +283,19 @@ public class Rtf
     if ( out == null )
       throw new IllegalArgumentException( "Appendable is not allowed to be null" );
 
+    RtfException rtfException = null;
     try
     {
       writeRtfDocument( out );
     }
     catch ( IOException e )
     {
-      throw new RtfException( e );
+      throw (rtfException = new RtfException( e ));
     }
     finally
     {
       if ( out instanceof Closeable )
-        try { ((Closeable) out).close(); } catch ( IOException e ) { throw new RtfException(e); }
+        try { ((Closeable) out).close(); } catch ( IOException e ) { throw new RtfException( rtfException, e ); }
     }
   }
 
@@ -387,7 +388,7 @@ public class Rtf
     {
       out.append( "\n{\\colortbl" );
 
-      int maxColorIndex = headerColors.lastKey().intValue();
+      int maxColorIndex = headerColors.lastKey();
 
       for ( int i = 0; i <= maxColorIndex; i++ )
       {

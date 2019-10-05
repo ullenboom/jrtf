@@ -39,7 +39,7 @@ import java.util.*;
  */
 public abstract class RtfPara
 {
-  /**
+  /*
    * <section> := <secfmt>* <hdrftr>? <para>+ (\sect <section>)?
    * <para>    := <textpar> | <row>
    * 
@@ -110,7 +110,7 @@ public abstract class RtfPara
    * @param texts Text to set in paragraph.
    * @return New {@code RtfTextPara} object with text.
    */
-  public static RtfTextPara p( final RtfHeaderStyle style , final RtfText... texts )
+  public static RtfTextPara p( final RtfHeaderStyle style, final RtfText... texts )
   {
     if ( texts == null || texts.length == 0 )
       return new RtfTextPara() {
@@ -118,7 +118,7 @@ public abstract class RtfPara
           out.append( "\\par" );
         }
       };
-      
+
     return new RtfTextPara() {
       @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
         out.append( "{" );
@@ -144,7 +144,7 @@ public abstract class RtfPara
    * @param texts Text to set in paragraph.
    * @return New {@code RtfTextPara} object with text.
    */
-  public static RtfTextPara pard( final RtfText... texts )
+  public static RtfTextPara pard( RtfText... texts )
   {
     return pard( RtfHeaderStyle.NORMAL , texts );
   }
@@ -189,7 +189,7 @@ public abstract class RtfPara
    * @param text Text to set in paragraph.
    * @return New {@code RtfPara} object with text and bullet.
    */
-  public static RtfPara ul( final String text )
+  public static RtfPara ul( String text )
   {
     return ul( new RtfText( text ) );
   }
@@ -237,7 +237,7 @@ public abstract class RtfPara
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    List<RtfPara> paras = new ArrayList<RtfPara>();
+    List<RtfPara> paras = new ArrayList<>();
     for ( RtfText cell : cells )
       paras.add( p(cell) );
 
@@ -270,7 +270,7 @@ public abstract class RtfPara
     if ( cells == null || cells.length == 0 )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    List<RtfPara> paras = new ArrayList<RtfPara>();
+    List<RtfPara> paras = new ArrayList<>();
     for ( Object cell : cells )
     {
       if ( cell instanceof RtfPara )

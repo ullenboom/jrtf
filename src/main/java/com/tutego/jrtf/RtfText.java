@@ -118,7 +118,7 @@ public class RtfText
       {
         if ( texts[ i ] instanceof RtfText )
           ((RtfText) texts[ i ]).rtf( result );
-        else if ( texts[i] instanceof RtfTemplate )
+        else if ( texts[ i ] instanceof RtfTemplate )
           result.append( ((RtfTemplate) texts[ i ]).out() );
         else if ( texts[ i ] instanceof RtfPara )  // check more
           throw new RtfException( "RtfPara in method text() is not allowed. There is no sensible toString() method declared" );
@@ -662,7 +662,7 @@ public class RtfText
    */
   public static RtfText footnote( Object para )
   {
-    return footnote( RtfPara.p( para ) );
+    return footnote( new RtfPara[] {RtfPara.p( para )} );
   }
   
   // Fields  
@@ -720,7 +720,7 @@ public class RtfText
           recentResult.rtf( out, false );
 
         out.append( "}}" );
-      };
+      }
     };
   }
 
