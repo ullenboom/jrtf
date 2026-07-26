@@ -1,3 +1,5 @@
+# jRTF
+
 jRTF is a simple library to generate RTF documents and to fill RTF template files. The syntax is
 compact and non-verbose which makes it to some kind of DSL (domain specific language) for RTF
 documents. It's published under the BSD license.
@@ -9,15 +11,16 @@ gaps are pictures (only JPEG/PNG/EMF, no legacy WMF/PICT encoding), nested table
 patterns beyond a solid fill. Modern RTF list tables and bookmarks (not part of RTF 1.0 itself) are
 also supported.
 
-The Basics
-==========
+## The Basics
 
 Write a simple RTF document to a file:
 
-    Rtf.rtf().p( "Hello World" ).out( new FileWriter("out.rtf") );
+```java
+Rtf.rtf().p( "Hello World" ).out( new FileWriter("out.rtf") );
+```
 
-Special RTF-characters like "{", "}", "\" are encoded automatically.
-"\t" will stay tab and "\n" will be converted to a new paragraph.
+Special RTF characters such as `{`, `}`, and `\` are encoded automatically.
+`\t` remains a tab, and `\n` is converted to a new paragraph.
 
 The static `rtf()` creates a new RTF document object and the `p()` method is short for "paragraph".
 The `out()` method finally writes the output to an `Appendable` (a `Writer` for example) and `out()`
@@ -31,18 +34,19 @@ allows you to build several RTF documents at the same time and modify them at th
 Because jRTF makes heavy use of static methods the programs can be very concise and compact with
 static imports. Let's assume the following (static) imports for the next examples:
 
-    import static com.tutego.jrtf.Rtf.rtf;
-    import static com.tutego.jrtf.RtfDocfmt.*;
-    import static com.tutego.jrtf.RtfHeader.*;
-    import static com.tutego.jrtf.RtfInfo.*;
-    import static com.tutego.jrtf.RtfFields.*;
-    import static com.tutego.jrtf.RtfPara.*;
-    import static com.tutego.jrtf.RtfSectionFormatAndHeaderFooter.*;
-    import static com.tutego.jrtf.RtfText.*;
-    import static com.tutego.jrtf.RtfUnit.*;
+```java
+import static com.tutego.jrtf.Rtf.rtf;
+import static com.tutego.jrtf.RtfDocfmt.*;
+import static com.tutego.jrtf.RtfHeader.*;
+import static com.tutego.jrtf.RtfInfo.*;
+import static com.tutego.jrtf.RtfFields.*;
+import static com.tutego.jrtf.RtfPara.*;
+import static com.tutego.jrtf.RtfSectionFormatAndHeaderFooter.*;
+import static com.tutego.jrtf.RtfText.*;
+import static com.tutego.jrtf.RtfUnit.*;
+```
 
-Sections
-========
+## Sections
 
 A RTF document consists of paragraphs which itself are arranged in sections. A section is some kind
 of mini document with own header, footer, margins and columns. Most documents consist of only one
@@ -50,26 +54,31 @@ section.
 
 The `p()` method of the `Rtf` class is just a façade for the following
 
-    rtf().section( p( "Hello World" ) ).out( new FileWriter("out.rtf") );
+```java
+rtf().section( p( "Hello World" ) ).out( new FileWriter("out.rtf") );
+```
 
 If there will be more sections they are accumulated this way:
 
-    rtf().section(xx).section(xx).section(xx).out(xx);
+```java
+rtf().section(xx).section(xx).section(xx).out(xx);
+```
 
-Paragraphs and Formattings
-==========================
+## Paragraphs and Formattings
 
 The following RTF document consists of several paragraphs and text formattings:
 
-    rtf().section(
-       p( "first paragraph" ),
-       p( tab(),
-          " second par ",
-          bold( "with something in bold" ),
-          text( " and " ),
-          italic( underline( "italic underline" ) )     
-        )  
-    ).out( out );
+```java
+rtf().section(
+   p( "first paragraph" ),
+   p( tab(),
+      " second par ",
+      bold( "with something in bold" ),
+      text( " and " ),
+      italic( underline( "italic underline" ) )
+    )
+).out( out );
+```
 
 The declaration of the section method is:
 
@@ -116,129 +125,142 @@ cell (used directly as that cell's paragraph) since a table row is naturally a s
 paragraphs, not of inline text. Every method's Javadoc says explicitly which of these rules apply,
 so when in doubt, check there.
 
-
-Special Text and Pictures
-=========================
+## Special Text and Pictures
 
 A footnote (`rtf()` omitted for brevity) is added as following:
 
-    p( text("Read this book"),
-       footnote( "The joy of RTF" ),
-       text(".") )
+```java
+p( text("Read this book"),
+   footnote( "The joy of RTF" ),
+   text(".") )
+```
 
 Using a field requires two text blocks: One for the format description and one for the displayed
 value a reader can show (most recent calculated result of the field).
 
-    field( p("time \\@ \"dd.MM.yyyy\""),
-           p("20.06.2010") )
+```java
+field( p("time \\@ \"dd.MM.yyyy\""),
+       p("20.06.2010") )
+```
 
 Because there are so many different fields and time is a common case there is an extra class
 `RtfFields` with static utility methods. Insert a time field with a pattern like this:
 `timeField("hh:mm:ss")`. Or the number of pages for a header:
 
-    p( pageNumberField(), "von", sectionPagesField() )
+```java
+p( pageNumberField(), "von", sectionPagesField() )
+```
 
 Pictures are part of a paragraph. The source is given by an `URL` or `InputStream`. If the resource
 is not available a `RtfException` will be thrown during writing.
 
-    p( picture( getClass().getResource( "folder.png" ) )
-       .size( 64, 64, PIXEL )
-       .type( AUTOMATIC )
-     )
+```java
+p( picture( getClass().getResource( "folder.png" ) )
+   .size( 64, 64, PIXEL )
+   .type( AUTOMATIC )
+ )
+```
 
 You can explicitly set the picture type to PNG or JPEG, but usually `PictureType.AUTOMATIC` will do
 the job.
 
-
-
-Paragraph Formatting
-====================
-
+## Paragraph Formatting
 
 It you want a paragraph with bullets at the beginning use `ul()` instead of `p()`:
 
-    section(
-      p( "first paragraph" ),
-      ul( "bullet1"),
-      ul( "bullet2"),
-      p( "another paragraph" )
-    )
+```java
+section(
+  p( "first paragraph" ),
+  ul( "bullet1"),
+  ul( "bullet2"),
+  p( "another paragraph" )
+)
+```
 
 The `p()` methods return an `RtfTextPara` object which allows formatting the paragraph according to
 the builder pattern. Aligning a paragraph is done this way;
 
-    p( text("centered and indented") ).alignCentered().indentFirstLine( 0.25, RtfUnit.CM )
+```java
+p( text("centered and indented") ).alignCentered().indentFirstLine( 0.25, RtfUnit.CM )
+```
 
 `RtfUnit` is an enum. RTF uses a quite unique measurement (twips) but with the enum there is no need
 to know anything about twips.
 
 If you want to use tabs do any of this:
 
-    p( "1\t2\t3" ).tab( 3, CM )
-                  .tab( TabKind.CENTER, TabLead.DOTS, 9, CM )
+```java
+p( "1\t2\t3" ).tab( 3, CM )
+              .tab( TabKind.CENTER, TabLead.DOTS, 9, CM )
+```
 
 Additional to `p()` there is a method `pard()` where the paragraph styles are not inherited to the
 following paragraph.
 
-
-Tables
-======
+## Tables
 
 Tables are a bit tricky in RTF because there isn't a concept of a table but just the concept of a
 row. In total a section can contain two different types of blocks: paragraphs and rows. While `p()`
 lets you insert a regular paragraph the method `row()` lets you insert a row.
 
-    p( "lala" ),
-    row( "Number", "Square" ),
-    row( 1, 1 ),
-    row( 2, 4 ),
-    p( "lulu" )
+```java
+p( "lala" ),
+row( "Number", "Square" ),
+row( 1, 1 ),
+row( 2, 4 ),
+p( "lulu" )
+```
 
 While the result type of `p()` is `RtfTextPara` the result type of `row()` is `RtfRow`. With
 `RtfRow` you style the whole row in a similar way you style the paragraph.
 
-    row(
-      bold( "S" ), bold( "T" )
-    ).bottomCellBorder().topCellBorder().cellSpace( 1, CM ),
-    row(
-      "Good", "nice"
-    ). cellSpace( 1, CM )
+```java
+row(
+  bold( "S" ), bold( "T" )
+).bottomCellBorder().topCellBorder().cellSpace( 1, CM ),
+row(
+  "Good", "nice"
+). cellSpace( 1, CM )
+```
 
 For full control over each cell — width, background color, borders, vertical alignment, text
 alignment and horizontal/vertical merging — pass `RtfCell` objects (statically imported from
 `RtfCell.cell`) to `row()`. The per-cell widths are turned into the cumulative `\cellx`
 boundaries the RTF format requires:
 
-    import static com.tutego.jrtf.RtfCell.cell;
+```java
+import static com.tutego.jrtf.RtfCell.cell;
 
-    row(
-      cell( bold( "Product" ) ).width( 6, CM ).backgroundColor( 4 ).allBorders(),
-      cell( bold( "Price" ) ).width( 3, CM ).backgroundColor( 4 ).alignRight().allBorders()
-    ),
-    row(
-      cell( "Coffee" ).width( 6, CM ).allBorders(),
-      cell( "2.50" ).width( 3, CM ).alignRight().allBorders()
-    )
+row(
+  cell( bold( "Product" ) ).width( 6, CM ).backgroundColor( 4 ).allBorders(),
+  cell( bold( "Price" ) ).width( 3, CM ).backgroundColor( 4 ).alignRight().allBorders()
+),
+row(
+  cell( "Coffee" ).width( 6, CM ).allBorders(),
+  cell( "2.50" ).width( 3, CM ).alignRight().allBorders()
+)
+```
 
 A cell without an explicit `width(...)` contributes a default width of one inch. A cell may also
 hold several paragraphs — they are separated by `\par` and the cell is terminated by a single
 `\cell`.
 
-A Bit of Style
-==============
+## A Bit of Style
 
 In order to use different fonts and colors a header has to precede the section:
 
-    rtf()
-      .header(
-        color( 0xff, 0, 0 ).at( 1 ),
-        color( 0, 0xff, 0 ).at( 2 ),
-        color( 0, 0, 0xff ).at( 3 ),
-        font( "Calibri" ).at( 0 )
-      ).section(
-        p( font( 1, "Second paragraph" ) ),
-        p( color( 1, "green" ) )
-      ).out( out );
+```java
+rtf()
+  .header(
+    color( 0xff, 0, 0 ).at( 1 ),
+    color( 0, 0xff, 0 ).at( 2 ),
+    color( 0, 0, 0xff ).at( 3 ),
+    font( "Calibri" ).at( 0 )
+  ).section(
+    p( font( 1, "Second paragraph" ) ),
+    p( color( 1, "green" ) )
+  ).out( out );
+```
 
 This header is setting 3 colors and one font. Every color and font is identified by an index. This
 index is used later to identify this color and font. The numbering starts with 0. If there is no
@@ -247,35 +269,39 @@ font given, "Times" will be the default font at position 0.
 Some formats and styles are bound to a section, like a header. Let's set a header for all pages in
 that section:
 
-    section(
-      headerOnAllPages(
-        p( "Date: ", currentDate() )
-      ),
-      p( "bla bla bla " )
-    )
+```java
+section(
+  headerOnAllPages(
+    p( "Date: ", currentDate() )
+  ),
+  p( "bla bla bla " )
+)
+```
 
-Metadata (Info, Document Formattings)
-=====================================
+## Metadata (Info, Document Formattings)
 
 A RTF document can have some associated meta data in a header, info or document info block. You can
 set this on the `rtf()` object:
 
-    rtf()
-      .info( author("christian"), title("without parental guidance") )
-      .documentFormatting( defaultTab( 1, CM ),
-                           revisionMarking() )
-      .section("")
-      .out( out );
+```java
+rtf()
+  .info( author("christian"), title("without parental guidance") )
+  .documentFormatting( defaultTab( 1, CM ),
+                       revisionMarking() )
+  .section("")
+  .out( out );
+```
 
-Templating with jRTF
-====================
+## Templating with jRTF
 
 jRTF is not able to read and change existing RTF documents (although I encourage programmers to
 extend jRTF) but you can inject `RtfText` in slots. If you want to do so prepare a RTF document with
 any Word processor and define "variables" which are framed in %%. If for example an address has to
 be written in the RTF document put a definition like
 
-    %%ADDRESSLINE1%%
+```text
+%%ADDRESSLINE1%%
+```
 
 in the regular text. (Take care not to change the formattings in between. If jRTF is not
 substituting your variable open the RTF file and check if the variable is really in the format
@@ -283,20 +309,19 @@ substituting your variable open the RTF file and check if the variable is really
 
 To substitute use the following jRTF API:
 
-    Rtf.template( new FileInputStream("template.rtf") )
-       .inject( "ADDRESSLINE1", "tutego" )
-       .inject( "ADDRESSLINE2", bold("Sonsbeck") )
-       .out( FileOutputStream("out.rtf") );
+```java
+Rtf.template( new FileInputStream("template.rtf") )
+   .inject( "ADDRESSLINE1", "tutego" )
+   .inject( "ADDRESSLINE2", bold("Sonsbeck") )
+   .out( FileOutputStream("out.rtf") );
+```
 
 The key is always of type `String` but the value argument for `inject()` goes to
 `RtfText.text(Object)`. That means regular Strings or formatted RTF text is both fine — see
 [What does `Object` actually mean here?](#what-does-object-actually-mean-here) above for the
 precise rules.
 
-
-jRTF Design Decisions
-=====================
-
+## jRTF Design Decisions
 
 Several facts drove the design of jRTF.
 
@@ -328,12 +353,10 @@ Several facts drove the design of jRTF.
   definition during writing a text and insert automatically a header information which is written in
   the second pass.
 
-What's not supported and how YOU can help
-=========================================
-
+## What's not supported and how YOU can help
 
 jRTF is grown out of my own need to generate RTF documents. Some background about this
-project: http://www.tutego.de/ is a German training institute and we are generating RTF documents
+project: [tutego.de](http://www.tutego.de/) is a German training institute and we are generating RTF documents
 for two reasons. First we send a document in revision mode to every trainer on a regular basis with
 his/her contact details, availability and a table with his/her seminars so the trainer can make
 changes and additions. Secondly, the jRTF template mechanism is used to prepare offers if a customer
@@ -379,16 +402,12 @@ style. This problem can be solved in three different ways:
 - Offer either a builder style and a `EnumSet` style.
 - Change to `EnumSet` and accept that there a two different API "styles".
 
-Alternative Libraries
-=====================
+## Alternative Libraries
 
-If you are looking to a mature open source alternative take a look at iText RTF
-(http://sourceforge.net/projects/itextrtf/). Unfortunately the RTF support was removed from the
+If you are looking to a mature open source alternative, take a look at [iText RTF](http://sourceforge.net/projects/itextrtf/). Unfortunately the RTF support was removed from the
 official build and you have to search for the RTF version explicitly.
 
-
-Thanks for patches and help
-===========================
+## Thanks for patches and help
 
 * Bill Stackhouse
 * Claude Code
