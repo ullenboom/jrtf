@@ -73,15 +73,19 @@ public final class RtfTableStyle {
   }
 
   public static final class Builder {
-    private final List<String> definitions = new ArrayList<>();
+    private final List<Consumer<RtfOutput>> definitions = new ArrayList<>();
     private int rowBandSize = 0;
     private int columnBandSize = 0;
 
     public Builder allBorders() {
-      definitions.add( "\\" + RtfControlWords.CELL_BORDER_TOP    + "\\" + RtfControlWords.BORDER_SINGLE );
-      definitions.add( "\\" + RtfControlWords.CELL_BORDER_BOTTOM + "\\" + RtfControlWords.BORDER_SINGLE );
-      definitions.add( "\\" + RtfControlWords.CELL_BORDER_LEFT   + "\\" + RtfControlWords.BORDER_SINGLE );
-      definitions.add( "\\" + RtfControlWords.CELL_BORDER_RIGHT  + "\\" + RtfControlWords.BORDER_SINGLE );
+      definitions.add( out -> out.cw( RtfControlWords.CELL_BORDER_TOP )
+                                  .cw( RtfControlWords.BORDER_SINGLE ) );
+      definitions.add( out -> out.cw( RtfControlWords.CELL_BORDER_BOTTOM )
+                                  .cw( RtfControlWords.BORDER_SINGLE ) );
+      definitions.add( out -> out.cw( RtfControlWords.CELL_BORDER_LEFT )
+                                  .cw( RtfControlWords.BORDER_SINGLE ) );
+      definitions.add( out -> out.cw( RtfControlWords.CELL_BORDER_RIGHT )
+                                  .cw( RtfControlWords.BORDER_SINGLE ) );
       return this;
     }
 
@@ -90,15 +94,15 @@ public final class RtfTableStyle {
 
     public RtfTableStyle build() {
       int rb = rowBandSize, cb = columnBandSize;
-      List<String> defs = new ArrayList<>( definitions );
+      List<Consumer<RtfOutput>> defs = new ArrayList<>( definitions );
       return new RtfTableStyle( out -> {
         out.open( RtfControlWords.TABLE_STYLE_DEFINITION );
-        for ( String def : defs )
-          out.append( def );
+        for ( Consumer<RtfOutput> def : defs )
+          def.accept( out );
         if ( rb > 0 )
-          out.cw( RtfControlWords.TABLE_STYLE_ROW_BAND_SIZE ).append( rb );
+          out.cw( RtfControlWords.TABLE_STYLE_ROW_BAND_SIZE, rb );
         if ( cb > 0 )
-          out.cw( RtfControlWords.TABLE_STYLE_COLUMN_BAND_SIZE ).append( cb );
+          out.cw( RtfControlWords.TABLE_STYLE_COLUMN_BAND_SIZE, cb );
         out.semi();
         out.close();
       } );
