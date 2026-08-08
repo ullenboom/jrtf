@@ -213,8 +213,21 @@ public class RtfTextPara extends RtfPara {
   }
 
   /**
+   * Sets the language for the entire paragraph using a {@link java.util.Locale},
+   * which is mapped to the closest LCID. Prefer this over the numeric version.
+   *
+   * @param locale Language to use for spell checking and hyphenation.
+   * @return {@code this}-object.
+   */
+  public RtfTextPara language( java.util.Locale locale ) {
+    // Lookup via RtfText's table; defer to the numeric overload
+    return language( lcidFromLocale( locale ) );
+  }
+
+  /**
    * Sets the language for the entire paragraph, used for spell checking
    * and hyphenation. Common LCIDs: 1031 (German), 1033 (US English).
+   * Prefer {@link #language(java.util.Locale)} when possible.
    *
    * @param lcid Windows Language Code Identifier.
    * @return {@code this}-object.
@@ -222,6 +235,15 @@ public class RtfTextPara extends RtfPara {
   public RtfTextPara language( int lcid ) {
     parfmt.append( '\\' ).append( RtfControlWords.LANGUAGE ).append( lcid ).append( '\n' );
     return this;
+  }
+
+  private static int lcidFromLocale( java.util.Locale locale ) {
+    Integer lcid = RtfText.LOCALE_TO_LCID.get( locale );
+    if ( lcid == null )
+      throw new IllegalArgumentException(
+          "No LCID mapping for " + locale + ". Use language(int lcid) with "
+          + "the numeric Windows Language Code Identifier." );
+    return lcid;
   }
 
   /**

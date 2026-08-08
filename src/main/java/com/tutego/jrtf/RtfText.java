@@ -33,6 +33,9 @@ package com.tutego.jrtf;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
@@ -163,10 +166,83 @@ public class RtfText {
     return new RtfText( out -> Rtf.asRtf( out, t ) );
   }
 
+  // -- Language ----------------------------------------------------------------
+
+  static final Map<Locale, Integer> LOCALE_TO_LCID = new HashMap<>();
+
+  static {
+    // German
+    LOCALE_TO_LCID.put( Locale.GERMAN,              1031 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "de-AT" ), 3079 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "de-CH" ), 2055 );
+    // English
+    LOCALE_TO_LCID.put( Locale.ENGLISH,              1033 );
+    LOCALE_TO_LCID.put( Locale.UK,                   2057 );
+    LOCALE_TO_LCID.put( Locale.US,                   1033 );
+    // French
+    LOCALE_TO_LCID.put( Locale.FRENCH,               1036 );
+    LOCALE_TO_LCID.put( Locale.CANADA_FRENCH,        3084 );
+    // Italian
+    LOCALE_TO_LCID.put( Locale.ITALIAN,              1040 );
+    // Spanish
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "es" ),    1034 );
+    // Portuguese
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "pt" ),    2070 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "pt-BR" ), 1046 );
+    // Dutch
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "nl" ),    1043 );
+    // Russian
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "ru" ),    1049 );
+    // Japanese
+    LOCALE_TO_LCID.put( Locale.JAPANESE,             1041 );
+    // Chinese
+    LOCALE_TO_LCID.put( Locale.CHINESE,              2052 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "zh-TW" ), 1028 );
+    // Korean
+    LOCALE_TO_LCID.put( Locale.KOREAN,               1042 );
+    // Other common locales
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "ar" ),    1025 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "tr" ),    1055 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "pl" ),    1045 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "sv" ),    1053 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "no" ),    1044 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "da" ),    1030 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "fi" ),    1035 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "cs" ),    1029 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "hu" ),    1038 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "ro" ),    1048 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "el" ),    1032 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "he" ),    1037 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "th" ),    1054 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "vi" ),    1066 );
+    LOCALE_TO_LCID.put( Locale.forLanguageTag( "hi" ),    1081 );
+  }
+
+  /**
+   * Sets the language for the given text using a {@link Locale}, which is
+   * much more common in the Java world than a Windows LCID. The locale is
+   * mapped to the closest matching LCID via a built-in table covering
+   * ~30 languages. For locales not in the table, provide the LCID directly
+   * via {@link #language(int, Object)}.
+   *
+   * @param locale Language to use for spell checking and hyphenation.
+   * @param text   Text to associate with this language.
+   * @return New RtfText object.
+   */
+  public static RtfText language( Locale locale, Object text ) {
+    Integer lcid = LOCALE_TO_LCID.get( locale );
+    if ( lcid == null )
+      throw new IllegalArgumentException(
+          "No LCID mapping for " + locale + ". Use language(int lcid, Object text) "
+          + "with the numeric Windows Language Code Identifier." );
+    return language( lcid, text );
+  }
+
   /**
    * Sets the language for the given text, used by word processors for
    * spell checking and hyphenation. Common LCIDs: 1031 (German),
    * 1033 (US English), 1036 (French), 1040 (Italian).
+   * Prefer {@link #language(Locale, Object)} when possible.
    *
    * @param lcid Windows Language Code Identifier.
    * @param text Text to associate with this language.
