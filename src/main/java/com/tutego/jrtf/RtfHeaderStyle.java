@@ -266,18 +266,11 @@ public final class RtfHeaderStyle {
 
   /**
    * Writes the style-sheet definition directly to the output, evaluated only
-   * when the enclosing document is written. Prefer this over {@link #toString()}
-   * for the lazy rendering path.
+   * when the enclosing document is written.
    */
   void rtf( RtfOutput out ) {
     out.open().cw( RtfControlWords.STYLE ).append( id ).sp();
     renderer.accept( out );
     out.close();
-  }
-
-  @Override public String toString() {
-    StringBuilder sb = new StringBuilder( 128 );
-    rtf( new RtfOutput( sb ) );
-    return sb.toString();
   }
 }

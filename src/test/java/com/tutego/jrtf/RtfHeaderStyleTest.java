@@ -7,6 +7,12 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 class RtfHeaderStyleTest {
 
+  private static String rtf( RtfHeaderStyle style ) {
+    StringBuilder sb = new StringBuilder( 128 );
+    style.rtf( new RtfOutput( sb ) );
+    return sb.toString();
+  }
+
   @Test void builtinsHaveFixedIdsAndAreStableAcrossCalls() {
     assertThat( RtfHeaderStyle.NORMAL.getId() ).isEqualTo( 0 );
     assertThat( RtfHeaderStyle.HEADER_1.getId() ).isEqualTo( 1 );
@@ -15,12 +21,12 @@ class RtfHeaderStyleTest {
     assertThat( RtfHeaderStyle.builtins() ).isNotSameAs( RtfHeaderStyle.builtins() );
   }
 
-  @Test void builderStyleIsNotEvaluatedUntilToString() {
+  @Test void builderStyleIsNotEvaluatedUntilWrite() {
     RtfHeaderStyle style = RtfHeaderStyle.builder( "S" ).build();
     Rtf.rtf().headerStyles( style );           // assigns id, does not render
-    String firstWrite = style.toString();       // renders
+    String firstWrite = rtf( style );           // renders
     assertThat( firstWrite ).isEqualTo( "{\\s0  S;}" );
-    String secondWrite = style.toString();      // renders again (no caching)
+    String secondWrite = rtf( style );          // renders again (no caching)
     assertThat( secondWrite ).isEqualTo( "{\\s0  S;}" );
   }
 
@@ -28,7 +34,7 @@ class RtfHeaderStyleTest {
     RtfHeaderStyle style = RtfHeaderStyle.builder( "MyStyle" )
         .basedOn( RtfHeaderStyle.NORMAL ).build();
     Rtf.rtf().headerStyles( style );
-    assertThat( style.toString() ).isEqualTo( "{\\s0 \\sbasedon0 MyStyle;}" );
+    assertThat( rtf( style ) ).isEqualTo( "{\\s0 \\sbasedon0 MyStyle;}" );
   }
 
   @Test void builderRejectsMissingName() {
@@ -40,7 +46,7 @@ class RtfHeaderStyleTest {
     RtfHeaderStyle style = RtfHeaderStyle.builder( "Built" )
         .basedOn( RtfHeaderStyle.NORMAL ).font( 0 ).fontSize( 24 ).bold().alignCentered().build();
     Rtf.rtf().headerStyles( style );
-    assertThat( style.toString() ).isEqualTo( "{\\s0 \\sbasedon0\\f0\\fs24\\b\\qc Built;}" );
+    assertThat( rtf( style ) ).isEqualTo( "{\\s0 \\sbasedon0\\f0\\fs24\\b\\qc Built;}" );
   }
 
   @Test void assignedIdIsNotOverwrittenOnSecondRegistration() {
