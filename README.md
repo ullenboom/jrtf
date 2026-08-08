@@ -7,7 +7,7 @@ See also:
 * [jrtf in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jrtf%22)
 * [Javadoc](http://javadoc.io/doc/com.tutego/jrtf/)
 
-**RTF 1.0 coverage:** roughly **80-90%** of the original RTF 1.0 core feature set is supported —
+**RTF 1.0 coverage:** roughly **90-95%** of the original RTF 1.0 core feature set is supported —
 this is a rough estimate, not a rigorous conformance count. Character and paragraph formatting,
 tables, footnotes, fields, form fields, comments, track changes, bidirectional text, bookmarks,
 hyperlinks, stylesheets, list tables, pictures (JPEG/PNG/EMF), and document metadata are covered.
