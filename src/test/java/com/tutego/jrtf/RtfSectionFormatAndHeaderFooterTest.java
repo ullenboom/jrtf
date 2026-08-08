@@ -21,7 +21,7 @@ class RtfSectionFormatAndHeaderFooterTest {
   }
 
   @Test void columnsRejectsNonPositive() {
-    assertThatExceptionOfType( RtfException.class )
+    assertThatExceptionOfType( IllegalArgumentException.class )
         .isThrownBy( () -> RtfSectionFormatAndHeaderFooter.columns( 0 ) );
   }
 

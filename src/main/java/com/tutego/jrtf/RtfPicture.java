@@ -242,6 +242,9 @@ public class RtfPicture {
       out.open( RtfControlWords.PICTURE_DESTINATION );
 
       if ( pictureType == PictureType.AUTOMATIC ) {
+        if ( hexPicData.length() < 10 * 2 )
+          throw new RtfException( "Image is too small to detect picture type automatically. "
+                                + "Pass an explicit PictureType for images smaller than 10 bytes." );
         // Find out the picture type by poking in the first bytes
         String hexChar1 = hexPicData.substring( 1 * 2, 1 * 2 + 2 );
         String hexChar2 = hexPicData.substring( 2 * 2, 2 * 2 + 2 );

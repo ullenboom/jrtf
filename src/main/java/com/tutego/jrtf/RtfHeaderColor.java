@@ -113,7 +113,7 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
    * Use via {@code RtfHeaderColor.theme(ThemeColor.MAIN_DARK_1).at(1)}.
    * <p>
    * Theme colors adapt to the document's overall colour scheme
-   * (e.g. dark mode vs light mode).
+   * (e.g. dark mode vs. light mode).
    */
   public enum ThemeColor {
     MAIN_DARK_1( "cmaindarkone" ),

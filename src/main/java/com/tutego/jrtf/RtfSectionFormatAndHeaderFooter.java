@@ -94,7 +94,7 @@ public class RtfSectionFormatAndHeaderFooter {
 
   public static RtfSectionFormatAndHeaderFooter columns( int columns ) {
     if ( columns <= 0 )
-      throw new RtfException( "Number of colums can't be <= 0" );
+      throw new IllegalArgumentException( "Number of columns must be > 0, was " + columns );
     return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.COLUMNS, columns ) );
   }
 

@@ -106,9 +106,8 @@ public class RtfTextPara extends RtfPara {
   int cellWidthTwips = -1;
 
   /**
-   * Returns the RTF control words for the <textpar> formattings.
-   *
-   * @return
+   * Writes accumulated paragraph formatting (borders, paragraph format, tabs)
+   * directly to the output.
    */
   void writeFormattingTo( RtfOutput out ) {
     out.append( brdrdef ).append( parfmt ).append( tabdef );

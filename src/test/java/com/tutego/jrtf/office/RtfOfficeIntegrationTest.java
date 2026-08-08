@@ -321,19 +321,23 @@ class RtfOfficeIntegrationTest {
     pb.redirectError( stderrFile.toFile() );
 
     Process process = pb.start();
-    boolean finished = process.waitFor( 120, TimeUnit.SECONDS );
-    if ( !finished ) {
+    try {
+      boolean finished = process.waitFor( 120, TimeUnit.SECONDS );
+      if ( !finished ) {
+        process.destroyForcibly();
+        throw new IllegalStateException( "soffice did not finish within 120 seconds" );
+      }
+
+      String stdout = readFile( stdoutFile );
+      String stderr = readFile( stderrFile );
+
+      Path expectedOutput = outDir.resolve( baseNameWithoutExtension( rtfFile ) + ".txt" );
+      String outputText = Files.exists( expectedOutput ) ? readFile( expectedOutput ) : "";
+
+      return new ConversionResult( process.exitValue(), stdout, stderr, outputText );
+    } finally {
       process.destroyForcibly();
-      throw new IllegalStateException( "soffice did not finish within 120 seconds" );
     }
-
-    String stdout = readFile( stdoutFile );
-    String stderr = readFile( stderrFile );
-
-    Path expectedOutput = outDir.resolve( baseNameWithoutExtension( rtfFile ) + ".txt" );
-    String outputText = Files.exists( expectedOutput ) ? readFile( expectedOutput ) : "";
-
-    return new ConversionResult( process.exitValue(), stdout, stderr, outputText );
   }
 
   private static String readFile( Path file ) throws IOException {

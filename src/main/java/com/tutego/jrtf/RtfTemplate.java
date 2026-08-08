@@ -190,11 +190,10 @@ public class RtfTemplate {
   }
 
   /**
-   * Performs the variable transformation and writes the RTF document and send
-   * the output to an {@link Appendable}. This method closes the {@link Appendable}
-   * after writing if its of type {@link Closeable}.
+   * Performs the variable transformation and writes the RTF document
+   * as Windows-1252 encoded bytes to the given stream, then closes it.
    *
-   * @param out Destination of this RTF output.
+   * @param out Destination stream.
    */
   public void out( OutputStream out ) {
     try ( OutputStream os = out ) {

@@ -79,44 +79,51 @@ public class RtfInfo {
 
   // <subject> '{' \subject #PCDATA '}'
   public static RtfInfo subject( String subject ) {
+    String s = subject != null ? subject : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_SUBJECT ).sp()
-                                     .append( Rtf.asRtf( subject ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // <title> '{' \title #PCDATA '}'
   public static RtfInfo title( String title ) {
+    String s = title != null ? title : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_TITLE ).sp()
-                                     .append( Rtf.asRtf( title ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // <author> '{' \author #PCDATA '}'
   public static RtfInfo author( String author ) {
+    String s = author != null ? author : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_AUTHOR ).sp()
-                                     .append( Rtf.asRtf( author ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // <keywords> '{' \keywords #PCDATA '}'
   public static RtfInfo keywords( String keywords ) {
+    String s = keywords != null ? keywords : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_KEYWORDS ).sp()
-                                     .append( Rtf.asRtf( keywords ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // <comment> '{' \comment #PCDATA '}'
   public static RtfInfo comment( String comment ) {
+    String s = comment != null ? comment : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_COMMENT ).sp()
-                                     .append( Rtf.asRtf( comment ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // <operator> '{' \operator #PCDATA '}'
   public static RtfInfo operator( String operator ) {
+    String s = operator != null ? operator : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_OPERATOR ).sp()
-                                     .append( Rtf.asRtf( operator ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // <doccomm> '{' \doccomm #PCDATA '}'
   public static RtfInfo doccomm( String comment ) {
+    String s = comment != null ? comment : "";
     return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_DOC_COMMENT ).sp()
-                                     .append( Rtf.asRtf( comment ) ).close() );
+                                     .append( Rtf.asRtf( s ) ).close() );
   }
 
   // ---- Numeric info entries ----
