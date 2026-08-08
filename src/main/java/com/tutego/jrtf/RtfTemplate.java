@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2016 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -174,12 +174,8 @@ public class RtfTemplate {
         continue;
 
       StringBuilder sb = new StringBuilder( 128 );
-      try {
-        RtfText.text( value ).rtf( sb );
-      }
-      catch ( IOException e ) {
-        throw new RtfException( e );
-      }
+      RtfOutput out = new RtfOutput( sb );
+      RtfText.text( value ).rtf( out );
       matcher.appendReplacement( result, Matcher.quoteReplacement( sb.toString() ) );
     }
 

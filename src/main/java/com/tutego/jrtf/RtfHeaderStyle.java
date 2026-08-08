@@ -26,9 +26,40 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+ * Copyright (c) 2010-2026 Christian Ullenboom
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ *
+ * * Neither the name of 'jRTF' nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software
+ *   without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.tutego.jrtf;
 
-import java.io.IOException;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
@@ -39,19 +70,10 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The six built-in styles ({@link #NORMAL}, {@link #HEADER_1} .. {@link #HEADER_5}) keep their
  * original, fixed style ids. Additional, user-defined styles can be created with
- * {@link #custom(String, Renderer)} or {@link #builder(String)}; their id is assigned once they
+ * {@link #builder(String)}; their id is assigned once they
  * are registered with {@link Rtf#headerStyles(RtfHeaderStyle...)}.
  */
 public final class RtfHeaderStyle {
-  /**
-   * Render body of a style definition (the part between {@code \sN} and the closing brace),
-   * evaluated only when the enclosing document is written.
-   */
-  @FunctionalInterface
-  public interface Renderer {
-    void rtf( Appendable out ) throws IOException;
-  }
-
   /**
    * Default style.
    */
@@ -104,34 +126,11 @@ public final class RtfHeaderStyle {
   /**
    * Render body for this style, evaluated only when the document is written.
    */
-  private final Renderer renderer;
+  private final Consumer<RtfOutput> renderer;
 
-  private RtfHeaderStyle( int id, Renderer renderer ) {
+  private RtfHeaderStyle( int id, Consumer<RtfOutput> renderer ) {
     this.id = id;
     this.renderer = renderer;
-  }
-
-  /**
-   * Creates a custom style with full control over its RTF. The renderer is only evaluated
-   * when the enclosing document is written, not when this method is called.
-   *
-   * @param name     Style name, shown in word processor UIs (e.g. "My Style").
-   * @param renderer Additional RTF control words for this style, written right after the name
-   *                 and its trailing semicolon (e.g. to add {@code \sbasedon0}). May be
-   *                 {@code null} (only the name is written).
-   * @return New unregistered {@code RtfHeaderStyle}; register it with
-   * {@link Rtf#headerStyles(RtfHeaderStyle...)} to assign its id.
-   */
-  public static RtfHeaderStyle custom( String name, @Nullable Renderer renderer ) {
-    if ( name == null || name.isEmpty() )
-      throw new IllegalArgumentException( "Style name is missing" );
-
-    String escapedName = Rtf.asRtf( name );
-    return new RtfHeaderStyle( -1, out -> {
-      out.append( escapedName ).append( ';' );
-      if ( renderer != null )
-        renderer.rtf( out );
-    } );
   }
 
   /**
@@ -177,7 +176,7 @@ public final class RtfHeaderStyle {
      * @return {@code this}-object.
      */
     public Builder font( int fontnum ) {
-      charFmt.append( RtfControlWords.FONT ).append( fontnum );
+      charFmt.append( '\\' ).append( RtfControlWords.FONT ).append( fontnum );
       return this;
     }
 
@@ -188,7 +187,7 @@ public final class RtfHeaderStyle {
      * @return {@code this}-object.
      */
     public Builder fontSize( int fontSize ) {
-      charFmt.append( RtfControlWords.FONT_SIZE ).append( fontSize );
+      charFmt.append( '\\' ).append( RtfControlWords.FONT_SIZE ).append( fontSize );
       return this;
     }
 
@@ -198,7 +197,7 @@ public final class RtfHeaderStyle {
      * @return {@code this}-object.
      */
     public Builder bold() {
-      charFmt.append( RtfControlWords.BOLD );
+      charFmt.append( '\\' ).append( RtfControlWords.BOLD );
       return this;
     }
 
@@ -208,7 +207,7 @@ public final class RtfHeaderStyle {
      * @return {@code this}-object.
      */
     public Builder italic() {
-      charFmt.append( RtfControlWords.ITALIC );
+      charFmt.append( '\\' ).append( RtfControlWords.ITALIC );
       return this;
     }
 
@@ -218,7 +217,7 @@ public final class RtfHeaderStyle {
      * @return {@code this}-object.
      */
     public Builder alignCentered() {
-      charFmt.append( RtfControlWords.ALIGN_CENTERED );
+      charFmt.append( '\\' ).append( RtfControlWords.ALIGN_CENTERED );
       return this;
     }
 
@@ -235,9 +234,9 @@ public final class RtfHeaderStyle {
 
       return new RtfHeaderStyle( -1, out -> {
         if ( basedOnStyle != null )
-          out.append( RtfControlWords.BASED_ON_STYLE ).append( Integer.toString( basedOnStyle.getId() ) );
+          out.cw( RtfControlWords.BASED_ON_STYLE ).append( basedOnStyle.getId() );
         out.append( charFmtSnapshot );
-        out.append( ' ' ).append( escapedName ).append( ';' );
+        out.sp().append( escapedName ).semi();
       } );
     }
   }
@@ -264,15 +263,11 @@ public final class RtfHeaderStyle {
   }
 
   @Override public String toString() {
-    StringBuilder sb = new StringBuilder( 64 );
-    sb.append( "{" ).append( RtfControlWords.STYLE ).append( id ).append( ' ' );
-    try {
-      renderer.rtf( sb );
-    }
-    catch ( IOException e ) {
-      throw new RtfException( e );
-    }
-    sb.append( '}' );
+    StringBuilder sb = new StringBuilder( 128 );
+    RtfOutput out = new RtfOutput( sb );
+    out.open().cw( RtfControlWords.STYLE ).append( id ).sp();
+    renderer.accept( out );
+    out.close();
     return sb.toString();
   }
 }

@@ -2,8 +2,6 @@ package com.tutego.jrtf;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -21,14 +19,15 @@ class RtfHeaderTest {
     assertThat( out ).contains( "\\red255\\green42\\blue0;" );
   }
 
-  @Test void fontInfoWritesFamilyCharsetAndPitch() throws IOException {
+  @Test void fontInfoWritesFamilyCharsetAndPitch() {
     StringBuilder sb = new StringBuilder();
+    RtfOutput out = new RtfOutput( sb );
     RtfHeaderFont font = (RtfHeaderFont) RtfHeader.font( "Arial" )
         .family( RtfHeaderFont.FontFamily.SWISS )
         .charset( RtfHeaderFont.CharSet.ANSI )
         .pitch( RtfHeaderFont.Pitch.VARIABLE )
         .at( 2 );
-    font.writeFontInfo( sb );
+    font.writeFontInfo( out );
     assertThat( sb.toString() ).isEqualTo( "{\\f2\\fswiss\\fcharset0\\fprq2 Arial;}" );
   }
 }

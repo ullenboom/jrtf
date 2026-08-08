@@ -124,8 +124,8 @@ public final class RtfCell {
    */
   public RtfCell width( double width, RtfUnit unit ) {
     this.widthTwips = unit.toTwips( Math.abs( width ) );
-    celldef.append( RtfControlWords.CELL_WIDTH_TYPE_FIXED )
-           .append( RtfControlWords.CELL_WIDTH ).append( widthTwips );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_WIDTH_TYPE_FIXED )
+           .append( '\\' ).append( RtfControlWords.CELL_WIDTH ).append( widthTwips );
     return this;
   }
 
@@ -138,7 +138,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell backgroundColor( int colorIndex ) {
-    celldef.append( RtfControlWords.CELL_BACKGROUND_COLOR ).append( colorIndex );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BACKGROUND_COLOR ).append( colorIndex );
     return this;
   }
 
@@ -150,7 +150,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell topBorder() {
-    celldef.append( RtfControlWords.CELL_BORDER_TOP ).append( RtfControlWords.BORDER_SINGLE );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_TOP ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
     return this;
   }
 
@@ -160,7 +160,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell bottomBorder() {
-    celldef.append( RtfControlWords.CELL_BORDER_BOTTOM ).append( RtfControlWords.BORDER_SINGLE );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_BOTTOM ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
     return this;
   }
 
@@ -170,7 +170,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell leftBorder() {
-    celldef.append( RtfControlWords.CELL_BORDER_LEFT ).append( RtfControlWords.BORDER_SINGLE );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_LEFT ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
     return this;
   }
 
@@ -180,7 +180,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell rightBorder() {
-    celldef.append( RtfControlWords.CELL_BORDER_RIGHT ).append( RtfControlWords.BORDER_SINGLE );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_RIGHT ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
     return this;
   }
 
@@ -201,7 +201,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell verticalAlignTop() {
-    celldef.append( RtfControlWords.CELL_VERTICAL_ALIGN_TOP );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_VERTICAL_ALIGN_TOP );
     return this;
   }
 
@@ -211,7 +211,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell verticalAlignCenter() {
-    celldef.append( RtfControlWords.CELL_VERTICAL_ALIGN_CENTER );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_VERTICAL_ALIGN_CENTER );
     return this;
   }
 
@@ -221,7 +221,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell verticalAlignBottom() {
-    celldef.append( RtfControlWords.CELL_VERTICAL_ALIGN_BOTTOM );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_VERTICAL_ALIGN_BOTTOM );
     return this;
   }
 
@@ -234,7 +234,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell mergeHorizontallyFirst() {
-    celldef.append( RtfControlWords.CELL_MERGE_FIRST );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_MERGE_FIRST );
     return this;
   }
 
@@ -244,7 +244,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell mergeHorizontally() {
-    celldef.append( RtfControlWords.CELL_MERGE );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_MERGE );
     return this;
   }
 
@@ -255,7 +255,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell mergeVerticallyFirst() {
-    celldef.append( RtfControlWords.CELL_VERTICAL_MERGE_FIRST );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_VERTICAL_MERGE_FIRST );
     return this;
   }
 
@@ -265,7 +265,7 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell mergeVertically() {
-    celldef.append( RtfControlWords.CELL_VERTICAL_MERGE );
+    celldef.append( '\\' ).append( RtfControlWords.CELL_VERTICAL_MERGE );
     return this;
   }
 
@@ -330,10 +330,10 @@ public final class RtfCell {
   }
 
   private static RtfPara wrapBold( RtfPara para ) {
-    return RtfPara.of( ( out, withEndingPar ) -> {
-      out.append( "{" ).append( RtfControlWords.BOLD ).append( ' ' );
-      para.rtf( out, withEndingPar );
-      out.append( '}' );
+    return RtfPara.of( out -> {
+      out.open( RtfControlWords.BOLD ).sp();
+      para.rtf( out, false );
+      out.close();
     } );
   }
 

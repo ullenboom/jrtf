@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,13 +32,27 @@
 package com.tutego.jrtf;
 
 /**
- * Utility methods around the method {@link RtfText#field(RtfPara, RtfPara)}.
+ * Utility methods for building RTF fields &mdash; the {@code \field} / {@code \fldinst} /
+ * {@code \fldrslt} construct plus common field types such as hyperlinks, page numbers,
+ * and table of contents.
+ * <p>
+ * The basic field building blocks ({@link #field(RtfPara, RtfPara)} etc.) live here
+ * rather than on {@link RtfText} because the field-instruction language that goes inside
+ * a field is a separate mini-language from RTF control words.
  */
 public class RtfFields {
-  /**
-   * Private constructor. The user will not instantiate this class.
-   */
   private RtfFields() {}
+
+  // ---- Field-instruction-language constants ----
+
+  /** Hyperlink bookmark switch ({@code \l}) inside a {@code \fldinst} destination. */
+  static final String FIELD_SWITCH_HYPERLINK_BOOKMARK = "\\\\l";
+
+  /** Date-format picture switch ({@code \@}) inside a {@code \fldinst} destination. */
+  static final String FIELD_SWITCH_DATE_FORMAT = "\\@";
+
+  /** Instruction text for a Table of Contents field. */
+  static final String TOC_FIELD_INSTRUCTION = "TOC \\\\f \\\\h \\\\u \\\\o \"1-5\" ";
 
   /**
    * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
@@ -67,7 +81,7 @@ public class RtfFields {
    * @return {@link RtfText} which represents a field with time.
    */
   public static RtfText timeField( String format ) {
-    format = "time " + RtfControlWords.FIELD_SWITCH_DATE_FORMAT + " \"" + format + "\"";
+    format = "time " + FIELD_SWITCH_DATE_FORMAT + " \"" + format + "\"";
 
     return field( format );
   }
@@ -105,6 +119,6 @@ public class RtfFields {
    * @return {@link RtfText} which represents a field with TOC.
    */
   public static RtfText tableOfContentsField() {
-    return field( RtfControlWords.TOC_FIELD_INSTRUCTION );
+    return field( TOC_FIELD_INSTRUCTION );
   }
 }

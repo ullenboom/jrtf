@@ -15,25 +15,25 @@ class RtfHeaderStyleTest {
     assertThat( RtfHeaderStyle.builtins() ).isNotSameAs( RtfHeaderStyle.builtins() );
   }
 
-  @Test void customStyleRendererIsNotEvaluatedUntilToString() {
-    boolean[] called = { false };
-    RtfHeaderStyle style = RtfHeaderStyle.custom( "S", out -> { called[ 0 ] = true; out.append( "\\sbasedon0" ); } );
-    assertThat( called[ 0 ] ).isFalse();
-    Rtf.rtf().headerStyles( style );
-    assertThat( called[ 0 ] ).isFalse();
-    style.toString();
-    assertThat( called[ 0 ] ).isTrue();
+  @Test void builderStyleIsNotEvaluatedUntilToString() {
+    RtfHeaderStyle style = RtfHeaderStyle.builder( "S" ).build();
+    Rtf.rtf().headerStyles( style );           // assigns id, does not render
+    String firstWrite = style.toString();       // renders
+    assertThat( firstWrite ).isEqualTo( "{\\s0  S;}" );
+    String secondWrite = style.toString();      // renders again (no caching)
+    assertThat( secondWrite ).isEqualTo( "{\\s0  S;}" );
   }
 
-  @Test void customStyleRendersNameAndRendererOutput() {
-    RtfHeaderStyle style = RtfHeaderStyle.custom( "MyStyle", out -> out.append( "\\sbasedon0" ) );
+  @Test void builderRendersNameAndBasedOnAndFormatting() {
+    RtfHeaderStyle style = RtfHeaderStyle.builder( "MyStyle" )
+        .basedOn( RtfHeaderStyle.NORMAL ).build();
     Rtf.rtf().headerStyles( style );
-    assertThat( style.toString() ).isEqualTo( "{\\s0 MyStyle;\\sbasedon0}" );
+    assertThat( style.toString() ).isEqualTo( "{\\s0 \\sbasedon0 MyStyle;}" );
   }
 
-  @Test void customStyleRejectsMissingName() {
-    assertThatIllegalArgumentException().isThrownBy( () -> RtfHeaderStyle.custom( "", out -> {} ) );
-    assertThatIllegalArgumentException().isThrownBy( () -> RtfHeaderStyle.custom( null, out -> {} ) );
+  @Test void builderRejectsMissingName() {
+    assertThatIllegalArgumentException().isThrownBy( () -> RtfHeaderStyle.builder( "" ) );
+    assertThatIllegalArgumentException().isThrownBy( () -> RtfHeaderStyle.builder( null ) );
   }
 
   @Test void builderComposesBasedOnFontAndAlignment() {
@@ -43,12 +43,8 @@ class RtfHeaderStyleTest {
     assertThat( style.toString() ).isEqualTo( "{\\s0 \\sbasedon0\\f0\\fs24\\b\\qc Built;}" );
   }
 
-  @Test void builderRejectsMissingName() {
-    assertThatIllegalArgumentException().isThrownBy( () -> RtfHeaderStyle.builder( "" ) );
-  }
-
   @Test void assignedIdIsNotOverwrittenOnSecondRegistration() {
-    RtfHeaderStyle style = RtfHeaderStyle.custom( "S", out -> {} );
+    RtfHeaderStyle style = RtfHeaderStyle.builder( "S" ).build();
     Rtf.rtf().headerStyles( style );
     int firstId = style.getId();
     Rtf.rtf().headerStyles( style ); // register with a different, fresh document

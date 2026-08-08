@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

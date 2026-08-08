@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tutego.jrtf;
-
-import java.io.IOException;
 
 /**
  * Header definitions for font declarations.
@@ -394,10 +392,9 @@ public class RtfHeaderFont extends RtfHeader {
   /**
    * Writes out the RTF definition for a font.
    *
-   * @param out
-   * @throws IOException
+   * @param out Output buffer.
    */
-  void writeFontInfo( Appendable out ) throws IOException {
+  void writeFontInfo( RtfOutput out ) {
     /*
      * <fontinfo> := <fontnum>
      *               <fontfamily>
@@ -417,10 +414,10 @@ public class RtfHeaderFont extends RtfHeader {
      * <fontname>   := #PCDATA
      */
 
-    out.append( "{" ).append( RtfControlWords.FONT ).append( Integer.toString( fontnum ) )
-       .append( RtfControlWords.FONT ).append( fontfamily.toString().toLowerCase() )
-       .append( (charSet != null ? RtfControlWords.FONT_CHARSET + charSet : "") )
-       .append( (pitch != null ? RtfControlWords.FONT_PITCH + pitch : "") )
-       .append( " " ).append( fontname ).append( ";}" );
+    out.open( RtfControlWords.FONT ).append( fontnum )
+       .cw( RtfControlWords.FONT ).append( fontfamily.toString().toLowerCase() )
+       .append( (charSet != null ? "\\" + RtfControlWords.FONT_CHARSET + charSet : "") )
+       .append( (pitch != null ? "\\" + RtfControlWords.FONT_PITCH + pitch : "") )
+       .sp().append( fontname ).closeSemi();
   }
 }

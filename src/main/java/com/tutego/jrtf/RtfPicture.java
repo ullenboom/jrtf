@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -121,9 +121,6 @@ public class RtfPicture {
    * @param source Source of the image. Must not be {@code null}.
    */
   RtfPicture( StreamSource source ) {
-    if ( source == null )
-      throw new IllegalArgumentException( "Image source can't be null" );
-
     this.source = source;
   }
 
@@ -238,55 +235,57 @@ public class RtfPicture {
    * @return RtfText.
    */
   public RtfText type( PictureType pictureType ) {
-    return RtfText.of( out -> {
-        ensureLoaded();
+    // Build the RTF lazily: image bytes are only read when the enclosing
+    // document is written, not when type() is called.
+    return new RtfText( out -> {
+      try { ensureLoaded(); }
+      catch ( IOException e ) { throw new RtfException( e ); }
 
-        out.append( "{" ).append( RtfControlWords.PICTURE_DESTINATION );
+      out.open( RtfControlWords.PICTURE_DESTINATION );
 
-        if ( pictureType == PictureType.AUTOMATIC ) {
-          // Find out the picture type by poking in the first bytes
+      if ( pictureType == PictureType.AUTOMATIC ) {
+        // Find out the picture type by poking in the first bytes
+        String hexChar1 = hexPicData.substring( 1 * 2, 1 * 2 + 2 );
+        String hexChar2 = hexPicData.substring( 2 * 2, 2 * 2 + 2 );
+        String hexChar3 = hexPicData.substring( 3 * 2, 3 * 2 + 2 );
+        String hexChar6 = hexPicData.substring( 6 * 2, 6 * 2 + 2 );
+        String hexChar7 = hexPicData.substring( 7 * 2, 7 * 2 + 2 );
+        String hexChar8 = hexPicData.substring( 8 * 2, 8 * 2 + 2 );
+        String hexChar9 = hexPicData.substring( 9 * 2, 9 * 2 + 2 );
 
-          String hexChar1 = hexPicData.substring( 1 * 2, 1 * 2 + 2 );
-          String hexChar2 = hexPicData.substring( 2 * 2, 2 * 2 + 2 );
-          String hexChar3 = hexPicData.substring( 3 * 2, 3 * 2 + 2 );
-          String hexChar6 = hexPicData.substring( 6 * 2, 6 * 2 + 2 );
-          String hexChar7 = hexPicData.substring( 7 * 2, 7 * 2 + 2 );
-          String hexChar8 = hexPicData.substring( 8 * 2, 8 * 2 + 2 );
-          String hexChar9 = hexPicData.substring( 9 * 2, 9 * 2 + 2 );
+        char char1 = (char) Integer.parseInt( hexChar1, 16 );
+        char char2 = (char) Integer.parseInt( hexChar2, 16 );
+        char char3 = (char) Integer.parseInt( hexChar3, 16 );
+        char char6 = (char) Integer.parseInt( hexChar6, 16 );
+        char char7 = (char) Integer.parseInt( hexChar7, 16 );
+        char char8 = (char) Integer.parseInt( hexChar8, 16 );
+        char char9 = (char) Integer.parseInt( hexChar9, 16 );
 
-          char char1 = (char) Integer.parseInt( hexChar1, 16 );
-          char char2 = (char) Integer.parseInt( hexChar2, 16 );
-          char char3 = (char) Integer.parseInt( hexChar3, 16 );
-          char char6 = (char) Integer.parseInt( hexChar6, 16 );
-          char char7 = (char) Integer.parseInt( hexChar7, 16 );
-          char char8 = (char) Integer.parseInt( hexChar8, 16 );
-          char char9 = (char) Integer.parseInt( hexChar9, 16 );
-
-          if ( char6 == 'J' && char7 == 'F' && char8 == 'I' && char9 == 'F' )
-            out.append( PictureType.JPG.toString() );
-          else if ( char1 == 'P' && char2 == 'N' && char3 == 'G' )
-            out.append( PictureType.PNG.toString() );
-          else
-            throw new RtfException( "Unsupported image type. Pass an explicit PictureType for formats "
-                                    + "other than JPG and PNG." );
-        }
+        if ( char6 == 'J' && char7 == 'F' && char8 == 'I' && char9 == 'F' )
+          out.cw( PictureType.JPG.toString() );
+        else if ( char1 == 'P' && char2 == 'N' && char3 == 'G' )
+          out.cw( PictureType.PNG.toString() );
         else
-          out.append( pictureType.toString() );
+          throw new RtfException(
+              "Unsupported image type. Pass an explicit PictureType for formats "
+              + "other than JPG and PNG." );
+      }
+      else
+        out.cw( pictureType.toString() );
 
-        if ( widthInTwips != -1 )
-          out.append( RtfControlWords.PICTURE_WIDTH_GOAL ).append( Integer.toString( widthInTwips ) );
-        if ( heightInTwips != -1 )
-          out.append( RtfControlWords.PICTURE_HEIGHT_GOAL ).append( Integer.toString( heightInTwips ) );
+      if ( widthInTwips != -1 )
+        out.cw( RtfControlWords.PICTURE_WIDTH_GOAL ).append( widthInTwips );
+      if ( heightInTwips != -1 )
+        out.cw( RtfControlWords.PICTURE_HEIGHT_GOAL ).append( heightInTwips );
 
-        if ( scaleX != -1 )
-          out.append( RtfControlWords.PICTURE_SCALE_X ).append( Integer.toString( scaleX ) );
-        if ( scaleY != -1 )
-          out.append( RtfControlWords.PICTURE_SCALE_Y ).append( Integer.toString( scaleY ) );
+      if ( scaleX != -1 )
+        out.cw( RtfControlWords.PICTURE_SCALE_X ).append( scaleX );
+      if ( scaleY != -1 )
+        out.cw( RtfControlWords.PICTURE_SCALE_Y ).append( scaleY );
 
-        out.append( '\n' );
-        out.append( hexPicData );
-
-        out.append( '}' );
+      out.nl();
+      out.append( hexPicData );
+      out.close();
     } );
   }
 }

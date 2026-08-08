@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,40 +31,55 @@
  */
 package com.tutego.jrtf;
 
-import java.io.IOException;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a RTF paragraph.
  */
-public abstract class RtfTextPara extends RtfPara {
+public class RtfTextPara extends RtfPara {
+
+  Consumer<RtfOutput> renderer;
+  int styleId;
+  boolean resetDefaults;
+  boolean emptyParagraph;
 
   /**
-   * Functional interface for the render body of a {@code RtfTextPara}, so callers
-   * can pass a lambda instead of subclassing {@code RtfTextPara} anonymously.
-   */
-  @FunctionalInterface
-  interface Renderer {
-    void rtf( RtfTextPara self, Appendable out, boolean withEndingPar ) throws IOException;
-  }
-
-  /**
-   * Wraps a {@link Renderer} lambda into a {@code RtfTextPara}, so the returned
-   * object keeps all the builder methods of {@code RtfTextPara} (e.g. {@link #alignLeft()},
-   * {@link #tab(TabKind, TabLead, double, RtfUnit)}, whose accumulated state is reachable
-   * from the lambda via {@code self}) while its render body is expressed as a lambda,
-   * evaluated only when the enclosing document is written.
+   * Wraps a {@link Consumer} lambda into a {@code RtfTextPara}. Internal escape hatch —
+   * the returned object keeps all its builder methods while the render body is expressed
+   * as a lambda, evaluated only when the enclosing document is written.
    *
    * @param renderer Render body.
    * @return New {@code RtfTextPara} object delegating to {@code renderer}.
    */
-  static RtfTextPara of( Renderer renderer ) {
-    return new RtfTextPara() {
-      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-        renderer.rtf( this, out, withEndingPar );
-      }
-    };
+  static RtfTextPara of( Consumer<RtfOutput> renderer ) {
+    RtfTextPara para = new RtfTextPara();
+    para.renderer = renderer;
+    return para;
+  }
+
+  /** Package-private: called from {@link RtfPara#p} / {@link RtfPara#pard}. */
+  RtfTextPara() {}
+
+  @Override void rtf( RtfOutput out, boolean withEndingPar ) {
+    if ( emptyParagraph ) {
+      if ( resetDefaults )
+        out.cw( RtfControlWords.PARAGRAPH_DEFAULTS );
+      if ( withEndingPar )
+        out.cw( RtfControlWords.PAR );
+      return;
+    }
+    out.open();
+    if ( resetDefaults )
+      out.cw( RtfControlWords.PARAGRAPH_DEFAULTS );
+    out.cw( RtfControlWords.STYLE ).append( styleId ).sp();
+    out.append( textparFormatRtf() );
+    if ( renderer != null )
+      renderer.accept( out );
+    if ( withEndingPar )
+      out.cw( RtfControlWords.PAR );
+    out.close().nl();
   }
   /*
    * <textpar> := <pn>?
@@ -123,7 +138,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara reset() {
-    parfmt.append( RtfControlWords.PARAGRAPH_DEFAULTS ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.PARAGRAPH_DEFAULTS ).append( '\n' );
     return this;
   }
 
@@ -133,7 +148,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara hyphenationOn() {
-    parfmt.append( RtfControlWords.HYPHENATE_PARAGRAPH ).append( "1\n" );
+    parfmt.append( '\\' ).append( RtfControlWords.HYPHENATE_PARAGRAPH ).append( "1\n" );
     return this;
   }
 
@@ -143,7 +158,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara hyphenationOff() {
-    parfmt.append( RtfControlWords.HYPHENATE_PARAGRAPH ).append( "0\n" );
+    parfmt.append( '\\' ).append( RtfControlWords.HYPHENATE_PARAGRAPH ).append( "0\n" );
     return this;
   }
 
@@ -153,7 +168,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara partOfTable() {
-    parfmt.append( RtfControlWords.IN_TABLE ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.IN_TABLE ).append( '\n' );
     return this;
   }
 
@@ -163,7 +178,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara keep() {
-    parfmt.append( RtfControlWords.KEEP_TOGETHER ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.KEEP_TOGETHER ).append( '\n' );
     return this;
   }
 
@@ -173,7 +188,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara noWidowOrOrphanControl() {
-    parfmt.append( RtfControlWords.NO_WIDOW_CONTROL ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.NO_WIDOW_CONTROL ).append( '\n' );
     return this;
   }
 
@@ -183,7 +198,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara keepWithNextParagraph() {
-    parfmt.append( RtfControlWords.KEEP_WITH_NEXT ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.KEEP_WITH_NEXT ).append( '\n' );
     return this;
   }
 
@@ -197,7 +212,7 @@ public abstract class RtfTextPara extends RtfPara {
     if ( level < 0 )
       throw new IllegalArgumentException( "Level is not allowed to be negative but is " + level );
 
-    parfmt.append( RtfControlWords.OUTLINE_LEVEL ).append( level ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.OUTLINE_LEVEL ).append( level ).append( '\n' );
     return this;
   }
 
@@ -207,7 +222,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara noLineNumbering() {
-    parfmt.append( RtfControlWords.NO_LINE_NUMBERING ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.NO_LINE_NUMBERING ).append( '\n' );
     return this;
   }
 
@@ -217,7 +232,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara breakPageBeforeParagraph() {
-    parfmt.append( RtfControlWords.PAGE_BREAK_BEFORE ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.PAGE_BREAK_BEFORE ).append( '\n' );
     return this;
   }
 
@@ -229,7 +244,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara alignLeft() {
-    parfmt.append( RtfControlWords.ALIGN_LEFT ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.ALIGN_LEFT ).append( '\n' );
     return this;
   }
 
@@ -237,7 +252,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara alignRight() {
-    parfmt.append( RtfControlWords.ALIGN_RIGHT ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.ALIGN_RIGHT ).append( '\n' );
     return this;
   }
 
@@ -246,7 +261,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara alignJustified() {
-    parfmt.append( RtfControlWords.ALIGN_JUSTIFIED ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.ALIGN_JUSTIFIED ).append( '\n' );
     return this;
   }
 
@@ -255,7 +270,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara alignCentered() {
-    parfmt.append( RtfControlWords.ALIGN_CENTERED ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.ALIGN_CENTERED ).append( '\n' );
     return this;
   }
 
@@ -271,7 +286,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara indentFirstLine( double indentation, RtfUnit unit ) {
-    parfmt.append( RtfControlWords.FIRST_LINE_INDENT ).append( unit.toTwips( indentation ) ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.FIRST_LINE_INDENT ).append( unit.toTwips( indentation ) ).append( '\n' );
     return this;
   }
 
@@ -283,7 +298,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara indentLeft( double indentation, RtfUnit unit ) {
-    parfmt.append( RtfControlWords.LEFT_INDENT ).append( unit.toTwips( indentation ) ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.LEFT_INDENT ).append( unit.toTwips( indentation ) ).append( '\n' );
     return this;
   }
 
@@ -295,7 +310,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara indentRight( double indentation, RtfUnit unit ) {
-    parfmt.append( RtfControlWords.RIGHT_INDENT ).append( unit.toTwips( indentation ) ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.RIGHT_INDENT ).append( unit.toTwips( indentation ) ).append( '\n' );
     return this;
   }
 
@@ -311,7 +326,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara spaceBeforeLine( double space, RtfUnit unit ) {
-    parfmt.append( RtfControlWords.SPACE_BEFORE ).append( unit.toTwips( space ) ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.SPACE_BEFORE ).append( unit.toTwips( space ) ).append( '\n' );
     return this;
   }
 
@@ -323,7 +338,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara spaceAfterLine( double space, RtfUnit unit ) {
-    parfmt.append( RtfControlWords.SPACE_AFTER ).append( unit.toTwips( space ) ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.SPACE_AFTER ).append( unit.toTwips( space ) ).append( '\n' );
     return this;
   }
 
@@ -342,7 +357,7 @@ public abstract class RtfTextPara extends RtfPara {
   public RtfTextPara spaceBetweenLines( double space, RtfUnit unit ) {
     space = Math.abs( space );
 
-    parfmt.append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) ).append( '\n' );
     return this;
   }
 
@@ -358,8 +373,8 @@ public abstract class RtfTextPara extends RtfPara {
   public RtfTextPara spaceBetweenLinesMultipleAtLeastOrExactly( double space, RtfUnit unit ) {
     space = Math.abs( space );
 
-    parfmt.append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) )
-          .append( RtfControlWords.LINE_SPACING_MULTIPLE ).append( "0\n" );
+    parfmt.append( '\\' ).append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) )
+          .append( '\\' ).append( RtfControlWords.LINE_SPACING_MULTIPLE ).append( "0\n" );
     return this;
   }
 
@@ -375,8 +390,8 @@ public abstract class RtfTextPara extends RtfPara {
   public RtfTextPara spaceBetweenLinesMultiple( double space, RtfUnit unit ) {
     space = Math.abs( space );
 
-    parfmt.append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) )
-          .append( RtfControlWords.LINE_SPACING_MULTIPLE ).append( "1\n" );
+    parfmt.append( '\\' ).append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) )
+          .append( '\\' ).append( RtfControlWords.LINE_SPACING_MULTIPLE ).append( "1\n" );
     return this;
   }
 
@@ -389,7 +404,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @see #spaceBetweenLines(double, RtfUnit)
    */
   public RtfTextPara spaceBetweenLinesAutomatically() {
-    parfmt.append( RtfControlWords.LINE_SPACING ).append( "0\n" );
+    parfmt.append( '\\' ).append( RtfControlWords.LINE_SPACING ).append( "0\n" );
     return this;
   }
 
@@ -403,7 +418,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara rightToLeft() {
-    parfmt.append( RtfControlWords.RIGHT_TO_LEFT_PARAGRAPH ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.RIGHT_TO_LEFT_PARAGRAPH ).append( '\n' );
     return this;
   }
 
@@ -413,7 +428,7 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara leftToRight() {
-    parfmt.append( RtfControlWords.LEFT_TO_RIGHT_PARAGRAPH ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.LEFT_TO_RIGHT_PARAGRAPH ).append( '\n' );
     return this;
   }
 
@@ -537,18 +552,18 @@ public abstract class RtfTextPara extends RtfPara {
    */
   public RtfTextPara tab( @Nullable TabKind tabKind, @Nullable TabLead tabLead, double tabPostion, RtfUnit unit ) {
     if ( tabKind != null && tabKind != TabKind.LEFT && tabKind != TabKind.HANGING )
-      tabdef.append( tabKind );
+      tabdef.append( '\\' ).append( tabKind );
 
     if ( tabLead != null )
-      tabdef.append( tabLead );
+      tabdef.append( '\\' ).append( tabLead );
 
     if ( tabKind == TabKind.HANGING ) {
       int twips = unit.toTwips( tabPostion );
-      tabdef.append( String.format( RtfControlWords.LEFT_INDENT + "%d" + RtfControlWords.FIRST_LINE_INDENT + "-%d",
+      tabdef.append( String.format( "\\" + RtfControlWords.LEFT_INDENT + "%d" + "\\" + RtfControlWords.FIRST_LINE_INDENT + "-%d",
           twips, twips ) ).append( '\n' );
     }
     else {
-      tabdef.append( RtfControlWords.TAB_POSITION ).append( unit.toTwips( tabPostion ) ).append( '\n' );
+      tabdef.append( '\\' ).append( RtfControlWords.TAB_POSITION ).append( unit.toTwips( tabPostion ) ).append( '\n' );
     }
 
     return this;
@@ -575,9 +590,9 @@ public abstract class RtfTextPara extends RtfPara {
    */
   public RtfTextPara bartab( @Nullable TabLead tabLead, double tabPostion, RtfUnit unit ) {
     if ( tabLead != null )
-      tabdef.append( tabLead );
+      tabdef.append( '\\' ).append( tabLead );
 
-    tabdef.append( RtfControlWords.BAR_TAB_POSITION ).append( unit.toTwips( tabPostion ) ).append( '\n' );
+    tabdef.append( '\\' ).append( RtfControlWords.BAR_TAB_POSITION ).append( unit.toTwips( tabPostion ) ).append( '\n' );
     return this;
   }
 
@@ -705,7 +720,7 @@ public abstract class RtfTextPara extends RtfPara {
     if ( borderStyle == null )
       throw new IllegalArgumentException( "Border style is missing, can't be null" );
 
-    brdrdef.append( RtfControlWords.PARAGRAPH_BORDER_TOP ).append( borderStyle );
+    brdrdef.append( '\\' ).append( RtfControlWords.PARAGRAPH_BORDER_TOP ).append( '\\' ).append( borderStyle );
     appendBorderWidthAndColor( width, unit, colorIndex );
     return this;
   }
@@ -733,7 +748,7 @@ public abstract class RtfTextPara extends RtfPara {
     if ( borderStyle == null )
       throw new IllegalArgumentException( "Border style is missing, can't be null" );
 
-    brdrdef.append( RtfControlWords.PARAGRAPH_BORDER_BOTTOM ).append( borderStyle );
+    brdrdef.append( '\\' ).append( RtfControlWords.PARAGRAPH_BORDER_BOTTOM ).append( '\\' ).append( borderStyle );
     appendBorderWidthAndColor( width, unit, colorIndex );
     return this;
   }
@@ -761,7 +776,7 @@ public abstract class RtfTextPara extends RtfPara {
     if ( borderStyle == null )
       throw new IllegalArgumentException( "Border style is missing, can't be null" );
 
-    brdrdef.append( RtfControlWords.PARAGRAPH_BORDER_LEFT ).append( borderStyle );
+    brdrdef.append( '\\' ).append( RtfControlWords.PARAGRAPH_BORDER_LEFT ).append( '\\' ).append( borderStyle );
     appendBorderWidthAndColor( width, unit, colorIndex );
     return this;
   }
@@ -789,16 +804,16 @@ public abstract class RtfTextPara extends RtfPara {
     if ( borderStyle == null )
       throw new IllegalArgumentException( "Border style is missing, can't be null" );
 
-    brdrdef.append( RtfControlWords.PARAGRAPH_BORDER_RIGHT ).append( borderStyle );
+    brdrdef.append( '\\' ).append( RtfControlWords.PARAGRAPH_BORDER_RIGHT ).append( '\\' ).append( borderStyle );
     appendBorderWidthAndColor( width, unit, colorIndex );
     return this;
   }
 
   private void appendBorderWidthAndColor( double width, RtfUnit unit, int colorIndex ) {
     if ( width >= 0 )
-      brdrdef.append( RtfControlWords.BORDER_WIDTH ).append( unit.toTwips( width ) );
+      brdrdef.append( '\\' ).append( RtfControlWords.BORDER_WIDTH ).append( unit.toTwips( width ) );
     if ( colorIndex >= 0 )
-      brdrdef.append( RtfControlWords.BORDER_COLOR ).append( colorIndex );
+      brdrdef.append( '\\' ).append( RtfControlWords.BORDER_COLOR ).append( colorIndex );
   }
 
   /**
@@ -808,8 +823,8 @@ public abstract class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara backgroundColor( int colorIndex ) {
-    parfmt.append( RtfControlWords.PARAGRAPH_SHADING ).append( "10000" )
-          .append( RtfControlWords.PARAGRAPH_BACKGROUND_COLOR ).append( colorIndex ).append( '\n' );
+    parfmt.append( '\\' ).append( RtfControlWords.PARAGRAPH_SHADING ).append( "10000" )
+          .append( '\\' ).append( RtfControlWords.PARAGRAPH_BACKGROUND_COLOR ).append( colorIndex ).append( '\n' );
     return this;
   }
 
@@ -833,10 +848,10 @@ public abstract class RtfTextPara extends RtfPara {
     if ( levelIndex < 0 || levelIndex >= list.levelCount() )
       throw new IllegalArgumentException( "Level " + levelIndex + " is not configured on this list" );
 
-    parfmt.append( RtfControlWords.LEFT_INDENT ).append( list.indentTwipsAt( levelIndex ) )
-          .append( RtfControlWords.FIRST_LINE_INDENT ).append( "-" ).append( list.hangingTwipsAt( levelIndex ) )
-          .append( RtfControlWords.LIST_OVERRIDE_INDEX ).append( list.overrideIndex )
-          .append( RtfControlWords.LIST_LEVEL_INDEX ).append( levelIndex )
+    parfmt.append( '\\' ).append( RtfControlWords.LEFT_INDENT ).append( list.indentTwipsAt( levelIndex ) )
+          .append( '\\' ).append( RtfControlWords.FIRST_LINE_INDENT ).append( "-" ).append( list.hangingTwipsAt( levelIndex ) )
+          .append( '\\' ).append( RtfControlWords.LIST_OVERRIDE_INDEX ).append( list.overrideIndex )
+          .append( '\\' ).append( RtfControlWords.LIST_LEVEL_INDEX ).append( levelIndex )
           .append( '\n' );
 
     return this;
@@ -851,7 +866,7 @@ public abstract class RtfTextPara extends RtfPara {
    */
   public RtfTextPara cellWidth( double width, RtfUnit unit ) {
     this.cellWidthTwips = unit.toTwips( Math.abs( width ) );
-    cellfmt.append( RtfControlWords.CELL_WIDTH_TYPE_FIXED ).append( RtfControlWords.CELL_WIDTH )
+    cellfmt.append( '\\' ).append( RtfControlWords.CELL_WIDTH_TYPE_FIXED ).append( '\\' ).append( RtfControlWords.CELL_WIDTH )
            .append( cellWidthTwips )
            .append( '\n' );
 

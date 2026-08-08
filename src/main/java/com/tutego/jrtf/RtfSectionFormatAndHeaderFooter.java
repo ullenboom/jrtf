@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter reset() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.SECTION_DEFAULTS );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_DEFAULTS );
   }
 
   /**
@@ -84,7 +84,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter endnotesIncluded() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.END_NOTES_HERE );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.END_NOTES_HERE );
   }
 
   // Section break
@@ -95,7 +95,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter noBreak() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.SECTION_BREAK_NONE );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_NONE );
   }
 
   /**
@@ -104,7 +104,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewColumn() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.SECTION_BREAK_COLUMN );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_COLUMN );
   }
 
   /**
@@ -113,7 +113,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewPage() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.SECTION_BREAK_PAGE );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_PAGE );
   }
 
   /**
@@ -122,7 +122,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewEvenPage() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.SECTION_BREAK_EVEN );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_EVEN );
   }
 
   /**
@@ -131,7 +131,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewOddPage() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.SECTION_BREAK_ODD );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_ODD );
   }
 
   // Columns
@@ -146,7 +146,7 @@ public class RtfSectionFormatAndHeaderFooter {
     if ( columns <= 0 )
       throw new RtfException( "Number of colums can't be <= 0" );
 
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.COLUMNS + columns );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.COLUMNS + columns );
   }
 
   /**
@@ -157,7 +157,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter spaceBetweenColumns( double space, RtfUnit unit ) {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.COLUMN_SPACE + unit.toTwips( space ) );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.COLUMN_SPACE + unit.toTwips( space ) );
   }
 
   /**
@@ -166,7 +166,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter lineBetweenColumns() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.LINE_BETWEEN_COLUMNS );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.LINE_BETWEEN_COLUMNS );
   }
 
   // Line numbering
@@ -182,7 +182,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter beginningPageNumber( int pageNumber ) {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.PAGE_NUMBER_RESTART + pageNumber );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_RESTART + pageNumber );
   }
 
   /**
@@ -191,7 +191,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter pageNumberLowerRoman() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.PAGE_NUMBER_LOWER_ROMAN );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_LOWER_ROMAN );
   }
 
   /**
@@ -200,7 +200,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter pageNumberUpperRoman() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.PAGE_NUMBER_UPPER_ROMAN );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_UPPER_ROMAN );
   }
 
   /**
@@ -209,7 +209,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter pageNumberDecimal() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.PAGE_NUMBER_DECIMAL );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_DECIMAL );
   }
 
   /**
@@ -218,7 +218,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter titlePage() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.TITLE_PAGE );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.TITLE_PAGE );
   }
 
   // Vertical alignment
@@ -229,7 +229,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter topAlignText() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.VERTICAL_ALIGN_TOP );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_TOP );
   }
 
   /**
@@ -238,7 +238,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter bottomAlignText() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.VERTICAL_ALIGN_BOTTOM );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_BOTTOM );
   }
 
   /**
@@ -247,7 +247,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter centerVerticalText() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.VERTICAL_ALIGN_CENTER );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_CENTER );
   }
 
   /**
@@ -256,7 +256,7 @@ public class RtfSectionFormatAndHeaderFooter {
    * @return New {@code RtfSectionFormatAndHeaderFooter} object.
    */
   public static RtfSectionFormatAndHeaderFooter justifyVerticalText() {
-    return new RtfSectionFormatAndHeaderFooter( RtfControlWords.VERTICAL_ALIGN_JUSTIFIED );
+    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_JUSTIFIED );
   }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,7 +84,7 @@ public class RtfInfo {
    */
   public static RtfInfo subject( String subject ) {
     // <subject> '{' \subject #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_SUBJECT + " " + Rtf.asRtf( subject ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_SUBJECT + " " + Rtf.asRtf( subject ) + "}" );
   }
 
   /**
@@ -95,7 +95,7 @@ public class RtfInfo {
    */
   public static RtfInfo title( String title ) {
     // <title> '{' \title #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_TITLE + " " + Rtf.asRtf( title ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_TITLE + " " + Rtf.asRtf( title ) + "}" );
   }
 
   /**
@@ -106,7 +106,7 @@ public class RtfInfo {
    */
   public static RtfInfo author( String author ) {
     // <author> '{' \author #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_AUTHOR + " " + Rtf.asRtf( author ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_AUTHOR + " " + Rtf.asRtf( author ) + "}" );
   }
 
   /**
@@ -165,9 +165,9 @@ public class RtfInfo {
    */
   private static String timeGroup( String destination, int year, int month, int dayOfMonth,
                                    int hour, int minute, int second ) {
-    return String.format( "{%s " + RtfControlWords.INFO_YEAR + "%d " + RtfControlWords.INFO_MONTH + "%d "
-                          + RtfControlWords.INFO_DAY + "%d " + RtfControlWords.INFO_HOUR + "%d "
-                          + RtfControlWords.INFO_MINUTE + "%d " + RtfControlWords.INFO_SECOND + "%d}",
+    return String.format( "{\\%s " + "\\" + RtfControlWords.INFO_YEAR + "%d " + "\\" + RtfControlWords.INFO_MONTH + "%d "
+                          + "\\" + RtfControlWords.INFO_DAY + "%d " + "\\" + RtfControlWords.INFO_HOUR + "%d "
+                          + "\\" + RtfControlWords.INFO_MINUTE + "%d " + "\\" + RtfControlWords.INFO_SECOND + "%d}",
                           destination, year, month, dayOfMonth, hour, minute, second );
   }
 
@@ -179,7 +179,7 @@ public class RtfInfo {
    */
   public static RtfInfo keywords( String keywords ) {
     // <keywords> '{' \ keywords #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_KEYWORDS + " " + Rtf.asRtf( keywords ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_KEYWORDS + " " + Rtf.asRtf( keywords ) + "}" );
   }
 
   /**
@@ -191,7 +191,7 @@ public class RtfInfo {
    */
   public static RtfInfo comment( String comment ) {
     // <comment> '{' \ comment #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_COMMENT + " " + Rtf.asRtf( comment ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_COMMENT + " " + Rtf.asRtf( comment ) + "}" );
   }
 
   /**
@@ -202,7 +202,7 @@ public class RtfInfo {
    */
   public static RtfInfo operator( String operator ) {
     // <operator> '{' \ operator #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_OPERATOR + " " + Rtf.asRtf( operator ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_OPERATOR + " " + Rtf.asRtf( operator ) + "}" );
   }
 
   /**
@@ -214,7 +214,7 @@ public class RtfInfo {
    */
   public static RtfInfo doccomm( String comment ) {
     // <doccomm> '{' \ doccomm #PCDATA '}'
-    return new RtfInfo( "{" + RtfControlWords.INFO_DOC_COMMENT + " " + Rtf.asRtf( comment ) + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_DOC_COMMENT + " " + Rtf.asRtf( comment ) + "}" );
   }
 
   /**
@@ -224,7 +224,7 @@ public class RtfInfo {
    * @return New RtfInfo object.
    */
   public static RtfInfo version( int version ) {
-    return new RtfInfo( "{" + RtfControlWords.INFO_VERSION + version + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_VERSION + version + "}" );
   }
 
   /**
@@ -234,7 +234,7 @@ public class RtfInfo {
    * @return New RtfInfo object.
    */
   public static RtfInfo numberOfWords( int numberOfWords ) {
-    return new RtfInfo( "{" + RtfControlWords.INFO_NUMBER_OF_WORDS + numberOfWords + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_NUMBER_OF_WORDS + numberOfWords + "}" );
   }
 
   /**
@@ -244,6 +244,6 @@ public class RtfInfo {
    * @return New RtfInfo object.
    */
   public static RtfInfo numberOfPages( int numberOfPages ) {
-    return new RtfInfo( "{" + RtfControlWords.INFO_NUMBER_OF_PAGES + numberOfPages + "}" );
+    return new RtfInfo( "{\\" + RtfControlWords.INFO_NUMBER_OF_PAGES + numberOfPages + "}" );
   }
 }

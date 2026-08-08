@@ -28,7 +28,6 @@
  */
 package com.tutego.jrtf;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -292,7 +291,7 @@ public final class RtfList {
   // Rendering
 
   private static String hexByte( int value ) {
-    return String.format( RtfControlWords.HEX_ESCAPE_FORMAT, value & 0xFF );
+    return String.format( "\\'%02x", value & 0xFF );
   }
 
   /**
@@ -300,14 +299,14 @@ public final class RtfList {
    * index as the sole number placeholder (this implementation does not concatenate ancestor
    * level numbers).
    */
-  private static void writeLevel( Appendable out, int levelIndex, Level level ) throws IOException {
-    out.append( "{" ).append( RtfControlWords.LIST_LEVEL )
-       .append( RtfControlWords.LEVEL_NUMBER_FORMAT ).append( Integer.toString( level.format.levelnfc ) )
-       .append( RtfControlWords.LEVEL_JUSTIFICATION ).append( "0" )
-       .append( RtfControlWords.LEVEL_FOLLOW ).append( "0" )
-       .append( RtfControlWords.LEVEL_START_AT ).append( Integer.toString( level.startAt ) );
+  private static void writeLevel( RtfOutput out, int levelIndex, Level level ) {
+    out.open( RtfControlWords.LIST_LEVEL )
+       .cw( RtfControlWords.LEVEL_NUMBER_FORMAT ).append( level.format.levelnfc )
+       .cw( RtfControlWords.LEVEL_JUSTIFICATION ).append( "0" )
+       .cw( RtfControlWords.LEVEL_FOLLOW ).append( "0" )
+       .cw( RtfControlWords.LEVEL_START_AT ).append( level.startAt );
 
-    out.append( "{" ).append( RtfControlWords.LEVEL_TEXT ).append( ' ' );
+    out.open( RtfControlWords.LEVEL_TEXT ).sp();
     if ( level.format == NumberFormat.BULLET ) {
       out.append( hexByte( 1 ) ).append( hexByte( BULLET_CHAR ) );
     }
@@ -316,16 +315,16 @@ public final class RtfList {
       for ( int i = 0; i < level.suffix.length(); i++ )
         out.append( hexByte( level.suffix.charAt( i ) ) );
     }
-    out.append( ";}" );
+    out.closeSemi();
 
-    out.append( "{" ).append( RtfControlWords.LEVEL_NUMBERS ).append( ' ' );
+    out.open( RtfControlWords.LEVEL_NUMBERS ).sp();
     if ( level.format != NumberFormat.BULLET )
       out.append( hexByte( 1 ) );
-    out.append( ";}" );
+    out.closeSemi();
 
-    out.append( RtfControlWords.LEFT_INDENT ).append( Integer.toString( level.indentTwips ) )
-       .append( RtfControlWords.FIRST_LINE_INDENT ).append( "-" ).append( Integer.toString( level.hangingTwips ) )
-       .append( "}\n" );
+    out.cw( RtfControlWords.LEFT_INDENT ).append( level.indentTwips )
+       .cw( RtfControlWords.FIRST_LINE_INDENT ).append( "-" ).append( level.hangingTwips )
+       .close().nl();
   }
 
   /**
@@ -333,12 +332,12 @@ public final class RtfList {
    * Per spec, a list with more than one level must define all 9 levels, so levels beyond
    * the ones configured are padded with a clone of the last configured level.
    */
-  void writeListDefinition( Appendable out ) throws IOException {
+  void writeListDefinition( RtfOutput out ) {
     boolean simple = levels.size() <= 1;
 
-    out.append( "{" ).append( RtfControlWords.LIST )
-       .append( RtfControlWords.LIST_TEMPLATE_ID ).append( Integer.toString( listId * 1000 ) )
-       .append( RtfControlWords.LIST_SIMPLE ).append( simple ? "1" : "0" ).append( '\n' );
+    out.open( RtfControlWords.LIST )
+       .cw( RtfControlWords.LIST_TEMPLATE_ID, listId * 1000 )
+       .cw( RtfControlWords.LIST_SIMPLE ).append( simple ? "1" : "0" ).nl();
 
     int levelsToWrite = simple ? 1 : 9;
     for ( int i = 0; i < levelsToWrite; i++ ) {
@@ -346,17 +345,17 @@ public final class RtfList {
       writeLevel( out, i, level );
     }
 
-    out.append( RtfControlWords.LIST_ID ).append( Integer.toString( listId ) ).append( "}\n" );
+    out.cw( RtfControlWords.LIST_ID ).append( listId ).close().nl();
   }
 
   /**
    * Writes this list's {@code \listoverride} entry into the document's {@code \listoverridetable}.
    */
-  void writeListOverride( Appendable out ) throws IOException {
-    out.append( "{" ).append( RtfControlWords.LIST_OVERRIDE )
-       .append( RtfControlWords.LIST_ID ).append( Integer.toString( listId ) )
-       .append( RtfControlWords.LIST_OVERRIDE_COUNT ).append( "0" )
-       .append( RtfControlWords.LIST_OVERRIDE_INDEX ).append( Integer.toString( overrideIndex ) )
-       .append( "}\n" );
+  void writeListOverride( RtfOutput out ) {
+    out.open( RtfControlWords.LIST_OVERRIDE )
+       .cw( RtfControlWords.LIST_ID, listId )
+       .cw( RtfControlWords.LIST_OVERRIDE_COUNT ).append( "0" )
+       .cw( RtfControlWords.LIST_OVERRIDE_INDEX, overrideIndex )
+       .close().nl();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ package com.tutego.jrtf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
@@ -61,32 +62,25 @@ public abstract class RtfPara {
    */
 
   /**
-   * Writes out pure RTF of this paragraph into an {@link Appendable}.
+   * Writes out pure RTF of this paragraph into an output buffer.
    *
-   * @param out           Output.
+   * @param out           Output buffer.
    * @param withEndingPar Output will write an \par at the end.
    */
-  abstract void rtf( Appendable out, boolean withEndingPar ) throws IOException;
+  abstract void rtf( RtfOutput out, boolean withEndingPar );
 
   /**
-   * Functional interface for the render body of a {@code RtfPara}, so callers
-   * can pass a lambda instead of subclassing {@code RtfPara} anonymously.
-   */
-  @FunctionalInterface
-  interface Renderer {
-    void rtf( Appendable out, boolean withEndingPar ) throws IOException;
-  }
-
-  /**
-   * Wraps a {@link Renderer} lambda into a {@code RtfPara}.
+   * Wraps a {@link Consumer} lambda into a {@code RtfPara}. The consumer writes
+   * the paragraph content; the framework handles the grouping and optional
+   * {@code \par} terminator.
    *
    * @param renderer Render body, evaluated only when the enclosing document is written.
    * @return New {@code RtfPara} object delegating to {@code renderer}.
    */
-  static RtfPara of( Renderer renderer ) {
+  static RtfPara of( Consumer<RtfOutput> renderer ) {  // package-private escape hatch
     return new RtfPara() {
-      @Override void rtf( Appendable out, boolean withEndingPar ) throws IOException {
-        renderer.rtf( out, withEndingPar );
+      @Override void rtf( RtfOutput out, boolean withEndingPar ) {
+        renderer.accept( out );
       }
     };
   }
@@ -142,22 +136,18 @@ public abstract class RtfPara {
    * @return New {@code RtfTextPara} object with text.
    */
   public static RtfTextPara p( RtfHeaderStyle style, RtfText @Nullable ... texts ) {
-    if ( texts == null || texts.length == 0 )
-      return RtfTextPara.of( ( self, out, withEndingPar ) -> out.append( RtfControlWords.PAR ) );
-
-    return RtfTextPara.of( ( self, out, withEndingPar ) -> {
-      out.append( "{" );
-      out.append( RtfControlWords.STYLE ).append( Integer.toString( style.getId() ) ).append( " " );
-      out.append( self.textparFormatRtf() );
-
-      for ( RtfText rtfText : texts )
-        rtfText.rtf( out );
-
-      if ( withEndingPar )     // if its in table, withEndingPar will be false
-        out.append( RtfControlWords.PAR );
-
-      out.append( "}\n" );
-    } );
+    RtfTextPara para = new RtfTextPara();
+    para.styleId = style.getId();
+    if ( texts == null || texts.length == 0 ) {
+      para.emptyParagraph = true;
+    }
+    else {
+      para.renderer = out -> {
+        for ( RtfText rtfText : texts )
+          rtfText.rtf( out );
+      };
+    }
+    return para;
   }
 
   /**
@@ -186,23 +176,19 @@ public abstract class RtfPara {
    * @return New {@code RtfTextPara} object with text.
    */
   public static RtfTextPara pard( RtfHeaderStyle style, RtfText @Nullable ... texts ) {
-    if ( texts == null || texts.length == 0 )
-      return RtfTextPara.of( ( self, out, withEndingPar ) ->
-          out.append( RtfControlWords.PARAGRAPH_DEFAULTS ).append( RtfControlWords.PAR ) );
-
-    return RtfTextPara.of( ( self, out, withEndingPar ) -> {
-      out.append( "{" ).append( RtfControlWords.PARAGRAPH_DEFAULTS );
-      out.append( RtfControlWords.STYLE ).append( Integer.toString( style.getId() ) ).append( " " );
-      out.append( self.textparFormatRtf() );
-
-      for ( RtfText rtfText : texts )
-        rtfText.rtf( out );
-
-      if ( withEndingPar )     // if its in table, withEndingPar will be false
-        out.append( RtfControlWords.PAR );
-
-      out.append( "}\n" );
-    } );
+    RtfTextPara para = new RtfTextPara();
+    para.styleId = style.getId();
+    para.resetDefaults = true;
+    if ( texts == null || texts.length == 0 ) {
+      para.emptyParagraph = true;
+    }
+    else {
+      para.renderer = out -> {
+        for ( RtfText rtfText : texts )
+          rtfText.rtf( out );
+      };
+    }
+    return para;
   }
 
   /**
@@ -212,7 +198,7 @@ public abstract class RtfPara {
    * @return New {@code RtfPara} object with text and bullet.
    */
   public static RtfPara ul( String text ) {
-    return ul( new RtfText( text ) );
+    return ul( RtfText.text( text ) );
   }
 
   /**
@@ -223,22 +209,19 @@ public abstract class RtfPara {
    */
   public static RtfPara ul( RtfText text ) {
     final String s =
-        "{" + RtfControlWords.PARAGRAPH_DEFAULTS
-      + "{" + RtfControlWords.PN_TEXT + RtfControlWords.BULLET + RtfControlWords.TAB + "}"
-      + "{" + RtfControlWords.DESTINATION_MARKER + RtfControlWords.PARAGRAPH_NUMBERING
-            + RtfControlWords.PN_LEVEL_BULLET + RtfControlWords.PN_FONT + "1"
-            + RtfControlWords.PN_INDENT + "0"
-            + "{" + RtfControlWords.PN_TEXT_BEFORE + RtfControlWords.BULLET + "}}"
-      + RtfControlWords.FIRST_LINE_INDENT + "-200" + RtfControlWords.LEFT_INDENT + "200 ";
+        "{\\" + RtfControlWords.PARAGRAPH_DEFAULTS
+      + "{\\" + RtfControlWords.PN_TEXT + "\\" + RtfControlWords.BULLET + "\\" + RtfControlWords.TAB + "}"
+      + "{\\" + RtfControlWords.DESTINATION_MARKER + "\\" + RtfControlWords.PARAGRAPH_NUMBERING
+            + "\\" + RtfControlWords.PN_LEVEL_BULLET + "\\" + RtfControlWords.PN_FONT + "1"
+            + "\\" + RtfControlWords.PN_INDENT + "0"
+            + "{\\" + RtfControlWords.PN_TEXT_BEFORE + "\\" + RtfControlWords.BULLET + "}}"
+      + "\\" + RtfControlWords.FIRST_LINE_INDENT + "-200" + "\\" + RtfControlWords.LEFT_INDENT + "200 ";
 
-    return RtfPara.of( ( out, withEndingPar ) -> {
+    return RtfPara.of( out -> {
       out.append( s );
       text.rtf( out );
-
-      if ( withEndingPar )
-        out.append( RtfControlWords.PAR );
-
-      out.append( '}' );
+      out.cw( RtfControlWords.PAR );
+      out.close();
     } );
   }
 
@@ -254,7 +237,7 @@ public abstract class RtfPara {
   public static RtfPara hangingUl( RtfText text, double beforeBulletWidth,
                                    RtfUnit beforeBulletUnit, double indentWidth, RtfUnit indentUnit,
                                    double afterItemSpace, RtfUnit afterItemUnit ) {
-    return hangingUl( new RtfText( RtfControlWords.BULLET ), text, beforeBulletWidth, beforeBulletUnit,
+    return hangingUl( new RtfText( out -> out.cw( RtfControlWords.BULLET ) ), text, beforeBulletWidth, beforeBulletUnit,
                       indentWidth, indentUnit, afterItemSpace, afterItemUnit );
   }
 
@@ -276,22 +259,19 @@ public abstract class RtfPara {
     final int afterItemTwips = afterItemUnit.toTwips( afterItemSpace );
     final String s =
         String.format(
-            "{%s" + RtfControlWords.LEFT_INDENT + "%d" + RtfControlWords.FIRST_LINE_INDENT + "-%d",
-            (afterItemTwips != 0 ? (RtfControlWords.SPACE_AFTER + afterItemTwips) : ""),
+            "{%s\\" + RtfControlWords.LEFT_INDENT + "%d\\" + RtfControlWords.FIRST_LINE_INDENT + "-%d",
+            (afterItemTwips != 0 ? ("\\" + RtfControlWords.SPACE_AFTER + afterItemTwips) : ""),
             indentTwips, (indentTwips - beforeTwips) );
 
-    return RtfPara.of( ( out, withEndingPar ) -> {
+    return RtfPara.of( out -> {
       out.append( s );
-      out.append( "{" );
+      out.open();
       bulletText.rtf( out );
-      out.append( RtfControlWords.TAB );
-      out.append( "}" );
+      out.cw( RtfControlWords.TAB );
+      out.close();
       text.rtf( out );
-
-      if ( withEndingPar )
-        out.append( RtfControlWords.PAR );
-
-      out.append( "}" );
+      out.cw( RtfControlWords.PAR );
+      out.close();
     } );
   }
 
@@ -373,20 +353,19 @@ public abstract class RtfPara {
 
     final RtfText rtfText = RtfText.text( text );
 
-    return RtfPara.of( ( out, withEndingPar ) -> {
-      out.append( "{" ).append( RtfControlWords.PARAGRAPH_DEFAULTS )
-         .append( "{" ).append( RtfControlWords.PN_TEXT ).append( RtfControlWords.TAB ).append( "}" )
-         .append( "{" ).append( RtfControlWords.DESTINATION_MARKER ).append( RtfControlWords.PARAGRAPH_NUMBERING )
-         .append( RtfControlWords.PN_LEVEL_BODY ).append( numbering.controlWord )
-         .append( RtfControlWords.PN_START ).append( Integer.toString( start ) )
-         .append( RtfControlWords.PN_INDENT ).append( "360" )
-         .append( "{" ).append( RtfControlWords.PN_TEXT_AFTER ).append( ".}}" )
-         .append( RtfControlWords.FIRST_LINE_INDENT ).append( "-360" )
-         .append( RtfControlWords.LEFT_INDENT ).append( "360" ).append( " " );
+    return RtfPara.of( out -> {
+      out.open().cw( RtfControlWords.PARAGRAPH_DEFAULTS )
+         .nest( RtfControlWords.PN_TEXT, RtfControlWords.TAB )
+         .open( RtfControlWords.DESTINATION_MARKER ).cw( RtfControlWords.PARAGRAPH_NUMBERING )
+         .cw( RtfControlWords.PN_LEVEL_BODY ).cw( numbering.controlWord )
+         .cw( RtfControlWords.PN_START ).append( start )
+         .cw( RtfControlWords.PN_INDENT ).append( "360" )
+         .tag( RtfControlWords.PN_TEXT_AFTER, "." ).close()
+         .cw( RtfControlWords.FIRST_LINE_INDENT ).append( "-360" )
+         .cw( RtfControlWords.LEFT_INDENT ).append( "360" ).sp();
       rtfText.rtf( out );
-      if ( withEndingPar )
-        out.append( RtfControlWords.PAR );
-      out.append( "}" );
+      out.cw( RtfControlWords.PAR );
+      out.close();
     } );
   }
 
@@ -486,9 +465,10 @@ public abstract class RtfPara {
     if ( cells == null )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    return RtfRow.of( ( self, out, withEndingPar ) -> {
-      out.append( "{" ).append( RtfControlWords.ROW_DEFAULTS ).append( RtfControlWords.ROW_AUTOFIT )
-         .append( "1" ).append( RtfControlWords.IN_TABLE ).append( '\n' );
+    RtfRow row = new RtfRow();
+    row.renderer = out -> {
+      out.open().cw( RtfControlWords.ROW_DEFAULTS ).cw( RtfControlWords.ROW_AUTOFIT )
+         .append( 1 ).ctrl( RtfControlWords.IN_TABLE );
 
       // \cellxN is the cumulative right boundary of the cell in twips, not the cell index.
       int boundary = 0;
@@ -497,21 +477,21 @@ public abstract class RtfPara {
                     ? ((RtfTextPara) cellPara).cellWidthTwips
                     : RtfCell.DEFAULT_CELL_WIDTH_TWIPS;
         boundary += width;
-        out.append( self.tbldef )
+        out.append( row.tbldef )
            .append( (cellPara instanceof RtfTextPara) ?
                     ((RtfTextPara) cellPara).cellfmt :
                     "" )
-           .append( RtfControlWords.CELL_BACKGROUND_COLOR ).append( Integer.toString( colorIndex ) )
-           .append( RtfControlWords.CELL_BOUNDARY )
-           .append( Integer.toString( boundary ) ).append( '\n' );
+           .cw( RtfControlWords.CELL_BACKGROUND_COLOR ).append( colorIndex )
+           .pair( RtfControlWords.CELL_BOUNDARY, boundary );
       }
 
       for ( RtfPara cell : cells ) {
         cell.rtf( out, false );
-        out.append( RtfControlWords.CELL ).append( '\n' );
+        out.ctrl( RtfControlWords.CELL );
       }
-      out.append( RtfControlWords.ROW ).append( "}" );
-    } );
+      out.cw( RtfControlWords.ROW ).close();
+    };
+    return row;
   }
 
   /**
@@ -528,17 +508,16 @@ public abstract class RtfPara {
     if ( cells == null || cells.length == 0 )
       throw new RtfException( "There has to be at least one cell in a row" );
 
-    return RtfRow.of( ( self, out, withEndingPar ) -> {
-      out.append( "{" ).append( RtfControlWords.ROW_DEFAULTS ).append( RtfControlWords.IN_TABLE )
-         .append( '\n' );
+    RtfRow row = new RtfRow();
+    row.renderer = out -> {
+      out.open().cw( RtfControlWords.ROW_DEFAULTS ).ctrl( RtfControlWords.IN_TABLE );
 
       int boundary = 0;
       for ( RtfCell cell : cells ) {
         boundary += cell.effectiveWidthTwips();
-        out.append( self.tbldef )
+        out.append( row.tbldef )
            .append( cell.celldef )
-           .append( RtfControlWords.CELL_BOUNDARY ).append( Integer.toString( boundary ) )
-           .append( '\n' );
+           .pair( RtfControlWords.CELL_BOUNDARY, boundary );
       }
 
       for ( RtfCell cell : cells ) {
@@ -546,10 +525,11 @@ public abstract class RtfPara {
         for ( int i = 0; i < paras.size(); i++ )
           // \par separates paragraphs inside a cell; the final one is terminated by \cell only.
           paras.get( i ).rtf( out, i < paras.size() - 1 );
-        out.append( RtfControlWords.CELL ).append( '\n' );
+        out.ctrl( RtfControlWords.CELL );
       }
 
-      out.append( RtfControlWords.ROW ).append( "}" );
-    } );
+      out.cw( RtfControlWords.ROW ).close();
+    };
+    return row;
   }
 }

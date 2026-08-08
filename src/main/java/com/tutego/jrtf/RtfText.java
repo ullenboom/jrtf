@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,9 @@
  */
 package com.tutego.jrtf;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
@@ -62,60 +62,24 @@ public class RtfText {
    */
 
   /**
-   * RTF text. {@code null} exactly when this object was created via {@link #of(Renderer)}.
+   * Renders RTF content lazily — only evaluated when the enclosing document is written.
    */
-  private final @Nullable CharSequence rtf;
+  private final Consumer<RtfOutput> renderer;
 
   /**
-   * Render body, used instead of {@link #rtf} when this object was created via {@link #of(Renderer)}.
-   * {@code null} unless created via {@link #of(Renderer)}.
+   * Wraps a lazy RTF renderer.
    */
-  private final @Nullable Renderer renderer;
-
-  /**
-   * For wrapping RTF text to this object.
-   */
-  RtfText( CharSequence rtf ) {
-    this.rtf = rtf;
-    this.renderer = null;
-  }
-
-  private RtfText( Renderer renderer ) {
-    this.rtf = null;
+  RtfText( Consumer<RtfOutput> renderer ) {
     this.renderer = renderer;
   }
 
   /**
    * Writes the RTF of this RtfText object to the output.
    *
-   * @param out Appendable.
-   * @throws IOException
+   * @param out Output buffer.
    */
-  void rtf( Appendable out ) throws IOException {
-    if ( renderer != null )
-      renderer.rtf( out );
-    else
-      out.append( rtf );
-  }
-
-  /**
-   * Functional interface for the render body of a {@code RtfText}, so callers
-   * can pass a lambda instead of subclassing {@code RtfText} anonymously.
-   */
-  @FunctionalInterface
-  interface Renderer {
-    void rtf( Appendable out ) throws IOException;
-  }
-
-  /**
-   * Wraps a {@link Renderer} lambda into a {@code RtfText}, evaluated only when
-   * the enclosing document is written.
-   *
-   * @param renderer Render body.
-   * @return New {@code RtfText} object delegating to {@code renderer}.
-   */
-  static RtfText of( Renderer renderer ) {
-    return new RtfText( renderer );
+  void rtf( RtfOutput out ) {
+    renderer.accept( out );
   }
 
   /**
@@ -159,33 +123,28 @@ public class RtfText {
    */
   public static RtfText textJoinWithSpace( boolean joinWithSpace, @Nullable Object @Nullable ... texts ) {
     if ( texts == null || texts.length == 0 )
-      return new RtfText( "" );
+      return new RtfText( out -> {} );
 
-    StringBuilder result = new StringBuilder( 1024 );
-    for ( int i = 0; i < texts.length; i++ ) {
-      if ( texts[ i ] == null )
-        continue;
+    return new RtfText( out -> {
+      for ( int i = 0; i < texts.length; i++ ) {
+        if ( texts[ i ] == null )
+          continue;
 
-      if ( joinWithSpace )
-        if ( i > 0 && texts[ i - 1 ] != null )  // if preceding element is null, no space
-          result.append( ' ' );
+        if ( joinWithSpace
+             && i > 0 && texts[ i - 1 ] != null )  // if preceding element is null, no space
+          out.sp();
 
-      try {
         if ( texts[ i ] instanceof RtfText )
-          ((RtfText) texts[ i ]).rtf( result );
+          ((RtfText) texts[ i ]).rtf( out );
         else if ( texts[ i ] instanceof RtfTemplate )
-          result.append( ((RtfTemplate) texts[ i ]).out() );
+          out.append( ((RtfTemplate) texts[ i ]).out() );
         else if ( texts[ i ] instanceof RtfPara )  // check more
           throw new RtfException(
               "RtfPara in method text() is not allowed. There is no sensible toString() method declared" );
         else
-          Rtf.asRtf( result, texts[ i ].toString() );
+          Rtf.asRtf( out, texts[ i ].toString() );
       }
-      catch ( IOException e ) {
-        throw new RtfException( e );
-      }
-    }
-    return new RtfText( result );
+    } );
   }
 
   /**
@@ -199,7 +158,8 @@ public class RtfText {
     if ( text == null )
       text = "";
 
-    return new RtfText( Rtf.asRtf( text ) );
+    String t = text;
+    return new RtfText( out -> Rtf.asRtf( out, t ) );
   }
 
   /**
@@ -210,12 +170,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText font( int fontnum, Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 8 );
-    sb.append( "{" ).append( RtfControlWords.FONT ).append( fontnum )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.FONT ).append( fontnum ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -225,10 +185,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText italic( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 5 );
-    sb.append( "{" ).append( RtfControlWords.ITALIC ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.ITALIC ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -238,10 +200,12 @@ public class RtfText {
    * @return New RtfText object representing this bold text.
    */
   public static RtfText bold( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 5 );
-    sb.append( "{" ).append( RtfControlWords.BOLD ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.BOLD ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -251,10 +215,12 @@ public class RtfText {
    * @return New RtfText object representing this underlined text.
    */
   public static RtfText underline( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 6 );
-    sb.append( "{" ).append( RtfControlWords.UNDERLINE ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.UNDERLINE ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -264,10 +230,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText dottedUnderline( String text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 7 );
-    sb.append( "{" ).append( RtfControlWords.UNDERLINE_DOTTED ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.UNDERLINE_DOTTED ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -277,10 +245,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText doubleUnderline( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 8 );
-    sb.append( "{" ).append( RtfControlWords.UNDERLINE_DOUBLE ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.UNDERLINE_DOUBLE ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -290,10 +260,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText wordUnderline( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 7 );
-    sb.append( "{" ).append( RtfControlWords.UNDERLINE_WORD ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.UNDERLINE_WORD ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -303,10 +275,12 @@ public class RtfText {
    * @return New RtfText object representing this subscripted text.
    */
   public static RtfText subscript( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 7 );
-    sb.append( "{" ).append( RtfControlWords.SUBSCRIPT ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.SUBSCRIPT ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -316,10 +290,12 @@ public class RtfText {
    * @return New RtfText object representing this resivisioned text.
    */
   public static RtfText revised( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 11 );
-    sb.append( "{" ).append( RtfControlWords.REVISED ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.REVISED ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -329,10 +305,12 @@ public class RtfText {
    * @return New RtfText object representing this superscripted text.
    */
   public static RtfText superscript( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 9 );
-    sb.append( "{" ).append( RtfControlWords.SUPERSCRIPT ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.SUPERSCRIPT ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -342,10 +320,12 @@ public class RtfText {
    * @return New RtfText object representing this strikes through text.
    */
   public static RtfText strikethru( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 10 );
-    sb.append( "{" ).append( RtfControlWords.STRIKETHROUGH ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.STRIKETHROUGH ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -355,10 +335,12 @@ public class RtfText {
    * @return New RtfText object representing this shadowed text.
    */
   public static RtfText shadow( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 8 );
-    sb.append( "{" ).append( RtfControlWords.SHADOW ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.SHADOW ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -368,10 +350,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText smallCapitals( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 9 );
-    sb.append( "{" ).append( RtfControlWords.SMALL_CAPS ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.SMALL_CAPS ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -381,10 +365,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText capitals( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 8 );
-    sb.append( "{" ).append( RtfControlWords.CAPS ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.CAPS ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -394,10 +380,12 @@ public class RtfText {
    * @return New RtfText object representing this hidden text.
    */
   public static RtfText hidden( Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 4 );
-    sb.append( "{" ).append( RtfControlWords.HIDDEN ).append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.HIDDEN ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -411,11 +399,12 @@ public class RtfText {
     if ( fontSize < 0 )
       throw new IllegalArgumentException( "Font size can't be negative" );
 
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 12 );
-    sb.append( "{" ).append( RtfControlWords.KERNING ).append( fontSize )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.KERNING, fontSize ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -426,11 +415,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText expand( int twentiethsOfPoint, Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 12 );
-    sb.append( "{" ).append( RtfControlWords.CHAR_EXPAND ).append( twentiethsOfPoint )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.CHAR_EXPAND, twentiethsOfPoint ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -445,11 +435,12 @@ public class RtfText {
     if ( halfPoints < 0 )
       throw new IllegalArgumentException( "Amount can't be negative" );
 
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 8 );
-    sb.append( "{" ).append( RtfControlWords.SUBSCRIPT_LOWER ).append( halfPoints )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.SUBSCRIPT_LOWER, halfPoints ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -464,11 +455,12 @@ public class RtfText {
     if ( halfPoints < 0 )
       throw new IllegalArgumentException( "Amount can't be negative" );
 
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 8 );
-    sb.append( "{" ).append( RtfControlWords.SUPERSCRIPT_RAISE ).append( halfPoints )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.SUPERSCRIPT_RAISE, halfPoints ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -482,13 +474,12 @@ public class RtfText {
     if ( fontSize < 0 )
       throw new IllegalArgumentException( "Font size can't be negative" );
 
-    RtfText rtfText = text( text );
-
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 10 );
-    sb.append( "{" ).append( RtfControlWords.FONT_SIZE ).append( fontSize )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.FONT_SIZE, fontSize ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -499,12 +490,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText backgroundcolor( int colorindex, Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 10 );
-    sb.append( "{" ).append( RtfControlWords.CHAR_BACKGROUND_COLOR ).append( colorindex )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.CHAR_BACKGROUND_COLOR, colorindex ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -526,12 +517,12 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText color( int colorindex, Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 10 );
-    sb.append( "{" ).append( RtfControlWords.CHAR_FOREGROUND_COLOR ).append( colorindex )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.CHAR_FOREGROUND_COLOR, colorindex ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   /**
@@ -554,13 +545,15 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText color( int foregroundColorIndex, int backgroundColorIndex, Object text ) {
-    RtfText rtfText = text( text );
-    StringBuilder sb = new StringBuilder( rtfText.rtf.length() + 16 );
-    sb.append( "{" ).append( RtfControlWords.CHAR_FOREGROUND_COLOR ).append( foregroundColorIndex )
-      .append( RtfControlWords.CHAR_BACKGROUND_COLOR ).append( backgroundColorIndex )
-      .append( ' ' ).append( rtfText.rtf ).append( '}' );
-
-    return new RtfText( sb );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open()
+         .cw( RtfControlWords.CHAR_FOREGROUND_COLOR, foregroundColorIndex )
+         .cw( RtfControlWords.CHAR_BACKGROUND_COLOR, backgroundColorIndex )
+         .sp();
+      inner.rtf( out );
+      out.close();
+    } );
   }
 
   // Special Characters
@@ -572,7 +565,7 @@ public class RtfText {
    * @return New RtfText object representing this current date.
    */
   public static RtfText currentDate() {
-    return new RtfText( RtfControlWords.CURRENT_DATE + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.CURRENT_DATE ) );
   }
 
   /**
@@ -581,7 +574,7 @@ public class RtfText {
    * @return New RtfText object representing this current date.
    */
   public static RtfText currentDateLong() {
-    return new RtfText( RtfControlWords.CURRENT_DATE_LONG + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.CURRENT_DATE_LONG ) );
   }
 
   /**
@@ -590,7 +583,7 @@ public class RtfText {
    * @return New RtfText object representing this current date.
    */
   public static RtfText currentDateAbbreviated() {
-    return new RtfText( RtfControlWords.CURRENT_DATE_ABBREVIATED + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.CURRENT_DATE_ABBREVIATED ) );
   }
 
   /**
@@ -599,7 +592,7 @@ public class RtfText {
    * @return New RtfText object representing current time.
    */
   public static RtfText currentTime() {
-    return new RtfText( RtfControlWords.CURRENT_TIME + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.CURRENT_TIME ) );
   }
 
   /**
@@ -608,7 +601,7 @@ public class RtfText {
    * @return New RtfText object representing page number.
    */
   public static RtfText currentPageNumber() {
-    return new RtfText( RtfControlWords.CURRENT_PAGE_NUMBER + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.CURRENT_PAGE_NUMBER ) );
   }
 
   /**
@@ -617,7 +610,7 @@ public class RtfText {
    * @return New RtfText object representing the section number.
    */
   public static RtfText currentSectionNumber() {
-    return new RtfText( RtfControlWords.CURRENT_SECTION_NUMBER + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.CURRENT_SECTION_NUMBER ) );
   }
 
   /**
@@ -626,7 +619,7 @@ public class RtfText {
    * @return New RtfText object representing a page break.
    */
   public static RtfText pageBreak() {
-    return new RtfText( RtfControlWords.PAGE_BREAK + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.PAGE_BREAK ) );
   }
 
   /**
@@ -635,7 +628,7 @@ public class RtfText {
    * @return New RtfText object representing a column break.
    */
   public static RtfText columnBreak() {
-    return new RtfText( RtfControlWords.COLUMN_BREAK + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.COLUMN_BREAK ) );
   }
 
   /**
@@ -644,7 +637,7 @@ public class RtfText {
    * @return New RtfText object representing a like break.
    */
   public static RtfText lineBreak() {
-    return new RtfText( RtfControlWords.LINE_BREAK + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.LINE_BREAK ) );
   }
 
   /**
@@ -653,7 +646,7 @@ public class RtfText {
    * @return New RtfText object representing a soft page break.
    */
   public static RtfText softPageBreak() {
-    return new RtfText( RtfControlWords.SOFT_PAGE_BREAK + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.SOFT_PAGE_BREAK ) );
   }
 
   /**
@@ -663,14 +656,12 @@ public class RtfText {
    */
   public static RtfText hardRule( double lineWidth, RtfUnit lineWidthUnit ) {
     int lineWidthTwips = lineWidthUnit.toTwips( lineWidth );
-    // customize the line color with \dplineco[rgb], width with \dplinew
-    // return new RtfText( String.format("{\\pard {\\*\\do\\dobxcolumn\\dobypara\\dodhgt" +
-    //                                   "\\dpline\\dpxsize9200\\dplinesolid\\dplinew%d} \\par}",
-    //                                   lineWidthTwips ));
-    return new RtfText( String.format(
-        RtfControlWords.BOTTOM_BORDER + RtfControlWords.BORDER_SINGLE + RtfControlWords.BORDER_WIDTH + "%d {" +
-        RtfControlWords.FONT_SIZE + "0" + RtfControlWords.NON_BREAKING_SPACE + "}",
-        lineWidthTwips ) );
+    return new RtfText( out -> {
+      out.cw( RtfControlWords.BOTTOM_BORDER ).cw( RtfControlWords.BORDER_SINGLE )
+         .cw( RtfControlWords.BORDER_WIDTH ).append( lineWidthTwips )
+         .open( RtfControlWords.FONT_SIZE ).append( "0" )
+         .cw( RtfControlWords.NON_BREAKING_SPACE ).close();
+    } );
   }
 
   /**
@@ -679,7 +670,7 @@ public class RtfText {
    * @return New RtfText object representing a column break.
    */
   public static RtfText softColumnBreak() {
-    return new RtfText( RtfControlWords.SOFT_COLUMN_BREAK + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.SOFT_COLUMN_BREAK ) );
   }
 
   /**
@@ -688,7 +679,7 @@ public class RtfText {
    * @return New RtfText object representing a soft line break.
    */
   public static RtfText softLineBreak() {
-    return new RtfText( RtfControlWords.SOFT_LINE_BREAK + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.SOFT_LINE_BREAK ) );
   }
 
   /**
@@ -698,7 +689,7 @@ public class RtfText {
    * @return New RtfText object representing a tab.
    */
   public static RtfText tab() {
-    return new RtfText( RtfControlWords.TAB + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.TAB ) );
   }
 
   /**
@@ -707,7 +698,7 @@ public class RtfText {
    * @return New RtfText object representing a hyphen.
    */
   public static RtfText longHyphen() {
-    return new RtfText( RtfControlWords.EM_DASH + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.EM_DASH ) );
   }
 
   /**
@@ -716,7 +707,7 @@ public class RtfText {
    * @return New RtfText object representing a hypen.
    */
   public static RtfText shortHyphen() {
-    return new RtfText( RtfControlWords.EN_DASH + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.EN_DASH ) );
   }
 
   /**
@@ -725,7 +716,7 @@ public class RtfText {
    * @return New RtfText object representing a bullet.
    */
   public static RtfText bullet() {
-    return new RtfText( RtfControlWords.BULLET + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.BULLET ) );
   }
 
   /**
@@ -734,7 +725,7 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText leftQuotationMark() {
-    return new RtfText( RtfControlWords.LEFT_SINGLE_QUOTE + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.LEFT_SINGLE_QUOTE ) );
   }
 
   /**
@@ -743,7 +734,7 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText rightQuotationMark() {
-    return new RtfText( RtfControlWords.RIGHT_SINGLE_QUOTE + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.RIGHT_SINGLE_QUOTE ) );
   }
 
   /**
@@ -753,9 +744,12 @@ public class RtfText {
    * @return New RtfText object representing this text in quotation marks.
    */
   public static RtfText qoute( Object text ) {
-    RtfText rtfText = text( text );
-    return new RtfText( RtfControlWords.LEFT_SINGLE_QUOTE + "\n" + rtfText.rtf +
-                        RtfControlWords.RIGHT_SINGLE_QUOTE + "\n" );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.ctrl( RtfControlWords.LEFT_SINGLE_QUOTE );
+      inner.rtf( out );
+      out.ctrl( RtfControlWords.RIGHT_SINGLE_QUOTE );
+    } );
   }
 
   /**
@@ -764,7 +758,7 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText leftDoubleQuotationMark() {
-    return new RtfText( RtfControlWords.LEFT_DOUBLE_QUOTE + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.LEFT_DOUBLE_QUOTE ) );
   }
 
   /**
@@ -773,7 +767,7 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText rightDoubleQuotationMark() {
-    return new RtfText( RtfControlWords.RIGHT_DOUBLE_QUOTE + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.RIGHT_DOUBLE_QUOTE ) );
   }
 
   /**
@@ -783,9 +777,12 @@ public class RtfText {
    * @return New RtfText object representing this text in quotation marks.
    */
   public static RtfText doubleQuote( Object text ) {
-    RtfText rtfText = text( text );
-    return new RtfText( RtfControlWords.LEFT_DOUBLE_QUOTE + "\n" + rtfText.rtf +
-                        RtfControlWords.RIGHT_DOUBLE_QUOTE + "\n" );
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.ctrl( RtfControlWords.LEFT_DOUBLE_QUOTE );
+      inner.rtf( out );
+      out.ctrl( RtfControlWords.RIGHT_DOUBLE_QUOTE );
+    } );
   }
 
   /**
@@ -794,7 +791,7 @@ public class RtfText {
    * @return New RtfText object representing this text.
    */
   public static RtfText nonBreakingSpace() {
-    return new RtfText( RtfControlWords.NON_BREAKING_SPACE + "\n" );
+    return new RtfText( out -> out.ctrl( RtfControlWords.NON_BREAKING_SPACE ) );
   }
 
   // <pict>
@@ -836,13 +833,13 @@ public class RtfText {
    * @return New RtfText object representing this footnote.
    */
   public static RtfText footnote( RtfPara... paras ) {
-    return RtfText.of( out -> {
-      out.append( RtfControlWords.FOOTNOTE_REF_MARK ).append( "{" ).append( RtfControlWords.FOOTNOTE_DESTINATION )
-         .append( "{" ).append( RtfControlWords.SUPERSCRIPT_RAISE ).append( "6" )
-         .append( RtfControlWords.FOOTNOTE_REF_MARK ).append( " }" );
+    return new RtfText( out -> {
+      out.cw( RtfControlWords.FOOTNOTE_REF_MARK ).open( RtfControlWords.FOOTNOTE_DESTINATION )
+         .open( RtfControlWords.SUPERSCRIPT_RAISE ).append( "6" )
+         .cw( RtfControlWords.FOOTNOTE_REF_MARK ).append( " }" );
       for ( RtfPara rtfPara : paras )
         rtfPara.rtf( out, false );
-      out.append( "}\n" );
+      out.close().nl();
     } );
   }
 
@@ -856,7 +853,7 @@ public class RtfText {
     return footnote( new RtfPara[]{ RtfPara.p( para ) } );
   }
 
-  // Fields  
+  // Fields
 
   /**
    * Modifiers for fields.
@@ -912,20 +909,20 @@ public class RtfText {
      * <fldalt>    := \fldalt
      * <fieldrslt> := '{' \fldrslt <para>+ '}'
      */
-    return RtfText.of( out -> {
-      out.append( "{" ).append( RtfControlWords.FIELD );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.FIELD );
 
       if ( fieldModifier != null )
-        out.append( fieldModifier.toString() );
+        out.cw( fieldModifier.toString() );
 
-      out.append( "{" ).append( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).append( ' ' );
+      out.open().cw( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).sp();
       fieldInstructions.rtf( out, false );
-      out.append( "}{" ).append( RtfControlWords.FIELD_RESULT_DESTINATION ).append( ' ' );
+      out.close().open( RtfControlWords.FIELD_RESULT_DESTINATION ).sp();
 
       if ( recentResult != null )
         recentResult.rtf( out, false );
 
-      out.append( "}}" );
+      out.close().close();
     } );
   }
 
@@ -948,14 +945,14 @@ public class RtfText {
    * @return New RtfText object representing this hyperlink.
    */
   public static RtfText hyperlink( String url, RtfPara text ) {
-    return RtfText.of( out -> {
-      out.append( "{" ).append( RtfControlWords.FIELD )
-         .append( "{" ).append( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).append( "{HYPERLINK \"" )
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.FIELD )
+         .open().cw( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).append( "{HYPERLINK \"" )
          .append( Rtf.asRtf( url ) )
-         .append( "\"}}{" ).append( RtfControlWords.FIELD_RESULT_DESTINATION )
-         .append( "{" ).append( RtfControlWords.UNDERLINE ).append( ' ' );
+         .append( "\"}" ).close().open( RtfControlWords.FIELD_RESULT_DESTINATION )
+         .open( RtfControlWords.UNDERLINE ).sp();
       text.rtf( out, false );
-      out.append( "}}}" );
+      out.close().close().close();
     } );
   }
 
@@ -968,15 +965,15 @@ public class RtfText {
    * @return New RtfText object representing this hyperlink.
    */
   public static RtfText hyperlinkToBookmark( String bookmarkName, RtfPara text ) {
-    return RtfText.of( out -> {
-      out.append( "{" ).append( RtfControlWords.FIELD )
-         .append( "{" ).append( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).append( "{HYPERLINK " )
-         .append( RtfControlWords.FIELD_SWITCH_HYPERLINK_BOOKMARK ).append( " \"" )
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.FIELD )
+         .open().cw( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).append( "{HYPERLINK " )
+         .append( RtfFields.FIELD_SWITCH_HYPERLINK_BOOKMARK ).append( " \"" )
          .append( Rtf.asRtf( bookmarkName ) )
-         .append( "\"}}{" ).append( RtfControlWords.FIELD_RESULT_DESTINATION )
-         .append( "{" ).append( RtfControlWords.UNDERLINE ).append( ' ' );
+         .append( "\"}" ).close().open( RtfControlWords.FIELD_RESULT_DESTINATION )
+         .open( RtfControlWords.UNDERLINE ).sp();
       text.rtf( out, false );
-      out.append( "}}}" );
+      out.close().close().close();
     } );
   }
 
@@ -996,10 +993,140 @@ public class RtfText {
       throw new IllegalArgumentException( "Bookmark name can't be null" );
 
     RtfText content = text( texts );
-    return RtfText.of( out -> {
-      out.append( "{" ).append( RtfControlWords.BOOKMARK_START ).append( ' ' ).append( name ).append( "}" );
+    return new RtfText( out -> {
+      out.tag( RtfControlWords.BOOKMARK_START, " " + name );
       content.rtf( out );
-      out.append( "{" ).append( RtfControlWords.BOOKMARK_END ).append( ' ' ).append( name ).append( "}" );
+      out.tag( RtfControlWords.BOOKMARK_END, " " + name );
+    } );
+  }
+
+  // RtfField — generic field support
+
+  /**
+   * Inserts a {@link RtfField}, which encapsulates a field instruction and
+   * its optional recent result.
+   *
+   * @param rtfField Field to insert.
+   * @return New RtfText object representing this field.
+   */
+  public static RtfText field( RtfField rtfField ) {
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.FIELD );
+
+      if ( rtfField.modifier != null )
+        out.cw( rtfField.modifier.toString() );
+
+      out.open().cw( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).sp();
+      out.append( rtfField.instruction );
+      out.close();
+
+      if ( rtfField.recentResult != null ) {
+        out.open( RtfControlWords.FIELD_RESULT_DESTINATION ).sp();
+        rtfField.recentResult.rtf( out, false );
+        out.close();
+      }
+
+      out.close();
+    } );
+  }
+
+  // Form fields
+
+  /**
+   * Inserts a form field (text input, checkbox, or dropdown).
+   *
+   * @param formField Form field built with {@link RtfFormField#text()},
+   *                  {@link RtfFormField#checkbox()}, or {@link RtfFormField#dropdown()}.
+   * @return New RtfText object representing this form field.
+   */
+  public static RtfText formField( RtfFormField formField ) {
+    return new RtfText( formField::rtf );
+  }
+
+  // Annotations / comments
+
+  /**
+   * Inserts an annotation (comment) with an author and content paragraphs.
+   * The word processor shows the author initials as a reference mark,
+   * with the comment text in a balloon or review pane.
+   *
+   * @param author Author initials (e.g. "CU"). Must not be {@code null}.
+   * @param paras  Paragraphs forming the comment body.
+   * @return New RtfText object representing this comment.
+   */
+  public static RtfText comment( String author, RtfPara... paras ) {
+    if ( author == null || author.isEmpty() )
+      throw new IllegalArgumentException( "Comment author is missing" );
+
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.ANNOTATION_ID ).sp()   // just a placeholder marker
+         .cw( RtfControlWords.ANNOTATION_AUTHOR ).sp()
+         .append( Rtf.asRtf( author ) ).close();
+      out.open( RtfControlWords.ANNOTATION_DESTINATION );
+      for ( RtfPara para : paras )
+        para.rtf( out, false );
+      out.close();
+    } );
+  }
+
+  // Track changes / revision
+
+  /**
+   * Marks text as revised (tracked change). The original text is shown as deleted
+   * and the revised text as inserted. The enclosing word processor displays the
+   * change with the given author and date.
+   *
+   * @param author   Author initials (e.g. "CU"). May be {@code null} (no author info).
+   * @param original Original text before the change (shown as deleted).
+   * @param revised  Revised text after the change (shown as inserted).
+   * @return New RtfText object representing this tracked change.
+   */
+  public static RtfText revision( @Nullable String author, Object original, Object revised ) {
+    return new RtfText( out -> {
+      if ( author != null && !author.isEmpty() ) {
+        out.cw( RtfControlWords.REVISION_AUTHOR ).sp()
+           .append( Rtf.asRtf( author ) );
+      }
+      // deleted original
+      out.open( RtfControlWords.REVISED ).sp();
+      RtfText.text( original ).rtf( out );
+      out.close();
+      // inserted revision
+      RtfText.text( revised ).rtf( out );
+    } );
+  }
+
+  // Bidirectional text
+
+  /**
+   * Marks text as right-to-left (e.g. for Arabic or Hebrew). Use
+   * {@link #leftToRight(Object)} to embed LTR runs inside RTL paragraphs.
+   *
+   * @param text Text in a right-to-left script.
+   * @return New RtfText object with RTL direction.
+   */
+  public static RtfText rightToLeft( Object text ) {
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.RIGHT_TO_LEFT_CHAR ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
+  }
+
+  /**
+   * Marks text as left-to-right (e.g. for English words embedded in
+   * a right-to-left paragraph).
+   *
+   * @param text Text in a left-to-right script.
+   * @return New RtfText object with LTR direction.
+   */
+  public static RtfText leftToRight( Object text ) {
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.LEFT_TO_RIGHT_CHAR ).sp();
+      inner.rtf( out );
+      out.close();
     } );
   }
 }

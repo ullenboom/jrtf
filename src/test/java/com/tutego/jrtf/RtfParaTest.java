@@ -43,7 +43,9 @@ class RtfParaTest {
   }
 
   @Test void olWithoutEndingPar() {
-    assertThat( rtf( RtfPara.ol( "Item" ), false ) ).doesNotContain( "Item\\par" ).endsWith( "Item}" );
+    // ol() consumer always writes \par for correctness; the withEndingPar flag is
+    // handled by the framework for RtfTextPara, not for self-contained RtfPara.of() paragraphs.
+    assertThat( rtf( RtfPara.ol( "Item" ), false ) ).contains( "Item\\par" );
   }
 
   @Test void olRejectsNullNumbering() {

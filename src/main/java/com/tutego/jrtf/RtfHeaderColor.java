@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tutego.jrtf;
-
-import java.io.IOException;
 
 /**
  * Represents a color definition for the RTF header.
@@ -96,19 +94,15 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
   /**
    * Appends the color definition of one color in RTF format.
    *
-   * @param out Appendable
-   * @throws IOException
+   * @param out Output buffer.
    */
-  void writeColordef( Appendable out ) throws IOException {
+  void writeColordef( RtfOutput out ) {
     /*
      * <colordef> := \red ? & \green ? & \blue ? ';'
      */
-    out.append( RtfControlWords.RED )
-       .append( Integer.toString( r ) )
-       .append( RtfControlWords.GREEN )
-       .append( Integer.toString( g ) )
-       .append( RtfControlWords.BLUE )
-       .append( Integer.toString( b ) )
-       .append( ';' );
+    out.cw( RtfControlWords.RED ).append( r )
+       .cw( RtfControlWords.GREEN ).append( g )
+       .cw( RtfControlWords.BLUE ).append( b )
+       .semi();
   }
 }

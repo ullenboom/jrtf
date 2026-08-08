@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -116,20 +116,19 @@ public class Rtf {
   }
 
   /**
-   * Converts a given char sequence into RTF format and stream it to the {@code Appendable}.
+   * Converts a given char sequence into RTF format and writes it to the output buffer.
    *
-   * @param out
-   * @param rawText
-   * @throws IOException
+   * @param out     Output buffer.
+   * @param rawText Raw text to escape.
    */
-  static void asRtf( Appendable out, String rawText ) throws IOException {
+  static void asRtf( RtfOutput out, String rawText ) {
     for ( int i = 0; i < rawText.length(); i++ ) {
       char c = rawText.charAt( i );
 
       if ( c == '\n' )
-        out.append( RtfControlWords.PAR ).append( '\n' );
+        out.ctrl( RtfControlWords.PAR );
       else if ( c == '\t' )
-        out.append( RtfControlWords.TAB ).append( '\n' );
+        out.ctrl( RtfControlWords.TAB );
       else if ( c == '\\' )
         out.append( "\\\\" );
       else if ( c == '{' )
@@ -139,7 +138,7 @@ public class Rtf {
       else if ( c < 127 )
         out.append( c );
       else   // Use Unicode and ask the char from the String object; control word takes a signed 16-bit value per spec
-        out.append( RtfControlWords.UNICODE_CHAR ).append( Integer.toString( (short) c ) ).append( escapeWindows1252( c ) );
+        out.cw( RtfControlWords.UNICODE_CHAR ).append( (short) c ).append( escapeWindows1252( c ) );
     }
   }
 
@@ -153,16 +152,8 @@ public class Rtf {
     if ( rawText == null )
       return null;
 
-    // TODO: Optimize
-
     StringBuilder result = new StringBuilder( rawText.length() * 2 );
-    try {
-      asRtf( result, rawText );
-    }
-    catch ( IOException e ) {
-      // If this will happen we are really in trouble
-      throw new RtfException( e );
-    }
+    asRtf( new RtfOutput( result ), rawText );
     return result.toString();
   }
 
@@ -334,7 +325,7 @@ public class Rtf {
       throw new IllegalArgumentException( "Appendable is not allowed to be null" );
 
     try ( @Nullable Closeable closeable = out instanceof Closeable ? (Closeable) out : null ) {
-      writeRtfDocument( out );
+      writeRtfDocument( new RtfOutput( out ) );
     }
     catch ( IOException e ) {
       throw new RtfException( e );
@@ -348,8 +339,8 @@ public class Rtf {
    */
   public CharSequence out() {
     StringBuilder result = new StringBuilder( 4096 );
-    out( result );
-    return result;
+    writeRtfDocument( new RtfOutput( result ) );
+    return result.toString();
   }
 
   /**
@@ -375,7 +366,7 @@ public class Rtf {
   /**
    * Writes the complete RTF document.
    */
-  private void writeRtfDocument( Appendable out ) throws IOException {
+  private void writeRtfDocument( RtfOutput out ) {
     /*
      * <File>     := '{' <header> <document>'}'
      * <header>   := \rtf <charset> \deff? <fonttbl> <colortbl> <stylesheet>?
@@ -400,82 +391,82 @@ public class Rtf {
      *               <generator>?
      */
 
-    out.append( "{" );   // '{' <header> <document>'}'
+    out.open();   // '{' <header> <document>'}'
 
     // The RTF version will always be 1 and the
     // character is \ansi = Windows 1252
 
-    out.append( RtfControlWords.RTF_VERSION ).append( "1" )
-       .append( RtfControlWords.ANSI_CHARSET ).append( RtfControlWords.DEFAULT_FONT ).append( "0" );
+    out.cw( RtfControlWords.RTF_VERSION ).append( "1" )
+       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT ).append( "0" );
 
     /*
      * <fonttbl>  := '{' \fonttbl (<fontinfo> | ('{' <fontinfo> '}'))+ '}'
      */
-    out.append( "\n{" ).append( RtfControlWords.FONT_TABLE );
+    out.nl().open( RtfControlWords.FONT_TABLE );
 
     if ( headerFonts.isEmpty() )
-      out.append( "{" ).append( RtfControlWords.FONT ).append( "0 Times New Roman;}" );
+      out.entry( RtfControlWords.FONT, "0 Times New Roman" );
     else {
       for ( RtfHeaderFont font : headerFonts )
         font.writeFontInfo( out );
     }
 
-    out.append( '}' );
+    out.close();
 
     /*
      * <colortbl> := '{' \colortbl <colordef>+ '}'
      */
     if ( !headerColors.isEmpty() ) {
-      out.append( "\n{" ).append( RtfControlWords.COLOR_TABLE );
+      out.nl().open( RtfControlWords.COLOR_TABLE );
 
       int maxColorIndex = headerColors.lastKey();
 
       for ( int i = 0; i <= maxColorIndex; i++ ) {
         RtfHeaderColor color = headerColors.get( i );
         if ( color == null )
-          out.append( ';' );
+          out.semi();
         else
           color.writeColordef( out );
       }
 
-      out.append( '}' );
+      out.close();
     }
     else
-      out.append( "\n{" ).append( RtfControlWords.COLOR_TABLE ).append( ";}" );
+      out.nl().tag( RtfControlWords.COLOR_TABLE, ";" );
 
     /*
      * <stylesheet> := '{' \ stylesheet <style>+ '}'
      */
 
     if ( !headerStyles.isEmpty() ) {
-      out.append( "\n{" ).append( RtfControlWords.STYLE_SHEET );
+      out.nl().open( RtfControlWords.STYLE_SHEET );
       for ( RtfHeaderStyle style : headerStyles )
         out.append( style.toString() );
 
-      out.append( '}' );
+      out.close();
     }
 
     /*
      * <listtables> := <listtable> <listoverridetable>
      */
     if ( !lists.isEmpty() ) {
-      out.append( "\n{" ).append( RtfControlWords.LIST_TABLE_DESTINATION ).append( '\n' );
+      out.nl().open( RtfControlWords.LIST_TABLE_DESTINATION ).nl();
       for ( RtfList list : lists )
         list.writeListDefinition( out );
-      out.append( "}\n{" ).append( RtfControlWords.LIST_OVERRIDE_TABLE_DESTINATION ).append( '\n' );
+      out.close().nl().open( RtfControlWords.LIST_OVERRIDE_TABLE_DESTINATION ).nl();
       for ( RtfList list : lists )
         list.writeListOverride( out );
-      out.append( '}' );
+      out.close();
     }
 
-    out.append( '\n' );
+    out.nl();
 
     // Write <info>
 
     if ( info.length() > 0 ) {
-      out.append( "{" ).append( RtfControlWords.INFO_DESTINATION );
+      out.open( RtfControlWords.INFO_DESTINATION );
       out.append( info );
-      out.append( "}\n" );
+      out.close().nl();
     }
 
     // Write <docfmt>
@@ -505,12 +496,12 @@ public class Rtf {
       // write \sect between sections but not at the end
 
       if ( sectionCnt != sectionParagraphs.size() - 1 )
-        out.append( RtfControlWords.SECTION ).append( '\n' );
+        out.ctrl( RtfControlWords.SECTION );
     }
 
     // We are done
 
-    out.append( "}" );
+    out.close();
   }
 
   // Internal utility methods
@@ -520,17 +511,12 @@ public class Rtf {
    * <code>"{\" + rtfControlWord + " " + RTF of para + "}"</code>.
    */
   static StringBuilder frameRtfParagraphWithEndingPar( String rtfControlWord, RtfPara para ) {
-    try {
-      StringBuilder out = new StringBuilder( 1024 );
-      out.append( "{\\" );
-      out.append( rtfControlWord );
-      para.rtf( out, true );
-      out.append( '}' );
-      return out;
-    }
-    catch ( IOException e ) {
-      throw new RtfException( e );
-    }
+    StringBuilder sb = new StringBuilder( 1024 );
+    RtfOutput out = new RtfOutput( sb );
+    out.append( "{\\" ).append( rtfControlWord );
+    para.rtf( out, true );
+    out.close();
+    return sb;
   }
 
   /**
@@ -544,7 +530,7 @@ public class Rtf {
     try {
       final ByteBuffer bytes = charsetEncoder.encode( CharBuffer.wrap( String.valueOf( c ) ) );
       final int unsignedCharByte = bytes.get() & 255; // Treat byte as unsigned
-      return String.format( RtfControlWords.HEX_ESCAPE_FORMAT, unsignedCharByte );
+      return String.format( "\\'%02x", unsignedCharByte );
     }
     catch ( CharacterCodingException err ) {
       throw new RtfException( err );

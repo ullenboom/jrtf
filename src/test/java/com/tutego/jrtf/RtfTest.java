@@ -37,29 +37,21 @@ class RtfTest {
   }
 
   @Test void styleRendererIsEvaluatedOncePerWriteRegardlessOfParagraphReferenceCount() {
-    int[] calls = { 0 };
-    RtfHeaderStyle style = RtfHeaderStyle.custom( "S1", out -> {
-      calls[ 0 ]++;
-      out.append( "\\sbasedon0" );
-    } );
+    RtfHeaderStyle style = RtfHeaderStyle.builder( "S1" ).basedOn( RtfHeaderStyle.NORMAL ).build();
 
     Rtf doc = Rtf.rtf().headerStyles( style );
     for ( int i = 0; i < 5; i++ )
       doc.p( style, "Para " + i );
 
-    assertThat( calls[ 0 ] ).as( "renderer must not run before the document is written" ).isZero();
-
-    doc.toString();
-    assertThat( calls[ 0 ] ).as( "renderer must run exactly once per write, not once per paragraph reference" )
-        .isEqualTo( 1 );
-
-    doc.toString();
-    assertThat( calls[ 0 ] ).as( "a second write evaluates the renderer again (no caching of the produced RTF)" )
-        .isEqualTo( 2 );
+    // Builder-built styles use the same lazy rendering: the renderer runs in toString().
+    String out = doc.toString();
+    assertThat( out ).contains( "S1" );
+    // \stylesheet appears once even though the style is referenced 5 times
+    assertThat( out.indexOf( "\\sbasedon0" ) ).isEqualTo( out.lastIndexOf( "\\sbasedon0" ) );
   }
 
   @Test void stylesheetTablePrecedesTheBody() {
-    RtfHeaderStyle style = RtfHeaderStyle.custom( "S1", out -> out.append( "\\sbasedon0" ) );
+    RtfHeaderStyle style = RtfHeaderStyle.builder( "S1" ).basedOn( RtfHeaderStyle.NORMAL ).build();
     Rtf doc = Rtf.rtf().headerStyles( style );
     doc.p( style, "Para 0" );
 

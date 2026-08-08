@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Christian Ullenboom
+ * Copyright (c) 2010-2026 Christian Ullenboom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -106,7 +106,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt defaultTab( double width, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.DEFAULT_TAB_WIDTH + unit.toTwips( width ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.DEFAULT_TAB_WIDTH + unit.toTwips( width ) );
   }
 
   /**
@@ -118,7 +118,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt hyphenationHotZone( double width, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.HYPHENATION_HOT_ZONE + unit.toTwips( width ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.HYPHENATION_HOT_ZONE + unit.toTwips( width ) );
   }
 
   // Document Views and Zoom Level
@@ -129,7 +129,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt pageLayoutView() {
-    return new RtfDocfmt( RtfControlWords.VIEW_KIND + "1" );
+    return new RtfDocfmt( "\\" + RtfControlWords.VIEW_KIND + "1" );
   }
 
   // Footnotes and Endnotes
@@ -140,7 +140,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt footnotesOnly() {
-    return new RtfDocfmt( RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "0" );
+    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "0" );
   }
 
   /**
@@ -149,7 +149,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt endnotesOnly() {
-    return new RtfDocfmt( RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "1" );
+    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "1" );
   }
 
   /**
@@ -158,7 +158,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt footnotesEndnotes() {
-    return new RtfDocfmt( RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "2" );
+    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "2" );
   }
 
   /**
@@ -167,7 +167,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt footnoteNumberingArabic() {
-    return new RtfDocfmt( RtfControlWords.FOOTNOTE_NUMBERING_ARABIC );
+    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_NUMBERING_ARABIC );
   }
 
   /**
@@ -176,7 +176,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt footnoteNumberingUpperAlphabetic() {
-    return new RtfDocfmt( RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ALPHA );
+    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ALPHA );
   }
 
   /**
@@ -185,7 +185,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt footnoteNumberingUpperRoman() {
-    return new RtfDocfmt( RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ROMAN );
+    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ROMAN );
   }
 
   // Page information
@@ -198,7 +198,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt paperWidth( double width, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.PAPER_WIDTH + unit.toTwips( width ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.PAPER_WIDTH + unit.toTwips( width ) );
   }
 
   /**
@@ -209,7 +209,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt paperHeight( double height, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.PAPER_HEIGHT + unit.toTwips( height ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.PAPER_HEIGHT + unit.toTwips( height ) );
   }
 
   /**
@@ -221,8 +221,8 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt paper( double width, double height, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.PAPER_WIDTH + unit.toTwips( width ) +
-                              RtfControlWords.PAPER_HEIGHT + unit.toTwips( height ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.PAPER_WIDTH + unit.toTwips( width ) +
+                              "\\" + RtfControlWords.PAPER_HEIGHT + unit.toTwips( height ) );
   }
 
   /**
@@ -233,7 +233,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt leftMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.MARGIN_LEFT + unit.toTwips( margin ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_LEFT + unit.toTwips( margin ) );
   }
 
   /**
@@ -244,7 +244,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt rightMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.MARGIN_RIGHT + unit.toTwips( margin ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_RIGHT + unit.toTwips( margin ) );
   }
 
   /**
@@ -255,7 +255,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt topMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.MARGIN_TOP + unit.toTwips( margin ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_TOP + unit.toTwips( margin ) );
   }
 
   /**
@@ -266,7 +266,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt bottomMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( RtfControlWords.MARGIN_BOTTOM + unit.toTwips( margin ) );
+    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_BOTTOM + unit.toTwips( margin ) );
   }
 
   /**
@@ -275,7 +275,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt facingPages() {
-    return new RtfDocfmt( RtfControlWords.FACING_PAGES );
+    return new RtfDocfmt( "\\" + RtfControlWords.FACING_PAGES );
   }
 
   /**
@@ -284,7 +284,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt switchMargin() {
-    return new RtfDocfmt( RtfControlWords.MIRROR_MARGINS );
+    return new RtfDocfmt( "\\" + RtfControlWords.MIRROR_MARGINS );
   }
 
   /**
@@ -293,7 +293,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt landscape() {
-    return new RtfDocfmt( RtfControlWords.LANDSCAPE );
+    return new RtfDocfmt( "\\" + RtfControlWords.LANDSCAPE );
   }
 
   /**
@@ -302,7 +302,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt widowOrphanControl() {
-    return new RtfDocfmt( RtfControlWords.WIDOW_CONTROL );
+    return new RtfDocfmt( "\\" + RtfControlWords.WIDOW_CONTROL );
   }
 
   // Revision marks
@@ -314,7 +314,7 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt revisionProtected() {
-    return new RtfDocfmt( RtfControlWords.REVISION_PROTECTED );
+    return new RtfDocfmt( "\\" + RtfControlWords.REVISION_PROTECTED );
   }
 
   /**
@@ -323,6 +323,6 @@ public class RtfDocfmt {
    * @return New {@code RtfDocfmt} object.
    */
   public static RtfDocfmt revisionMarking() {
-    return new RtfDocfmt( RtfControlWords.REVISION_MARKING );
+    return new RtfDocfmt( "\\" + RtfControlWords.REVISION_MARKING );
   }
 }
