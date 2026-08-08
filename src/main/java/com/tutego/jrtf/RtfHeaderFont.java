@@ -46,7 +46,7 @@ public class RtfHeaderFont extends RtfHeader {
   public static final String HELVETICA = "Arial";
 
   /**
-   * Constant for Courier font.
+   * Constant for Arial font.
    */
   public static final String ARIAL = "Arial";
 

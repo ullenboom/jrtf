@@ -431,6 +431,9 @@ Several facts drove the design of jRTF.
 * jRTF renders lazily via `Consumer<RtfOutput>` — no content is built in memory; everything streams
   directly to the output `Appendable` when `out()` or `toString()` is called. An `RtfText` is not a
   string but a recipe for writing RTF.
+* jRTF is designed for **single-threaded** use. `Rtf` document instances are not thread-safe; the
+  shared `CharsetEncoder` used for Windows-1252 escaping is not synchronized. Build and write each
+  document from one thread.
 
 ## What's not supported and how YOU can help
 

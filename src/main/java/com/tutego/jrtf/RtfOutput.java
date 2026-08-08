@@ -35,10 +35,9 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
- * Internal RTF output target. Wraps an {@link Appendable} — either a user-supplied
- * {@link java.io.Writer} for streaming, or an internal {@link StringBuilder} — and
- * provides fluent append methods for all common types, plus RTF-specific helpers for
- * control words, grouping, and punctuation.
+ * Internal RTF output target. Wraps an {@link Appendable} (typically a user-supplied
+ * {@link java.io.Writer} for streaming) and provides fluent append methods for all
+ * common types, plus RTF-specific helpers for control words, grouping, and punctuation.
  * <p>
  * All public methods catch {@link IOException} from the underlying {@link Appendable}
  * and rethrow it as a {@link RtfException}. Callers never see a checked exception.

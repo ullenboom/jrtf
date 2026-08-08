@@ -97,7 +97,8 @@ public class RtfText {
    *       sensible {@code toString()} rendering into inline text, so it must be added with
    *       {@link Rtf#section(RtfPara...)} instead of being passed here.</li>
    *   <li>anything else (typically a {@code String}, but really any object) &mdash; converted with
-   *       {@code toString()} and RTF-escaped (special characters like {@code {}, }, \} are escaped,
+   *       {@code toString()} and RTF-escaped (special characters like <code>{</code>, <code>}</code>,
+ *       and <code>\</code> are escaped),
    *       {@code '\n'} becomes a paragraph break, {@code '\t'} becomes a tab).</li>
    * </ol>
    * If the argument is {@code null} or no elements are given the result is equal to {@code text("")}.

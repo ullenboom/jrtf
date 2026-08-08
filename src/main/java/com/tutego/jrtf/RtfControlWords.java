@@ -209,7 +209,7 @@ final class RtfControlWords {
   static final String DEFAULT_FONT = "deff";
   static final String DEFAULT_TAB_WIDTH = "deftab";
   static final String INFO_DESTINATION = "info";
-  static final String HYPHENATION_HOT_ZONE = "hyphhotzN";
+  static final String HYPHENATION_HOT_ZONE = "hyphhotz";
   static final String VIEW_KIND = "viewkind";
   static final String FOOTNOTE_ENDNOTE_PLACEMENT = "fet";
   static final String FOOTNOTE_NUMBERING_ARABIC = "ftnnar";

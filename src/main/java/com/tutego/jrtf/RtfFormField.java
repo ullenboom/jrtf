@@ -46,8 +46,7 @@ import org.jspecify.annotations.Nullable;
  */
 public final class RtfFormField {
 
-  /** Field type constant. */
-  @SuppressWarnings("unused") private final boolean isText, isCheckbox, isDropdown;
+  private final boolean isText, isCheckbox, isDropdown;
 
   /** Form field name (bookmark). */
   @Nullable private final String name;

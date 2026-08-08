@@ -37,7 +37,7 @@ package com.tutego.jrtf;
  * <ul>
  * <li>font definitions
  * <li>color tables
- * <li>style sheets (not implemented yet)
+ * <li>style sheets
  * </ul>
  */
 public abstract class RtfHeader {
