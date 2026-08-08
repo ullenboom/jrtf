@@ -62,6 +62,9 @@ public class RtfRow extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfRow tableStyle( RtfTableStyle style ) {
+    if ( style.getId() < 0 )
+      throw new IllegalArgumentException( "Table style must be registered first. "
+          + "Register it with Rtf.tableStyles(style) before using it here." );
     tbldef.append( '\\' ).append( RtfControlWords.TABLE_STYLE_DEFINITION ).append( style.getId() );
     return this;
   }

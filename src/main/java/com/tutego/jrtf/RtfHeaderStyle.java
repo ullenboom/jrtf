@@ -139,6 +139,9 @@ public final class RtfHeaderStyle {
     public Builder basedOn( RtfHeaderStyle style ) {
       if ( style == null )
         throw new IllegalArgumentException( "style must not be null" );
+      if ( style.getId() < 0 )
+        throw new IllegalArgumentException( "based-on style must be registered first. "
+            + "Register it with Rtf.headerStyles(style) before using it here." );
       this.basedOn = style;
       return this;
     }

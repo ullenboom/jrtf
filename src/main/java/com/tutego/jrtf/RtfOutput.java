@@ -138,22 +138,6 @@ final class RtfOutput {
   /** Appends a semicolon. */
   public RtfOutput semi()  { try { out.append( ';' );  } catch ( IOException e ) { throw new RtfException( e ); } return this; }
 
-  // ---- Hex escape ----
-
-  /**
-   * Writes a hex-escaped byte ({@code \'xx}) as used in font table entries
-   * and list-level text definitions.
-   */
-  public RtfOutput hexChar( int byteValue ) {
-    try {
-      out.append( "\\'" );
-      String hex = Integer.toHexString( byteValue & 0xFF );
-      if ( hex.length() < 2 ) out.append( '0' );
-      out.append( hex );
-    } catch ( IOException e ) { throw new RtfException( e ); }
-    return this;
-  }
-
   // ---- Grouping (stack / push-pop) ----
 
   /**

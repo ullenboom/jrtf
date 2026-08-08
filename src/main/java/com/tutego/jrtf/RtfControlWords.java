@@ -162,7 +162,6 @@ final class RtfControlWords {
   // Table styles
 
   static final String TABLE_STYLE_DEFINITION = "ts";
-  static final String TABLE_DEFINITION = "tabledef";
   static final String TABLE_STYLE_ROW_BAND_SIZE = "tsrowb";
   static final String TABLE_STYLE_COLUMN_BAND_SIZE = "tscellcb";
 
