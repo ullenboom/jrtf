@@ -133,21 +133,19 @@ public class RtfPicture {
     if ( loaded )
       return;
 
-    // Optimize it! Stream the data
-    // This is just my lazy version to easily figure out the image type
-
-    try ( InputStream in = source.open() ) {
-      int pos = 1;
-      for ( int b; (b = in.read()) != -1; ) {
-        String hexString = Integer.toHexString( b );
-        if ( hexString.length() == 1 )
-          hexPicData.append( '0' ).append( hexString );
-        else
-          hexPicData.append( hexString );
-
-        if ( pos++ == 40 ) {
-          pos = 1;
-          hexPicData.append( '\n' );
+    try ( InputStream in = new java.io.BufferedInputStream( source.open() ) ) {
+      byte[] buf = new byte[ 4096 ];
+      int pos = 0;  // hex chars written on current line (0..39)
+      int n;
+      while ( (n = in.read( buf )) != -1 ) {
+        for ( int i = 0; i < n; i++ ) {
+          int b = buf[ i ] & 0xFF;
+          if ( b < 16 ) hexPicData.append( '0' );
+          hexPicData.append( Integer.toHexString( b ) );
+          if ( ++pos == 40 ) {
+            pos = 0;
+            hexPicData.append( '\n' );
+          }
         }
       }
     }
@@ -235,8 +233,8 @@ public class RtfPicture {
    * @return RtfText.
    */
   public RtfText type( PictureType pictureType ) {
-    // Build the RTF lazily: image bytes are only read when the enclosing
-    // document is written, not when type() is called.
+    if ( pictureType == null )
+      throw new IllegalArgumentException( "PictureType must not be null" );
     return new RtfText( out -> {
       try { ensureLoaded(); }
       catch ( IOException e ) { throw new RtfException( e ); }

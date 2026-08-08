@@ -29,8 +29,8 @@ class RtfUnitTest {
     assertThat( RtfUnit.MM.toTwips( 10 ) ).isEqualTo( 567 );
   }
 
-  @Test void fractionalValuesAreTruncatedForIntegerUnits() {
-    assertThat( RtfUnit.TWIPS.toTwips( 99.9 ) ).isEqualTo( 99 );
+  @Test void fractionalValuesAreRoundedForAllUnits() {
+    assertThat( RtfUnit.TWIPS.toTwips( 99.9 ) ).isEqualTo( 100 );
     assertThat( RtfUnit.POINT.toTwips( 1.5 ) ).isEqualTo( 30 );
   }
 }

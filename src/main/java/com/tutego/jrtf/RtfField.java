@@ -133,6 +133,8 @@ public final class RtfField {
    * @return New {@code RtfField} with the switch appended.
    */
   public RtfField withSwitch( String rtfSwitch ) {
+    if ( rtfSwitch == null )
+      throw new IllegalArgumentException( "rtfSwitch must not be null" );
     return new RtfField( instruction + " " + rtfSwitch, recentResult, modifier );
   }
 

@@ -39,21 +39,21 @@ public enum RtfUnit {
    * Measurement in twips. A twip is a 1/20 of a point and the internal representation in RTF.
    */
   TWIPS {
-    @Override public int toTwips( double v ) {return (int) v;}
+    @Override public int toTwips( double v ) {return (int) Math.round( v );}
   },
 
   /**
    * Measurement in point. One point is 20 twips.
    */
   POINT {
-    @Override public int toTwips( double v ) {return (int) (v * 20);}
+    @Override public int toTwips( double v ) {return (int) Math.round( v * 20 );}
   },
 
   /**
    * Measurement in inch. One inch is 1440 twips.
    */
   INCH {
-    @Override public int toTwips( double v ) {return (int) (v * 1440);}
+    @Override public int toTwips( double v ) {return (int) Math.round( v * 1440 );}
   },
 
   /**

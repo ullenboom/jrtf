@@ -86,13 +86,24 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
   public RtfHeader at( int colorindex ) {
     if ( colorindex < 1 || colorindex > 255 )
       throw new RtfException(
-          "Color index " + colorindex + " ist out of range, has to be between 1 and 255" );
+          "Color index " + colorindex + " is out of range, must be between 1 and 255" );
 
     return new RtfHeaderColor( r, g, b, colorindex );
   }
 
-  public int compareTo( RtfHeaderColor other ) {
-    return this.colorindex - other.colorindex;
+  @Override public int compareTo( RtfHeaderColor other ) {
+    return Integer.compare( this.colorindex, other.colorindex );
+  }
+
+  @Override public boolean equals( Object o ) {
+    if ( this == o ) return true;
+    if ( !(o instanceof RtfHeaderColor) ) return false;
+    RtfHeaderColor that = (RtfHeaderColor) o;
+    return r == that.r && g == that.g && b == that.b && colorindex == that.colorindex;
+  }
+
+  @Override public int hashCode() {
+    return 31 * (31 * (31 * r + g) + b) + colorindex;
   }
 
   // Theme color names from RTF 1.7+

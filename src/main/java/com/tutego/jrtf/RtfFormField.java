@@ -31,6 +31,8 @@
  */
 package com.tutego.jrtf;
 
+import java.util.ArrayList;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,7 +48,9 @@ import org.jspecify.annotations.Nullable;
  */
 public final class RtfFormField {
 
-  private final boolean isText, isCheckbox, isDropdown;
+  enum Type { TEXT, CHECKBOX, DROPDOWN }
+
+  private final Type type;
 
   /** Form field name (bookmark). */
   @Nullable private final String name;
@@ -68,14 +72,11 @@ public final class RtfFormField {
   // ---- Dropdown properties ----
   @Nullable private final String[] items;
 
-  private RtfFormField( boolean isText, boolean isCheckbox, boolean isDropdown,
-                        @Nullable String name, @Nullable String statusText,
+  private RtfFormField( Type type, @Nullable String name, @Nullable String statusText,
                         @Nullable String helpText, @Nullable String defaultText,
                         int maxLength, boolean checked, int checkedSize,
                         @Nullable String[] items ) {
-    this.isText = isText;
-    this.isCheckbox = isCheckbox;
-    this.isDropdown = isDropdown;
+    this.type = type;
     this.name = name;
     this.statusText = statusText;
     this.helpText = helpText;
@@ -101,12 +102,11 @@ public final class RtfFormField {
 
   void rtf( RtfOutput out ) {
     out.open().cw( RtfControlWords.FORM_FIELD );
-    if ( isText )
-      out.cw( RtfControlWords.FORM_FIELD_TEXT );
-    else if ( isCheckbox )
-      out.cw( RtfControlWords.FORM_FIELD_CHECKBOX );
-    else
-      out.cw( RtfControlWords.FORM_FIELD_DROPDOWN );
+    switch ( type ) {
+      case TEXT:     out.cw( RtfControlWords.FORM_FIELD_TEXT ); break;
+      case CHECKBOX: out.cw( RtfControlWords.FORM_FIELD_CHECKBOX ); break;
+      case DROPDOWN: out.cw( RtfControlWords.FORM_FIELD_DROPDOWN ); break;
+    }
 
     if ( name != null )
       out.open( RtfControlWords.FORM_FIELD_NAME ).sp()
@@ -120,14 +120,14 @@ public final class RtfFormField {
       out.open( RtfControlWords.FORM_FIELD_HELP_TEXT ).sp()
          .append( Rtf.asRtf( helpText ) ).close();
 
-    if ( isText ) {
+    if ( type == Type.TEXT ) {
       if ( defaultText != null )
         out.open( RtfControlWords.FORM_FIELD_DEFAULT ).sp()
            .append( Rtf.asRtf( defaultText ) ).close();
       if ( maxLength > 0 )
         out.cw( RtfControlWords.FORM_FIELD_MAX_LENGTH ).append( maxLength );
     }
-    else if ( isCheckbox ) {
+    else if ( type == Type.CHECKBOX ) {
       out.cw( RtfControlWords.FORM_FIELD_CHECKED ).append( checked ? "1" : "0" )
          .cw( RtfControlWords.FORM_FIELD_SIZE, checkedSize );
     }
@@ -159,7 +159,7 @@ public final class RtfFormField {
     public TextBuilder helpText( String text ) { this.helpText = text; return this; }
     public TextBuilder defaultText( String text ) { this.defaultText = text; return this; }
     public TextBuilder maxLength( int maxLength ) { this.maxLength = maxLength; return this; }
-    public RtfFormField build() { return new RtfFormField( true, false, false, name, statusText, helpText, defaultText, maxLength, false, 0, null ); }
+    public RtfFormField build() { return new RtfFormField( Type.TEXT, name, statusText, helpText, defaultText, maxLength, false, 0, null ); }
   }
 
   /** Builder for a checkbox form field. */
@@ -175,7 +175,7 @@ public final class RtfFormField {
     public CheckboxBuilder helpText( String text ) { this.helpText = text; return this; }
     public CheckboxBuilder checked( boolean checked ) { this.checked = checked; return this; }
     public CheckboxBuilder size( int halfPoints ) { this.checkedSize = halfPoints; return this; }
-    public RtfFormField build() { return new RtfFormField( false, true, false, name, statusText, helpText, null, 0, checked, checkedSize, null ); }
+    public RtfFormField build() { return new RtfFormField( Type.CHECKBOX, name, statusText, helpText, null, 0, checked, checkedSize, null ); }
   }
 
   /** Builder for a dropdown-list form field. */
@@ -183,12 +183,12 @@ public final class RtfFormField {
     private String name = null;
     private String statusText = null;
     private String helpText = null;
-    private java.util.ArrayList<String> items = new java.util.ArrayList<>();
+    private final ArrayList<String> items = new ArrayList<>();
 
     public DropdownBuilder name( String name ) { this.name = name; return this; }
     public DropdownBuilder statusText( String text ) { this.statusText = text; return this; }
     public DropdownBuilder helpText( String text ) { this.helpText = text; return this; }
     public DropdownBuilder item( String item ) { items.add( item ); return this; }
-    public RtfFormField build() { return new RtfFormField( false, false, true, name, statusText, helpText, null, 0, false, 0, items.toArray( new String[ 0 ] ) ); }
+    public RtfFormField build() { return new RtfFormField( Type.DROPDOWN, name, statusText, helpText, null, 0, false, 0, items.toArray( new String[ 0 ] ) ); }
   }
 }

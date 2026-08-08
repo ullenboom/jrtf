@@ -1040,6 +1040,8 @@ public class RtfText {
    * @return New RtfText object representing this hyperlink.
    */
   public static RtfText hyperlink( String url, RtfPara text ) {
+    if ( url == null )
+      throw new IllegalArgumentException( "URL must not be null" );
     return new RtfText( out -> {
       out.open().cw( RtfControlWords.FIELD )
          .open().cw( RtfControlWords.FIELD_INSTRUCTION_DESTINATION ).append( "{HYPERLINK \"" )

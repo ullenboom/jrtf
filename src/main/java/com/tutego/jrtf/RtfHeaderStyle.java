@@ -165,6 +165,8 @@ public final class RtfHeaderStyle {
      * @return {@code this}-object.
      */
     public Builder basedOn( RtfHeaderStyle style ) {
+      if ( style == null )
+        throw new IllegalArgumentException( "style must not be null" );
       this.basedOn = style;
       return this;
     }

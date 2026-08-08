@@ -521,10 +521,16 @@ public class Rtf {
     try {
       final ByteBuffer bytes = charsetEncoder.encode( CharBuffer.wrap( String.valueOf( c ) ) );
       final int unsignedCharByte = bytes.get() & 255; // Treat byte as unsigned
-      return String.format( "\\'%02x", unsignedCharByte );
+      return BYTE_HEX_LOOKUP[ unsignedCharByte ];
     }
     catch ( CharacterCodingException err ) {
       throw new RtfException( err );
     }
+  }
+
+  private static final String[] BYTE_HEX_LOOKUP = new String[ 256 ];
+  static {
+    for ( int i = 0; i < 256; i++ )
+      BYTE_HEX_LOOKUP[ i ] = String.format( "\\'%02x", i );
   }
 }

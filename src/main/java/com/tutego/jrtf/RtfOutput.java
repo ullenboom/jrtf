@@ -228,18 +228,25 @@ final class RtfOutput {
    */
   public RtfOutput group( String controlWord, Consumer<RtfOutput> block ) {
     try { out.append( '{' ).append( '\\' ).append( controlWord ); } catch ( IOException e ) { throw new RtfException( e ); }
-    block.accept( this );
-    try { out.append( '}' ); } catch ( IOException e ) { throw new RtfException( e ); }
+    try {
+      block.accept( this );
+    } finally {
+      try { out.append( '}' ); } catch ( IOException e ) { throw new RtfException( e ); }
+    }
     return this;
   }
 
   /**
-   * Wraps content in an RTF group.
+   * Wraps content in an RTF group. The group is always closed,
+   * even if the block throws.
    */
   public RtfOutput group( Runnable block ) {
     try { out.append( '{' ); } catch ( IOException e ) { throw new RtfException( e ); }
-    block.run();
-    try { out.append( '}' ); } catch ( IOException e ) { throw new RtfException( e ); }
+    try {
+      block.run();
+    } finally {
+      try { out.append( '}' ); } catch ( IOException e ) { throw new RtfException( e ); }
+    }
     return this;
   }
 
