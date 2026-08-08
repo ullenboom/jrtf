@@ -31,20 +31,21 @@
  */
 package com.tutego.jrtf;
 
+import java.util.function.Consumer;
+
 /**
  * Represents meta information about the RTF document like author, title, keywords.
  */
 public class RtfInfo {
-  /**
-   * RTF result of this info.
-   */
-  final String rtf;
 
-  /**
-   * Initializes this object.
-   */
-  private RtfInfo( String rtf ) {
-    this.rtf = rtf;
+  private final Consumer<RtfOutput> renderer;
+
+  private RtfInfo( Consumer<RtfOutput> renderer ) {
+    this.renderer = renderer;
+  }
+
+  void rtf( RtfOutput out ) {
+    renderer.accept( out );
   }
 
   /*
@@ -76,174 +77,102 @@ public class RtfInfo {
    * <time> \yr? \mo? \dy? \hr? \min? \sec?
    */
 
-  /**
-   * Sets the subject of this document.
-   *
-   * @param subject Subject.
-   * @return New RtfInfo object.
-   */
+  // <subject> '{' \subject #PCDATA '}'
   public static RtfInfo subject( String subject ) {
-    // <subject> '{' \subject #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_SUBJECT + " " + Rtf.asRtf( subject ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_SUBJECT ).sp()
+                                     .append( Rtf.asRtf( subject ) ).close() );
   }
 
-  /**
-   * Sets the title of this document.
-   *
-   * @param title Title.
-   * @return New RtfInfo object.
-   */
+  // <title> '{' \title #PCDATA '}'
   public static RtfInfo title( String title ) {
-    // <title> '{' \title #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_TITLE + " " + Rtf.asRtf( title ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_TITLE ).sp()
+                                     .append( Rtf.asRtf( title ) ).close() );
   }
 
-  /**
-   * Sets the author of this document.
-   *
-   * @param author Author.
-   * @return New RtfInfo object.
-   */
+  // <author> '{' \author #PCDATA '}'
   public static RtfInfo author( String author ) {
-    // <author> '{' \author #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_AUTHOR + " " + Rtf.asRtf( author ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_AUTHOR ).sp()
+                                     .append( Rtf.asRtf( author ) ).close() );
   }
 
-  /**
-   * Sets the create time of this document.
-   *
-   * @param year       Year.
-   * @param month      Month.
-   * @param dayOfMonth Day of month.
-   * @param hour       Hour.
-   * @param minute     Minute.
-   * @param second     Second.
-   * @return New RtfInfo object.
-   */
-  public static RtfInfo creatim( int year, int month, int dayOfMonth, int hour, int minute,
-                                 int second ) {
-    // <creatim> '{' \ creatim <time> '}'
-    return new RtfInfo( timeGroup( RtfControlWords.INFO_CREATION_TIME, year, month, dayOfMonth, hour, minute, second ) );
-  }
-
-  /**
-   * Sets the revision (last-save) time of this document.
-   *
-   * @param year       Year.
-   * @param month      Month.
-   * @param dayOfMonth Day of month.
-   * @param hour       Hour.
-   * @param minute     Minute.
-   * @param second     Second.
-   * @return New RtfInfo object.
-   */
-  public static RtfInfo revtim( int year, int month, int dayOfMonth, int hour, int minute,
-                                int second ) {
-    // <revtim> '{' \ revtim <time> '}'
-    return new RtfInfo( timeGroup( RtfControlWords.INFO_REVISION_TIME, year, month, dayOfMonth, hour, minute, second ) );
-  }
-
-  /**
-   * Sets the last-print time of this document.
-   *
-   * @param year       Year.
-   * @param month      Month.
-   * @param dayOfMonth Day of month.
-   * @param hour       Hour.
-   * @param minute     Minute.
-   * @param second     Second.
-   * @return New RtfInfo object.
-   */
-  public static RtfInfo printim( int year, int month, int dayOfMonth, int hour, int minute,
-                                 int second ) {
-    // <printim> '{' \ printim <time> '}'
-    return new RtfInfo( timeGroup( RtfControlWords.INFO_PRINT_TIME, year, month, dayOfMonth, hour, minute, second ) );
-  }
-
-  /**
-   * Builds a {@code {\destination \yrN \moN \dyN \hrN \minN \secN}} time group.
-   */
-  private static String timeGroup( String destination, int year, int month, int dayOfMonth,
-                                   int hour, int minute, int second ) {
-    return String.format( "{\\%s " + "\\" + RtfControlWords.INFO_YEAR + "%d " + "\\" + RtfControlWords.INFO_MONTH + "%d "
-                          + "\\" + RtfControlWords.INFO_DAY + "%d " + "\\" + RtfControlWords.INFO_HOUR + "%d "
-                          + "\\" + RtfControlWords.INFO_MINUTE + "%d " + "\\" + RtfControlWords.INFO_SECOND + "%d}",
-                          destination, year, month, dayOfMonth, hour, minute, second );
-  }
-
-  /**
-   * Sets the keywords of this document.
-   *
-   * @param keywords Keywords.
-   * @return New RtfInfo object.
-   */
+  // <keywords> '{' \keywords #PCDATA '}'
   public static RtfInfo keywords( String keywords ) {
-    // <keywords> '{' \ keywords #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_KEYWORDS + " " + Rtf.asRtf( keywords ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_KEYWORDS ).sp()
+                                     .append( Rtf.asRtf( keywords ) ).close() );
   }
 
-  /**
-   * Sets a comment (abstract) for this document, stored in the info group,
-   * not visible in the document body.
-   *
-   * @param comment Comment.
-   * @return New RtfInfo object.
-   */
+  // <comment> '{' \comment #PCDATA '}'
   public static RtfInfo comment( String comment ) {
-    // <comment> '{' \ comment #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_COMMENT + " " + Rtf.asRtf( comment ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_COMMENT ).sp()
+                                     .append( Rtf.asRtf( comment ) ).close() );
   }
 
-  /**
-   * Sets the name of the operator who last modified this document.
-   *
-   * @param operator Operator name.
-   * @return New RtfInfo object.
-   */
+  // <operator> '{' \operator #PCDATA '}'
   public static RtfInfo operator( String operator ) {
-    // <operator> '{' \ operator #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_OPERATOR + " " + Rtf.asRtf( operator ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_OPERATOR ).sp()
+                                     .append( Rtf.asRtf( operator ) ).close() );
   }
 
-  /**
-   * Sets a comment for this document, associated with the document (as opposed to
-   * {@link #comment(String)}, which is a plain info-group comment).
-   *
-   * @param comment Comment.
-   * @return New RtfInfo object.
-   */
+  // <doccomm> '{' \doccomm #PCDATA '}'
   public static RtfInfo doccomm( String comment ) {
-    // <doccomm> '{' \ doccomm #PCDATA '}'
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_DOC_COMMENT + " " + Rtf.asRtf( comment ) + "}" );
+    return new RtfInfo( out -> out.open().cw( RtfControlWords.INFO_DOC_COMMENT ).sp()
+                                     .append( Rtf.asRtf( comment ) ).close() );
   }
 
-  /**
-   * Sets the internal version number of this document.
-   *
-   * @param version Version number.
-   * @return New RtfInfo object.
-   */
+  // ---- Numeric info entries ----
+
+  // \version?
   public static RtfInfo version( int version ) {
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_VERSION + version + "}" );
+    return new RtfInfo( out -> out.tag( RtfControlWords.INFO_VERSION,
+                                         Integer.toString( version ) ) );
   }
 
-  /**
-   * Sets the number of words in this document (for use by a document-management utility).
-   *
-   * @param numberOfWords Number of words.
-   * @return New RtfInfo object.
-   */
+  // \nofwords?
   public static RtfInfo numberOfWords( int numberOfWords ) {
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_NUMBER_OF_WORDS + numberOfWords + "}" );
+    return new RtfInfo( out -> out.tag( RtfControlWords.INFO_NUMBER_OF_WORDS,
+                                         Integer.toString( numberOfWords ) ) );
   }
 
-  /**
-   * Sets the number of pages in this document (for use by a document-management utility).
-   *
-   * @param numberOfPages Number of pages.
-   * @return New RtfInfo object.
-   */
+  // \nofpages?
   public static RtfInfo numberOfPages( int numberOfPages ) {
-    return new RtfInfo( "{\\" + RtfControlWords.INFO_NUMBER_OF_PAGES + numberOfPages + "}" );
+    return new RtfInfo( out -> out.tag( RtfControlWords.INFO_NUMBER_OF_PAGES,
+                                         Integer.toString( numberOfPages ) ) );
+  }
+
+  // ---- Time-based info entries ----
+
+  // <creatim> '{' \creatim <time> '}'
+  public static RtfInfo creatim( int year, int month, int dayOfMonth,
+                                 int hour, int minute, int second ) {
+    return timeInfo( RtfControlWords.INFO_CREATION_TIME, year, month, dayOfMonth,
+                     hour, minute, second );
+  }
+
+  // <revtim> '{' \revtim <time> '}'
+  public static RtfInfo revtim( int year, int month, int dayOfMonth,
+                                int hour, int minute, int second ) {
+    return timeInfo( RtfControlWords.INFO_REVISION_TIME, year, month, dayOfMonth,
+                     hour, minute, second );
+  }
+
+  // <printim> '{' \printim <time> '}'
+  public static RtfInfo printim( int year, int month, int dayOfMonth,
+                                 int hour, int minute, int second ) {
+    return timeInfo( RtfControlWords.INFO_PRINT_TIME, year, month, dayOfMonth,
+                     hour, minute, second );
+  }
+
+  private static RtfInfo timeInfo( String destination, int year, int month, int dayOfMonth,
+                                   int hour, int minute, int second ) {
+    return new RtfInfo( out -> {
+      out.open().cw( destination ).sp()
+         .cw( RtfControlWords.INFO_YEAR ).append( year ).sp()
+         .cw( RtfControlWords.INFO_MONTH ).append( month ).sp()
+         .cw( RtfControlWords.INFO_DAY ).append( dayOfMonth ).sp()
+         .cw( RtfControlWords.INFO_HOUR ).append( hour ).sp()
+         .cw( RtfControlWords.INFO_MINUTE ).append( minute ).sp()
+         .cw( RtfControlWords.INFO_SECOND ).append( second )
+         .close();
+    } );
   }
 }

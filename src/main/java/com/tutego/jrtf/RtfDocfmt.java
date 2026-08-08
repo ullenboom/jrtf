@@ -31,298 +31,143 @@
  */
 package com.tutego.jrtf;
 
+import java.util.function.Consumer;
+
 /**
  * Instances represent document format like page width, margins.
  */
 public class RtfDocfmt {
-  /**
-   * A0 paper format.
-   */
-  public static final RtfDocfmt A0 = paper( 118.9, 84.1, RtfUnit.CM );
-
-  /**
-   * A1 paper format.
-   */
-  public static final RtfDocfmt A1 = paper( 84.1, 59.4, RtfUnit.CM );
-
-  /**
-   * A2 paper format.
-   */
-  public static final RtfDocfmt A2 = paper( 59.4, 42.0, RtfUnit.CM );
-
-  /**
-   * A3 paper format.
-   */
-  public static final RtfDocfmt A3 = paper( 42.0, 21.0, RtfUnit.CM );
-
-  /**
-   * A4 paper format.
-   */
-  public static final RtfDocfmt A4 = paper( 29.7, 21.0, RtfUnit.CM );
-
-  /**
-   * A5 paper format.
-   */
-  public static final RtfDocfmt A5 = paper( 21.0, 14.8, RtfUnit.CM );
-
-  /**
-   * A6 paper format.
-   */
-  public static final RtfDocfmt A6 = paper( 14.8, 10.5, RtfUnit.CM );
-
-  /**
-   * A7 paper format.
-   */
-  public static final RtfDocfmt A7 = paper( 10.5, 7.4, RtfUnit.CM );
-
-  /**
-   * A8 paper format.
-   */
-  public static final RtfDocfmt A8 = paper( 7.4, 5.2, RtfUnit.CM );
 
   /* <document> := <info>? <docfmt>* <section>+ */
 
-  /**
-   * RTF with format string.
-   */
-  final String rtf;
+  private final Consumer<RtfOutput> renderer;
 
-  /**
-   * Initialize this instance with the RTF control word.
-   *
-   * @param rtf
-   */
-  private RtfDocfmt( String rtf ) {
-    this.rtf = rtf;
+  private RtfDocfmt( Consumer<RtfOutput> renderer ) {
+    this.renderer = renderer;
   }
+
+  void rtf( RtfOutput out ) {
+    renderer.accept( out );
+  }
+
+  // Paper format constants
+
+  public static final RtfDocfmt A0 = paper( 118.9, 84.1, RtfUnit.CM );
+  public static final RtfDocfmt A1 = paper( 84.1, 59.4, RtfUnit.CM );
+  public static final RtfDocfmt A2 = paper( 59.4, 42.0, RtfUnit.CM );
+  public static final RtfDocfmt A3 = paper( 42.0, 21.0, RtfUnit.CM );
+  public static final RtfDocfmt A4 = paper( 29.7, 21.0, RtfUnit.CM );
+  public static final RtfDocfmt A5 = paper( 21.0, 14.8, RtfUnit.CM );
+  public static final RtfDocfmt A6 = paper( 14.8, 10.5, RtfUnit.CM );
+  public static final RtfDocfmt A7 = paper( 10.5, 7.4, RtfUnit.CM );
+  public static final RtfDocfmt A8 = paper( 7.4, 5.2, RtfUnit.CM );
 
   // General control words
 
-  /**
-   * Default tab width. If not set the default is 720 twips.
-   *
-   * @param width Width of the tab.
-   * @param unit  Unit of the tab.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt defaultTab( double width, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.DEFAULT_TAB_WIDTH + unit.toTwips( width ) );
+    int twips = unit.toTwips( width );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.DEFAULT_TAB_WIDTH, twips ) );
   }
 
-  /**
-   * Hyphenation hot zone.
-   *
-   * @param width Amount of space at the right margin in which words
-   *              are hyphenated.
-   * @param unit  Unit of the tab.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt hyphenationHotZone( double width, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.HYPHENATION_HOT_ZONE + unit.toTwips( width ) );
+    int twips = unit.toTwips( width );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.HYPHENATION_HOT_ZONE, twips ) );
   }
 
-  // Document Views and Zoom Level
+  // Document Views
 
-  /**
-   * Sets the view mode of the document to page layout.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt pageLayoutView() {
-    return new RtfDocfmt( "\\" + RtfControlWords.VIEW_KIND + "1" );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.VIEW_KIND ).append( "1" ) );
   }
 
   // Footnotes and Endnotes
 
-  /**
-   * Footnotes only or nothing at all (default).
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt footnotesOnly() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "0" );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT ).append( "0" ) );
   }
 
-  /**
-   * Endnotes only.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt endnotesOnly() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "1" );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT ).append( "1" ) );
   }
 
-  /**
-   * Footnotes and endnotes both.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt footnotesEndnotes() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT + "2" );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FOOTNOTE_ENDNOTE_PLACEMENT ).append( "2" ) );
   }
 
-  /**
-   * Footnote numbering - Arabic numbering (1, 2, 3, _).
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt footnoteNumberingArabic() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_NUMBERING_ARABIC );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FOOTNOTE_NUMBERING_ARABIC ) );
   }
 
-  /**
-   * Footnote numbering - Alphabetic uppercase (A, B, C, _).
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt footnoteNumberingUpperAlphabetic() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ALPHA );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ALPHA ) );
   }
 
-  /**
-   * Footnote numbering - Roman lowercase (i, ii, iii, _).
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt footnoteNumberingUpperRoman() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ROMAN );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FOOTNOTE_NUMBERING_UPPER_ROMAN ) );
   }
 
   // Page information
 
-  /**
-   * Paper width. Default is 12,240 twips.
-   *
-   * @param width Width of the page.
-   * @param unit  Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt paperWidth( double width, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.PAPER_WIDTH + unit.toTwips( width ) );
+    int twips = unit.toTwips( width );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.PAPER_WIDTH, twips ) );
   }
 
-  /**
-   * Paper height. Default is 15,840 twips.
-   *
-   * @param height Height of the page.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt paperHeight( double height, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.PAPER_HEIGHT + unit.toTwips( height ) );
+    int twips = unit.toTwips( height );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.PAPER_HEIGHT, twips ) );
   }
 
-  /**
-   * Paper width and height.
-   *
-   * @param width  Height of the page.
-   * @param height Height of the page.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt paper( double width, double height, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.PAPER_WIDTH + unit.toTwips( width ) +
-                              "\\" + RtfControlWords.PAPER_HEIGHT + unit.toTwips( height ) );
+    int w = unit.toTwips( width );
+    int h = unit.toTwips( height );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.PAPER_WIDTH, w )
+                                    .cw( RtfControlWords.PAPER_HEIGHT, h ) );
   }
 
-  /**
-   * Left margin. Default is 1,800 twips.
-   *
-   * @param margin Left margin.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt leftMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_LEFT + unit.toTwips( margin ) );
+    int twips = unit.toTwips( margin );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.MARGIN_LEFT, twips ) );
   }
 
-  /**
-   * Right margin. Default is 1,800 twips.
-   *
-   * @param margin Right margin.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt rightMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_RIGHT + unit.toTwips( margin ) );
+    int twips = unit.toTwips( margin );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.MARGIN_RIGHT, twips ) );
   }
 
-  /**
-   * Top margin. Default is 1,440 twips.
-   *
-   * @param margin Top margin.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt topMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_TOP + unit.toTwips( margin ) );
+    int twips = unit.toTwips( margin );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.MARGIN_TOP, twips ) );
   }
 
-  /**
-   * Bottom margin. Default is 1,440 twips.
-   *
-   * @param margin Bottom margin.
-   * @param unit   Measurement unit.
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt bottomMargin( double margin, RtfUnit unit ) {
-    return new RtfDocfmt( "\\" + RtfControlWords.MARGIN_BOTTOM + unit.toTwips( margin ) );
+    int twips = unit.toTwips( margin );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.MARGIN_BOTTOM, twips ) );
   }
 
-  /**
-   * Facing pages (activates odd/even headers and gutters).
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt facingPages() {
-    return new RtfDocfmt( "\\" + RtfControlWords.FACING_PAGES );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FACING_PAGES ) );
   }
 
-  /**
-   * Switches margin definitions on left and right pages.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt switchMargin() {
-    return new RtfDocfmt( "\\" + RtfControlWords.MIRROR_MARGINS );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.MIRROR_MARGINS ) );
   }
 
-  /**
-   * Landscape format.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt landscape() {
-    return new RtfDocfmt( "\\" + RtfControlWords.LANDSCAPE );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.LANDSCAPE ) );
   }
 
-  /**
-   * Enable widow and orphan control.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt widowOrphanControl() {
-    return new RtfDocfmt( "\\" + RtfControlWords.WIDOW_CONTROL );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.WIDOW_CONTROL ) );
   }
 
   // Revision marks
 
-  /**
-   * This document is protected for revisions. The user can edit the document, but revision marking cannot be
-   * disabled.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt revisionProtected() {
-    return new RtfDocfmt( "\\" + RtfControlWords.REVISION_PROTECTED );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.REVISION_PROTECTED ) );
   }
 
-  /**
-   * Turns on revision marking.
-   *
-   * @return New {@code RtfDocfmt} object.
-   */
   public static RtfDocfmt revisionMarking() {
-    return new RtfDocfmt( "\\" + RtfControlWords.REVISION_MARKING );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.REVISION_MARKING ) );
   }
 }

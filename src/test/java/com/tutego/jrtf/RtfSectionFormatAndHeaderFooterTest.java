@@ -7,11 +7,17 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class RtfSectionFormatAndHeaderFooterTest {
 
+  private static String rtf( RtfSectionFormatAndHeaderFooter fmt ) {
+    StringBuilder sb = new StringBuilder();
+    fmt.rtf( new RtfOutput( sb ) );
+    return sb.toString();
+  }
+
   @Test void sectionFormattingConcatenatesInOrder() {
     RtfSectionFormatAndHeaderFooter combined = RtfSectionFormatAndHeaderFooter.sectionFormatting(
         RtfSectionFormatAndHeaderFooter.columns( 2 ),
         RtfSectionFormatAndHeaderFooter.titlePage() );
-    assertThat( combined.rtf.toString() ).isEqualTo( "\\cols2\\titlepg" );
+    assertThat( rtf( combined ) ).isEqualTo( "\\cols2\\titlepg" );
   }
 
   @Test void columnsRejectsNonPositive() {
@@ -20,17 +26,17 @@ class RtfSectionFormatAndHeaderFooterTest {
   }
 
   @Test void pageNumberFormats() {
-    assertThat( RtfSectionFormatAndHeaderFooter.pageNumberLowerRoman().rtf.toString() ).isEqualTo( "\\pgnlcrm" );
-    assertThat( RtfSectionFormatAndHeaderFooter.pageNumberUpperRoman().rtf.toString() ).isEqualTo( "\\pgnucrm" );
-    assertThat( RtfSectionFormatAndHeaderFooter.pageNumberDecimal().rtf.toString() ).isEqualTo( "\\pgndec" );
+    assertThat( rtf( RtfSectionFormatAndHeaderFooter.pageNumberLowerRoman() ) ).isEqualTo( "\\pgnlcrm" );
+    assertThat( rtf( RtfSectionFormatAndHeaderFooter.pageNumberUpperRoman() ) ).isEqualTo( "\\pgnucrm" );
+    assertThat( rtf( RtfSectionFormatAndHeaderFooter.pageNumberDecimal() ) ).isEqualTo( "\\pgndec" );
   }
 
   @Test void titlePage() {
-    assertThat( RtfSectionFormatAndHeaderFooter.titlePage().rtf.toString() ).isEqualTo( "\\titlepg" );
+    assertThat( rtf( RtfSectionFormatAndHeaderFooter.titlePage() ) ).isEqualTo( "\\titlepg" );
   }
 
   @Test void headerForAllPagesFramesParagraph() {
-    assertThat( RtfSectionFormatAndHeaderFooter.headerForAllPages( RtfPara.p( "H" ) ).rtf.toString() )
+    assertThat( rtf( RtfSectionFormatAndHeaderFooter.headerForAllPages( RtfPara.p( "H" ) ) ) )
         .isEqualTo( "{\\header{\\s0 H\\par}\n}" );
   }
 

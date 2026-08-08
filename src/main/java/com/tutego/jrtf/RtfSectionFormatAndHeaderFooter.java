@@ -31,234 +31,123 @@
  */
 package com.tutego.jrtf;
 
+import java.util.function.Consumer;
+
 /**
  * Section-Formatting.
  */
 public class RtfSectionFormatAndHeaderFooter {
-  /**
-   * Holds the RTF text for a header or footer element.
-   */
-  final CharSequence rtf;
 
-  /**
-   * Initializes this object with RTF text.
-   *
-   * @param rtf RTF.
-   */
-  private RtfSectionFormatAndHeaderFooter( CharSequence rtf ) {
-    this.rtf = rtf;
+  private final Consumer<RtfOutput> renderer;
+
+  private RtfSectionFormatAndHeaderFooter( Consumer<RtfOutput> renderer ) {
+    this.renderer = renderer;
+  }
+
+  void rtf( RtfOutput out ) {
+    renderer.accept( out );
   }
 
   /*
    * <section>  := <secfmt>* <hdrftr>? <para>+ (\sect <section>)?
    */
 
-  /**
-   * Builds a RtfSectionFormatAndHeaderFooter objects representing all the
-   * section formattings.
-   *
-   * @param sectionFormats Sequence of section formats.
-   * @return RtfSectionFormatAndHeaderFooter
-   */
   public static RtfSectionFormatAndHeaderFooter sectionFormatting(
       RtfSectionFormatAndHeaderFooter... sectionFormats ) {
-    StringBuilder sb = new StringBuilder( sectionFormats.length * 10 );
-    for ( RtfSectionFormatAndHeaderFooter rtfSectionFormat : sectionFormats )
-      sb.append( rtfSectionFormat.rtf );
-
-    return new RtfSectionFormatAndHeaderFooter( sb );
+    return new RtfSectionFormatAndHeaderFooter( out -> {
+      for ( RtfSectionFormatAndHeaderFooter fmt : sectionFormats )
+        fmt.rtf( out );
+    } );
   }
 
-  /**
-   * Reset to default section properties of this current section.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter reset() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_DEFAULTS );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.SECTION_DEFAULTS ) );
   }
 
-  /**
-   * Endnotes are included in this section.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter endnotesIncluded() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.END_NOTES_HERE );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.END_NOTES_HERE ) );
   }
 
   // Section break
 
-  /**
-   * No section break.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter noBreak() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_NONE );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.SECTION_BREAK_NONE ) );
   }
 
-  /**
-   * Section break starts a new column.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewColumn() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_COLUMN );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.SECTION_BREAK_COLUMN ) );
   }
 
-  /**
-   * Section break starts a new page. That is the default.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewPage() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_PAGE );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.SECTION_BREAK_PAGE ) );
   }
 
-  /**
-   * Section break starts at an even page.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewEvenPage() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_EVEN );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.SECTION_BREAK_EVEN ) );
   }
 
-  /**
-   * Section break starts at an odd page.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter breakStartsNewOddPage() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.SECTION_BREAK_ODD );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.SECTION_BREAK_ODD ) );
   }
 
   // Columns
 
-  /**
-   * Number of columns in this current section. Default is 1.
-   *
-   * @param columns Number of columns for this section.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter columns( int columns ) {
     if ( columns <= 0 )
       throw new RtfException( "Number of colums can't be <= 0" );
-
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.COLUMNS + columns );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.COLUMNS, columns ) );
   }
 
-  /**
-   * Space between columns in this current section. Default is 720 twips.
-   *
-   * @param space Space between columns.
-   * @param unit  Measurement.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter spaceBetweenColumns( double space, RtfUnit unit ) {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.COLUMN_SPACE + unit.toTwips( space ) );
+    int twips = unit.toTwips( space );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.COLUMN_SPACE, twips ) );
   }
 
-  /**
-   * Puts a line between columns in this current section.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter lineBetweenColumns() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.LINE_BETWEEN_COLUMNS );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.LINE_BETWEEN_COLUMNS ) );
   }
-
-  // Line numbering
-
-  // Page information
 
   // Page numbers
 
-  /**
-   * Beginning page number of this current section. Default is 1.
-   *
-   * @param pageNumber Beginning page number.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter beginningPageNumber( int pageNumber ) {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_RESTART + pageNumber );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.PAGE_NUMBER_RESTART, pageNumber ) );
   }
 
-  /**
-   * Page numbers are formatted with lowercase roman numerals.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter pageNumberLowerRoman() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_LOWER_ROMAN );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.PAGE_NUMBER_LOWER_ROMAN ) );
   }
 
-  /**
-   * Page numbers are formatted with uppercase roman numerals.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter pageNumberUpperRoman() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_UPPER_ROMAN );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.PAGE_NUMBER_UPPER_ROMAN ) );
   }
 
-  /**
-   * Page numbers are formatted with Arabic numerals. This is the default.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter pageNumberDecimal() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.PAGE_NUMBER_DECIMAL );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.PAGE_NUMBER_DECIMAL ) );
   }
 
-  /**
-   * This section has a title page that's different from the other pages in the section.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter titlePage() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.TITLE_PAGE );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.TITLE_PAGE ) );
   }
 
   // Vertical alignment
 
-  /**
-   * Text is top-aligned. This is the default.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter topAlignText() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_TOP );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.VERTICAL_ALIGN_TOP ) );
   }
 
-  /**
-   * Text is bottom-aligned.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter bottomAlignText() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_BOTTOM );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.VERTICAL_ALIGN_BOTTOM ) );
   }
 
-  /**
-   * Text is centered vertically.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter centerVerticalText() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_CENTER );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.VERTICAL_ALIGN_CENTER ) );
   }
 
-  /**
-   * Text is justified vertically.
-   *
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter justifyVerticalText() {
-    return new RtfSectionFormatAndHeaderFooter( "\\" + RtfControlWords.VERTICAL_ALIGN_JUSTIFIED );
+    return new RtfSectionFormatAndHeaderFooter( out -> out.cw( RtfControlWords.VERTICAL_ALIGN_JUSTIFIED ) );
   }
 
+  // Headers and footers
 
   /*
    * <section> := <secfmt>* <hdrftr>? <para>+ ( \sect <section>)?
@@ -266,58 +155,31 @@ public class RtfSectionFormatAndHeaderFooter {
    * <hdrctl>  := \header | \footer | \headerl | \headerr | \headerf | \footerl | \ footerr | \footerf
    */
 
-  /**
-   * Puts a header with a given paragraph on all pages in this current section.
-   *
-   * @param para Paragraph for the header.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter headerForAllPages( RtfPara para ) {
-    return new RtfSectionFormatAndHeaderFooter(
-        Rtf.frameRtfParagraphWithEndingPar( "header", para ) );
+    return headerFooter( "header", para );
   }
 
-  /**
-   * Puts a header with a given paragraph on all left-hand pages in this current section.
-   *
-   * @param para Paragraph for the header.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter headerForLeftHandPages( RtfPara para ) {
-    return new RtfSectionFormatAndHeaderFooter(
-        Rtf.frameRtfParagraphWithEndingPar( "headerl", para ) );
+    return headerFooter( "headerl", para );
   }
 
-  /**
-   * Puts a header with a given paragraph on all right-hand pages in this current section.
-   *
-   * @param para Paragraph for the header.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter headerForRightHandPages( RtfPara para ) {
-    return new RtfSectionFormatAndHeaderFooter(
-        Rtf.frameRtfParagraphWithEndingPar( "headerr", para ) );
+    return headerFooter( "headerr", para );
   }
 
-  /**
-   * Puts a header with a given paragraph on the first page in this current section.
-   *
-   * @param para Paragraph for the header.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter headerForFirstPage( RtfPara para ) {
-    return new RtfSectionFormatAndHeaderFooter(
-        Rtf.frameRtfParagraphWithEndingPar( "headerf", para ) );
+    return headerFooter( "headerf", para );
   }
 
-  /**
-   * Puts a footer with a given paragraph on all pages in this current section.
-   *
-   * @param para Paragraph for the footer.
-   * @return New {@code RtfSectionFormatAndHeaderFooter} object.
-   */
   public static RtfSectionFormatAndHeaderFooter footerOnAllPages( RtfPara para ) {
-    return new RtfSectionFormatAndHeaderFooter(
-        Rtf.frameRtfParagraphWithEndingPar( "footer", para ) );
+    return headerFooter( "footer", para );
+  }
+
+  private static RtfSectionFormatAndHeaderFooter headerFooter( String controlWord, RtfPara para ) {
+    return new RtfSectionFormatAndHeaderFooter( out -> {
+      out.open( controlWord );
+      para.rtf( out, true );
+      out.close();
+    } );
   }
 }

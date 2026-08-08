@@ -40,6 +40,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.*;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
@@ -83,19 +84,19 @@ public class Rtf {
   private final List<RtfList> lists = new ArrayList<>();
 
   /**
-   * Document info.
+   * Document info renderers.
    */
-  private final StringBuilder info = new StringBuilder();
+  private final List<Consumer<RtfOutput>> infoRenderers = new ArrayList<>();
 
   /**
-   * Document format.
+   * Document format renderers.
    */
-  private final StringBuilder docfmt = new StringBuilder();
+  private final List<Consumer<RtfOutput>> docfmtRenderers = new ArrayList<>();
 
   /**
    * Section data will be stored in 2 lists: One for the section formatting and headers
    */
-  private final List<@Nullable CharSequence> secfmtHdrftrs = new ArrayList<>();
+  private final List<@Nullable Consumer<RtfOutput>> secfmtHdrftrRenderers = new ArrayList<>();
   /**
    * and another list for the paragraphs itself.
    */
@@ -225,7 +226,7 @@ public class Rtf {
    */
   public Rtf info( RtfInfo... infos ) {
     for ( RtfInfo rtfInfo : infos )
-      info.append( rtfInfo.rtf );
+      infoRenderers.add( rtfInfo::rtf );
 
     return this;
   }
@@ -239,7 +240,7 @@ public class Rtf {
    */
   public Rtf documentFormatting( RtfDocfmt... documentFormattings ) {
     for ( RtfDocfmt rtfDocfmt : documentFormattings )
-      docfmt.append( rtfDocfmt.rtf );
+      docfmtRenderers.add( rtfDocfmt::rtf );
 
     return this;
   }
@@ -278,9 +279,9 @@ public class Rtf {
     // First add the style
 
     if ( secfmtHdrftr != null )
-      secfmtHdrftrs.add( secfmtHdrftr.rtf );
+      secfmtHdrftrRenderers.add( secfmtHdrftr::rtf );
     else
-      secfmtHdrftrs.add( null );
+      secfmtHdrftrRenderers.add( null );
 
     // then the paragraphs itself to the second list
 
@@ -463,16 +464,17 @@ public class Rtf {
 
     // Write <info>
 
-    if ( info.length() > 0 ) {
+    if ( !infoRenderers.isEmpty() ) {
       out.open( RtfControlWords.INFO_DESTINATION );
-      out.append( info );
+      for ( Consumer<RtfOutput> infoRenderer : infoRenderers )
+        infoRenderer.accept( out );
       out.close().nl();
     }
 
     // Write <docfmt>
 
-    if ( docfmt.length() > 0 )
-      out.append( docfmt );
+    for ( Consumer<RtfOutput> docfmtRenderer : docfmtRenderers )
+      docfmtRenderer.accept( out );
 
     /*
      * <document> := <info>? <docfmt>* <section>+
@@ -481,12 +483,12 @@ public class Rtf {
 
     for ( int sectionCnt = 0; sectionCnt < sectionParagraphs.size(); sectionCnt++ ) {
       RtfPara[] paragraphs = sectionParagraphs.get( sectionCnt );
-      @Nullable CharSequence secfmtHdrftr = secfmtHdrftrs.get( sectionCnt );
+      @Nullable Consumer<RtfOutput> secfmtHdrftrRenderer = secfmtHdrftrRenderers.get( sectionCnt );
 
       // <secfmt>* <hdrftr>?
 
-      if ( secfmtHdrftr != null )
-        out.append( secfmtHdrftr );
+      if ( secfmtHdrftrRenderer != null )
+        secfmtHdrftrRenderer.accept( out );
 
       // <para>+
 
@@ -502,21 +504,6 @@ public class Rtf {
     // We are done
 
     out.close();
-  }
-
-  // Internal utility methods
-
-  /**
-   * Frames a {@link RtfPara}. The result is similar too
-   * <code>"{\" + rtfControlWord + " " + RTF of para + "}"</code>.
-   */
-  static StringBuilder frameRtfParagraphWithEndingPar( String rtfControlWord, RtfPara para ) {
-    StringBuilder sb = new StringBuilder( 1024 );
-    RtfOutput out = new RtfOutput( sb );
-    out.append( "{\\" ).append( rtfControlWord );
-    para.rtf( out, true );
-    out.close();
-    return sb;
   }
 
   /**
