@@ -159,6 +159,20 @@ public class RtfTextPara extends RtfPara {
   }
 
   /**
+   * Sets the table nesting level for this paragraph (0 = outermost table,
+   * 1 = table inside a cell, etc.). Used for nested tables.
+   *
+   * @param level Nesting depth.
+   * @return {@code this}-object.
+   */
+  public RtfTextPara nestLevel( int level ) {
+    if ( level < 0 )
+      throw new IllegalArgumentException( "Nesting level must be >= 0, was " + level );
+    parfmt.append( '\\' ).append( RtfControlWords.NESTED_TABLE_LEVEL ).append( level ).append( '\n' );
+    return this;
+  }
+
+  /**
    * Keep paragraph intact.
    *
    * @return {@code this}-object.
@@ -239,6 +253,38 @@ public class RtfTextPara extends RtfPara {
    */
   public RtfTextPara noLineNumbering() {
     parfmt.append( '\\' ).append( RtfControlWords.NO_LINE_NUMBERING ).append( '\n' );
+    return this;
+  }
+
+  // Drop caps
+
+  /**
+   * Types of drop caps at the start of a paragraph.
+   */
+  public enum DropCapType {
+    /** No drop cap (default). */
+    NONE( 0 ),
+    /** First character is enlarged and drops into the text body. */
+    DROP( 1 ),
+    /** First character is enlarged but stays within the margin. */
+    MARGIN( 2 );
+
+    final int value;
+    DropCapType( int value ) { this.value = value; }
+  }
+
+  /**
+   * Sets a drop cap (enlarged first character) at the beginning of this paragraph.
+   *
+   * @param type  Drop cap style.
+   * @param lines Number of lines the dropped character spans (e.g. 3).
+   * @param chars Number of characters to drop, typically 1.
+   * @return {@code this}-object.
+   */
+  public RtfTextPara dropCap( DropCapType type, int lines, int chars ) {
+    parfmt.append( '\\' ).append( RtfControlWords.DROP_CAP_TYPE ).append( type.value ).append( '\n' )
+          .append( '\\' ).append( RtfControlWords.DROP_CAP_LINES ).append( lines ).append( '\n' )
+          .append( '\\' ).append( RtfControlWords.DROP_CAP_CHARS ).append( chars ).append( '\n' );
     return this;
   }
 

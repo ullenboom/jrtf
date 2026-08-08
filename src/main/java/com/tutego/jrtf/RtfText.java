@@ -258,6 +258,51 @@ public class RtfText {
   }
 
   /**
+   * Embossed text (raised appearance, light on top).
+   *
+   * @param text Text to emboss.
+   * @return New RtfText object.
+   */
+  public static RtfText emboss( Object text ) {
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.EMBOSS ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
+  }
+
+  /**
+   * Engraved text (sunken appearance, shadow on top).
+   *
+   * @param text Text to engrave.
+   * @return New RtfText object.
+   */
+  public static RtfText engrave( Object text ) {
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.ENGRAVE ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
+  }
+
+  /**
+   * Outline text (hollow characters, only the outline is drawn).
+   *
+   * @param text Text to render in outline.
+   * @return New RtfText object.
+   */
+  public static RtfText outline( Object text ) {
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open( RtfControlWords.OUTLINE ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
+  }
+
+  /**
    * Sets text with a given font style.
    *
    * @param fontnum Font number according to the header.

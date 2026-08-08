@@ -126,6 +126,22 @@ final class RtfControlWords {
   static final String PARAGRAPH_SHADING = "shading";
   static final String PARAGRAPH_BACKGROUND_COLOR = "cbpat";
 
+  // Font effects
+
+  static final String EMBOSS = "embo";
+  static final String ENGRAVE = "impr";
+  static final String OUTLINE = "outl";
+
+  // Drop caps
+
+  static final String DROP_CAP_TYPE = "dropcaptype";
+  static final String DROP_CAP_LINES = "dropcapli";
+  static final String DROP_CAP_CHARS = "dropcapt";
+
+  // Nested tables
+
+  static final String NESTED_TABLE_LEVEL = "itap";
+
   // Shading patterns
 
   static final String SHADING_PATTERN_HORIZ = "bghoriz";
