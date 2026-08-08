@@ -31,6 +31,8 @@
  */
 package com.tutego.jrtf;
 
+import java.io.InputStream;
+
 /**
  * Header definitions for font declarations.
  */
@@ -394,6 +396,22 @@ public class RtfHeaderFont extends RtfHeader {
    *
    * @param out Output buffer.
    */
+  private InputStream fontData;
+
+
+  /**
+   * Embeds the full font file (TTF, OTF) into the document so the font is
+   * available on systems that do not have it installed. No subsetting is
+   * performed — the entire font file is embedded.
+   *
+   * @param fontData Input stream of the font file (TrueType or OpenType).
+   * @return {@code this}-object.
+   */
+  public RtfHeaderFont embed( InputStream fontData ) {
+    this.fontData = fontData;
+    return this;
+  }
+
   void writeFontInfo( RtfOutput out ) {
     /*
      * <fontinfo> := <fontnum>
@@ -406,18 +424,33 @@ public class RtfHeaderFont extends RtfHeader {
      *               <codepage>?
      *               <fontname>
      *               <fontaltname>? ';'
-     *
-     * <fontnum>    := \f
-     * <fontfamily> := \fnil | \froman | \fswiss | \fmodern | \fscript | \fdecor | \ftech | \fbidi
-     * <fcharset>   := \fcharset
-     * <fprq>       := \fprq
-     * <fontname>   := #PCDATA
      */
 
     out.open( RtfControlWords.FONT ).append( fontnum )
        .cw( RtfControlWords.FONT ).append( fontfamily.toString().toLowerCase() )
        .append( (charSet != null ? "\\" + RtfControlWords.FONT_CHARSET + charSet : "") )
-       .append( (pitch != null ? "\\" + RtfControlWords.FONT_PITCH + pitch : "") )
-       .sp().append( fontname ).closeSemi();
+       .append( (pitch != null ? "\\" + RtfControlWords.FONT_PITCH + pitch : "") );
+
+    if ( fontData != null ) {
+      out.open( RtfControlWords.FONT_FILE_DESTINATION )
+         .cw( RtfControlWords.FONT_EMBED ).cw( RtfControlWords.FONT_FILE_CP ).append( "1252" )
+         .cw( RtfControlWords.FONT_FILE_NUMBER ).append( fontnum ).sp();
+      try ( InputStream in = new java.io.BufferedInputStream( fontData ) ) {
+        byte[] buf = new byte[ 4096 ];
+        int pos = 0;
+        int n;
+        while ( (n = in.read( buf )) != -1 ) {
+          for ( int i = 0; i < n; i++ ) {
+            out.append( Hex.RAW[ buf[ i ] & 0xFF ] );
+            if ( ++pos == 40 ) { pos = 0; out.nl(); }
+          }
+        }
+      } catch ( java.io.IOException e ) {
+        throw new RtfException( e );
+      }
+      out.close();
+    }
+
+    out.sp().append( fontname ).closeSemi();
   }
 }

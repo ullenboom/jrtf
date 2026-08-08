@@ -11,8 +11,7 @@ See also:
 this is a rough estimate, not a rigorous conformance count. Character and paragraph formatting,
 tables, footnotes, fields, form fields, comments, track changes, bidirectional text, bookmarks,
 hyperlinks, stylesheets, list tables, pictures (JPEG/PNG/EMF), and document metadata are covered.
-The main remaining gaps are drawing objects, nested tables, embedded fonts, legacy picture formats
-(WMF/PICT), and shading patterns beyond a solid fill.
+The main remaining gaps are drawing objects and legacy picture formats (WMF/PICT).
 
 ## The Basics
 
@@ -452,26 +451,28 @@ bookmarks and internal hyperlinks (`RtfText.bookmark`/`hyperlinkToBookmark`), mo
 support (`RtfHeaderStyle`), extended document metadata (`RtfInfo`), form fields (`RtfFormField` —
 text, checkbox, dropdown), comments/annotations (`RtfText.comment`), track changes
 (`RtfText.revision`), bidirectional text (`RtfText.rightToLeft`/`leftToRight`), field constants
-(`RtfField`), multi-column sections (`RtfSectionFormatAndHeaderFooter.columns`), and a good deal
-more character and paragraph formatting (all-caps, hidden text, kerning, character spacing, paragraph
-shading, border width/color, and more). What's still missing: drawing objects, sub documents,
-embedded fonts, GIF/WMF images (only JPEG/PNG/EMF are supported), nested tables (a table inside a
-cell), shading patterns beyond a solid fill, hierarchical list numbering (e.g. `1.1.1.` — this
-library's lists number each level independently), and RTF *reading*/parsing (jRTF is write-only; see
-`RtfTemplate` for the one exception, simple `%%VARIABLE%%` substitution in an existing file). The
-full RTF specification has grown to around 1400 control words over the years; some of the rest are
-easy to add, some are more conceptual work. You can help with
+(`RtfField`), multi-column sections, table styles (`RtfTableStyle`), document variables
+(`Rtf.docvar`), nested tables (`RtfTextPara.nestLevel`), shading patterns beyond solid fill, drop
+caps (`RtfTextPara.dropCap`), font effects (`emboss`/`engrave`/`outline`), font embedding
+(`RtfHeaderFont.embed`, full TTF/OTF without subsetting), language support via
+`java.util.Locale`, border styles on cells and rows, generator tag, and a good deal more character
+and paragraph formatting (all-caps, hidden text, kerning, character spacing, border width/color, and
+more). The entire library renders lazily via `Consumer<RtfOutput>` — no in-memory document model.
+What's still missing: drawing objects, sub documents, embedded fonts, GIF/WMF images (only
+JPEG/PNG/EMF are supported), hierarchical list numbering (e.g. `1.1.1.` — this library's lists
+number each level independently), and RTF *reading*/parsing (jRTF is write-only; see `RtfTemplate`
+for the one exception, simple `%%VARIABLE%%` substitution in an existing file). The full RTF
+specification has grown to around 1400 control words over the years; some of the rest are easy to
+add, some are more conceptual work. You can help with
 
 * testing jRTF
 * finding out where jRTF generates wrong RTF and where exceptions should be thrown
 * adding more control words to jRTF to support more formattings/styles
-* add more fields to `RtfField` (the most common ones are there, but many are not)
+* add more fields to `RtfField` (the most common are there, but many field types remain)
 * add GIF and WMF picture support
-* build an enum for different languages so that the whole document, a certain paragraph or text can
-  be in different languages
 * abstract from font, style and color positions in header and introduce names, which are mapped to
   these positions
-* add support for nested tables and drawing objects
+* add support for drawing objects
 * teach `RtfList` hierarchical (ancestor-concatenating) numbering, not just independent levels
 
 Furthermore some design decisions has to be made according to formattings: The problem now is that

@@ -165,6 +165,13 @@ final class RtfControlWords {
   static final String TABLE_STYLE_ROW_BAND_SIZE = "tsrowb";
   static final String TABLE_STYLE_COLUMN_BAND_SIZE = "tscellcb";
 
+  // Embedded fonts
+
+  static final String FONT_FILE_DESTINATION = "*\\fontfile";
+  static final String FONT_EMBED = "fontemb";
+  static final String FONT_FILE_CP = "cpg";
+  static final String FONT_FILE_NUMBER = "f";
+
   // Document variables
 
   static final String DOCUMENT_VARIABLE = "*\\docvar";
