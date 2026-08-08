@@ -178,16 +178,10 @@ public class Rtf {
   }
 
   /**
-   * Sets RTF headers for the document.
-   *
-   * @param headers Sequence of headers.
-   * @return {@code this}-reference.
-   */
-  /**
    * Sets the generator tag written into the RTF header. If not called, no
    * generator tag is emitted. Example: {@code rtf.generator("jRTF 1.2.0")}.
    *
-   * @param name Generator name/version string (ASCII, no braces or backslashes).
+   * @param name Generator name/version string.
    * @return {@code this}-reference.
    */
   public Rtf generator( String name ) {
@@ -195,6 +189,12 @@ public class Rtf {
     return this;
   }
 
+  /**
+   * Sets RTF headers for the document.
+   *
+   * @param headers Sequence of headers.
+   * @return {@code this}-reference.
+   */
   public Rtf header( RtfHeader... headers ) {
     for ( RtfHeader rtfHeader : headers ) {
       if ( rtfHeader instanceof RtfHeaderColor )
@@ -280,13 +280,6 @@ public class Rtf {
   }
 
   /**
-   * Document formatting to specify the attributes of the document,
-   * such as pager with, margins or footnote placement.
-   *
-   * @param documentFormattings RTF document formattings.
-   * @return {@code this}-reference.
-   */
-  /**
    * Sets a document variable (key-value pair stored in the RTF file).
    * Useful for mail-merge templates and external document processing tools.
    *
@@ -301,6 +294,13 @@ public class Rtf {
     return this;
   }
 
+  /**
+   * Document formatting to specify the attributes of the document,
+   * such as paper width, margins or footnote placement.
+   *
+   * @param documentFormattings RTF document formattings.
+   * @return {@code this}-reference.
+   */
   public Rtf documentFormatting( RtfDocfmt... documentFormattings ) {
     for ( RtfDocfmt rtfDocfmt : documentFormattings )
       docfmtRenderers.add( rtfDocfmt::rtf );
