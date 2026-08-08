@@ -60,7 +60,7 @@ public class RtfTextPara extends RtfPara {
     if ( resetDefaults )
       out.cw( RtfControlWords.PARAGRAPH_DEFAULTS );
     out.cw( RtfControlWords.STYLE ).append( styleId ).sp();
-    out.append( textparFormatRtf() );
+    writeFormattingTo( out );
     if ( renderer != null )
       renderer.accept( out );
     if ( withEndingPar )
@@ -110,9 +110,8 @@ public class RtfTextPara extends RtfPara {
    *
    * @return
    */
-  CharSequence textparFormatRtf() {
-    return new StringBuilder( 512 )
-        .append( brdrdef ).append( parfmt ).append( tabdef );
+  void writeFormattingTo( RtfOutput out ) {
+    out.append( brdrdef ).append( parfmt ).append( tabdef );
   }
 
   // Paragraph-Formatting Properties
