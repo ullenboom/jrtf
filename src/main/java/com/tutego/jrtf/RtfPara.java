@@ -207,17 +207,16 @@ public abstract class RtfPara {
    * @return New {@code RtfPara} object with text and bullet.
    */
   public static RtfPara ul( RtfText text ) {
-    final String s =
-        "{\\" + RtfControlWords.PARAGRAPH_DEFAULTS
-      + "{\\" + RtfControlWords.PN_TEXT + "\\" + RtfControlWords.BULLET + "\\" + RtfControlWords.TAB + "}"
-      + "{\\" + RtfControlWords.DESTINATION_MARKER + "\\" + RtfControlWords.PARAGRAPH_NUMBERING
-            + "\\" + RtfControlWords.PN_LEVEL_BULLET + "\\" + RtfControlWords.PN_FONT + "1"
-            + "\\" + RtfControlWords.PN_INDENT + "0"
-            + "{\\" + RtfControlWords.PN_TEXT_BEFORE + "\\" + RtfControlWords.BULLET + "}}"
-      + "\\" + RtfControlWords.FIRST_LINE_INDENT + "-200" + "\\" + RtfControlWords.LEFT_INDENT + "200 ";
-
     return RtfPara.of( out -> {
-      out.append( s );
+      out.open().cw( RtfControlWords.PARAGRAPH_DEFAULTS )
+         .open( RtfControlWords.PN_TEXT ).cw( RtfControlWords.BULLET )
+         .cw( RtfControlWords.TAB ).close()
+         .open( RtfControlWords.DESTINATION_MARKER ).cw( RtfControlWords.PARAGRAPH_NUMBERING )
+         .cw( RtfControlWords.PN_LEVEL_BULLET ).cw( RtfControlWords.PN_FONT, 1 )
+         .cw( RtfControlWords.PN_INDENT, 0 )
+         .open( RtfControlWords.PN_TEXT_BEFORE ).cw( RtfControlWords.BULLET ).close().close()
+         .cw( RtfControlWords.FIRST_LINE_INDENT ).append( "-200" )
+         .cw( RtfControlWords.LEFT_INDENT ).append( "200" ).sp();
       text.rtf( out );
       out.cw( RtfControlWords.PAR );
       out.close();
@@ -256,14 +255,13 @@ public abstract class RtfPara {
     int beforeTwips = beforeBulletUnit.toTwips( beforeBulletWidth );
     int indentTwips = indentUnit.toTwips( indentWidth );
     final int afterItemTwips = afterItemUnit.toTwips( afterItemSpace );
-    final String s =
-        String.format(
-            "{%s\\" + RtfControlWords.LEFT_INDENT + "%d\\" + RtfControlWords.FIRST_LINE_INDENT + "-%d",
-            (afterItemTwips != 0 ? ("\\" + RtfControlWords.SPACE_AFTER + afterItemTwips) : ""),
-            indentTwips, (indentTwips - beforeTwips) );
 
     return RtfPara.of( out -> {
-      out.append( s );
+      out.open();
+      if ( afterItemTwips != 0 )
+        out.cw( RtfControlWords.SPACE_AFTER, afterItemTwips );
+      out.cw( RtfControlWords.LEFT_INDENT, indentTwips )
+         .cw( RtfControlWords.FIRST_LINE_INDENT ).append( "-" ).append( indentTwips - beforeTwips );
       out.open();
       bulletText.rtf( out );
       out.cw( RtfControlWords.TAB );

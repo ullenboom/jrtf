@@ -443,8 +443,8 @@ public class Rtf {
     // The RTF version will always be 1 and the
     // character is \ansi = Windows 1252
 
-    out.cw( RtfControlWords.RTF_VERSION ).append( "1" )
-       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT ).append( "0" );
+    out.cw( RtfControlWords.RTF_VERSION, 1 )
+       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT, 0 );
 
     /*
      * <fonttbl>  := '{' \fonttbl (<fontinfo> | ('{' <fontinfo> '}'))+ '}'
