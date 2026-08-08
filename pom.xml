@@ -30,7 +30,7 @@
 
   <groupId>com.tutego</groupId>
   <artifactId>jrtf</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 
   <name>JRTF</name>
   <description>jRTF is a simple Java API to build RTF documents and to fill RTF templates

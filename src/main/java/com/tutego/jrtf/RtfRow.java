@@ -72,6 +72,17 @@ public class RtfRow extends RtfPara {
   // Row Formatting
 
   /**
+   * Sets the background color for the entire row.
+   *
+   * @param colorIndex Index of the color as defined in the header color table.
+   * @return {@code this}-object.
+   */
+  public RtfRow backgroundColor( int colorIndex ) {
+    tbldef.append( '\\' ).append( RtfControlWords.CELL_BACKGROUND_COLOR ).append( colorIndex );
+    return this;
+  }
+
+  /**
    * Keeps this row together with the following row (no page break between them).
    *
    * @return {@code this}-object.

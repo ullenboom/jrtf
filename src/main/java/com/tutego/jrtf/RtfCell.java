@@ -142,6 +142,19 @@ public final class RtfCell {
     return this;
   }
 
+  /**
+   * Sets the shading pattern for the cell background.
+   *
+   * @param pattern    Shading pattern (horizontal, vertical, diagonal, etc.).
+   * @param colorIndex Background color index in the color table.
+   * @return {@code this}-object.
+   */
+  public RtfCell shadingPattern( RtfTextPara.ShadingPattern pattern, int colorIndex ) {
+    celldef.append( '\\' ).append( pattern.controlWord )
+           .append( '\\' ).append( RtfControlWords.CELL_BACKGROUND_COLOR ).append( colorIndex );
+    return this;
+  }
+
   // Borders
 
   /**
