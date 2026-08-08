@@ -264,12 +264,20 @@ public final class RtfHeaderStyle {
     return id;
   }
 
-  @Override public String toString() {
-    StringBuilder sb = new StringBuilder( 128 );
-    RtfOutput out = new RtfOutput( sb );
+  /**
+   * Writes the style-sheet definition directly to the output, evaluated only
+   * when the enclosing document is written. Prefer this over {@link #toString()}
+   * for the lazy rendering path.
+   */
+  void rtf( RtfOutput out ) {
     out.open().cw( RtfControlWords.STYLE ).append( id ).sp();
     renderer.accept( out );
     out.close();
+  }
+
+  @Override public String toString() {
+    StringBuilder sb = new StringBuilder( 128 );
+    rtf( new RtfOutput( sb ) );
     return sb.toString();
   }
 }

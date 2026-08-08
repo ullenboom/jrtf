@@ -33,7 +33,7 @@ class RtfTest {
 
   @Test void minimalDocumentHasDefaultFontAndColorTable() {
     assertThat( Rtf.rtf().p( "Hi" ).toString() )
-        .isEqualTo( "{\\rtf1\\ansi\\deff0\n{\\*\\generator jRTF}\n{\\fonttbl{\\f0 Times New Roman;}}\n{\\colortbl;}\n{\\s0 Hi\\par}\n}" );
+        .isEqualTo( "{\\rtf1\\ansi\\deff0\n{\\fonttbl{\\f0 Times New Roman;}}\n{\\colortbl;}\n{\\s0 Hi\\par}\n}" );
   }
 
   @Test void styleRendererIsEvaluatedOncePerWriteRegardlessOfParagraphReferenceCount() {

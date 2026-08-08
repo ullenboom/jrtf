@@ -89,6 +89,11 @@ public class Rtf {
   private final List<RtfTableStyle> tableStyles = new ArrayList<>();
 
   /**
+   * Generator tag, or {@code null} if not set.
+   */
+  private @Nullable String generator;
+
+  /**
    * Document info renderers.
    */
   private final List<Consumer<RtfOutput>> infoRenderers = new ArrayList<>();
@@ -178,6 +183,18 @@ public class Rtf {
    * @param headers Sequence of headers.
    * @return {@code this}-reference.
    */
+  /**
+   * Sets the generator tag written into the RTF header. If not called, no
+   * generator tag is emitted. Example: {@code rtf.generator("jRTF 1.2.0")}.
+   *
+   * @param name Generator name/version string (ASCII, no braces or backslashes).
+   * @return {@code this}-reference.
+   */
+  public Rtf generator( String name ) {
+    this.generator = name;
+    return this;
+  }
+
   public Rtf header( RtfHeader... headers ) {
     for ( RtfHeader rtfHeader : headers ) {
       if ( rtfHeader instanceof RtfHeaderColor )
@@ -444,11 +461,11 @@ public class Rtf {
     // character is \ansi = Windows 1252
 
     out.cw( RtfControlWords.RTF_VERSION, 1 )
-       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT, 0 )
-       .nl();
+       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT, 0 );
 
-    // Generator tag
-    out.tag( "*\\generator", " jRTF" );
+    // Generator tag (only if explicitly set)
+    if ( generator != null )
+      out.tag( "*\\generator", " " + generator ).nl();
 
     /*
      * <fonttbl>  := '{' \fonttbl (<fontinfo> | ('{' <fontinfo> '}'))+ '}'
@@ -492,7 +509,7 @@ public class Rtf {
     if ( !headerStyles.isEmpty() ) {
       out.nl().open( RtfControlWords.STYLE_SHEET );
       for ( RtfHeaderStyle style : headerStyles )
-        out.append( style.toString() );
+        style.rtf( out );
 
       out.close();
     }
