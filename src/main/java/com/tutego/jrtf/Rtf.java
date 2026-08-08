@@ -65,8 +65,9 @@ public class Rtf {
    * Charset used for converting chars in the range of 127 < x < 255.
    */
   final static Charset charset = Charset.forName( "Windows-1252" );
-  final static CharsetEncoder charsetEncoder = charset.newEncoder().onMalformedInput( REPORT )
-                                                      .onUnmappableCharacter( REPORT );
+  private static final ThreadLocal<CharsetEncoder> charsetEncoder =
+      ThreadLocal.withInitial( () -> charset.newEncoder().onMalformedInput( REPORT )
+                                           .onUnmappableCharacter( REPORT ) );
   final static String CHARSET1252 = charset.name();
 
   /**
@@ -602,12 +603,13 @@ public class Rtf {
    * Escape character with <code>\'xx</code> type escaping using windows-1252 encoding.
    */
   static String escapeWindows1252( char c ) {
-    if ( !charsetEncoder.canEncode( c ) ) {
+    CharsetEncoder enc = charsetEncoder.get();
+    if ( !enc.canEncode( c ) ) {
       return "?";
     }
 
     try {
-      final ByteBuffer bytes = charsetEncoder.encode( CharBuffer.wrap( String.valueOf( c ) ) );
+      final ByteBuffer bytes = enc.encode( CharBuffer.wrap( String.valueOf( c ) ) );
       final int unsignedCharByte = bytes.get() & 255; // Treat byte as unsigned
       return Hex.ESCAPED[ unsignedCharByte ];
     }

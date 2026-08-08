@@ -428,11 +428,11 @@ Several facts drove the design of jRTF.
       "noLineNumbering ()" and not "lineNumberingOff ()" because you can't toggle the line numbering
       back. (RTF does not support this.)
 * jRTF renders lazily via `Consumer<RtfOutput>` — no content is built in memory; everything streams
-  directly to the output `Appendable` when `out()` or `toString()` is called. An `RtfText` is not a
+  directly to the output `Appendable` when `out()` is called. An `RtfText` is not a
   string but a recipe for writing RTF.
-* jRTF is designed for **single-threaded** use. `Rtf` document instances are not thread-safe; the
-  shared `CharsetEncoder` used for Windows-1252 escaping is not synchronized. Build and write each
-  document from one thread.
+* jRTF is **thread-safe**: multiple `Rtf` instances can be built and written in parallel from
+  different threads (e.g. in a web server generating one RTF document per request). Each
+  `Rtf` instance itself is not thread-safe — one document should be written from one thread.
 
 ## What's not supported and how YOU can help
 
