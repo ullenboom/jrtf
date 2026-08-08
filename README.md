@@ -8,11 +8,11 @@ See also:
 * [Javadoc](http://javadoc.io/doc/com.tutego/jrtf/)
 
 **RTF 1.0 coverage:** roughly **80-90%** of the original RTF 1.0 core feature set is supported —
-this is a rough estimate, not a rigorous conformance count. Character formatting, paragraph
-formatting, tables, footnotes, fields, form fields, comments, track changes, bidirectional text,
-and document metadata are covered near-completely. The main gaps are pictures (only JPEG/PNG/EMF,
-no legacy WMF/PICT encoding), nested tables, and shading patterns beyond a solid fill. Modern RTF
-list tables and bookmarks (not part of RTF 1.0 itself) are also supported.
+this is a rough estimate, not a rigorous conformance count. Character and paragraph formatting,
+tables, footnotes, fields, form fields, comments, track changes, bidirectional text, bookmarks,
+hyperlinks, stylesheets, list tables, pictures (JPEG/PNG/EMF), and document metadata are covered.
+The main remaining gaps are drawing objects, nested tables, embedded fonts, legacy picture formats
+(WMF/PICT), and shading patterns beyond a solid fill.
 
 ## The Basics
 
@@ -346,7 +346,7 @@ rtf()
 
 This header is setting 3 colors and one font. Every color and font is identified by an index. This
 index is used later to identify this color and font. The numbering starts with 0. If there is no
-font given, "Times" will be the default font at position 0.
+font given, "Times New Roman" will be the default font at position 0.
 
 Some formats and styles are bound to a section, like a header. Let's set a header for all pages in
 that section:
