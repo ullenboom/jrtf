@@ -290,10 +290,6 @@ public final class RtfList {
 
   // Rendering
 
-  private static String hexByte( int value ) {
-    return String.format( "\\'%02x", value & 0xFF );
-  }
-
   /**
    * Writes the {@code \listlevel} group for one level, self-referencing its own (0-based)
    * index as the sole number placeholder (this implementation does not concatenate ancestor
@@ -308,18 +304,18 @@ public final class RtfList {
 
     out.open( RtfControlWords.LEVEL_TEXT ).sp();
     if ( level.format == NumberFormat.BULLET ) {
-      out.append( hexByte( 1 ) ).append( hexByte( BULLET_CHAR ) );
+      out.append( Hex.ESCAPED[ 1 ] ).append( Hex.ESCAPED[ BULLET_CHAR ] );
     }
     else {
-      out.append( hexByte( 1 + level.suffix.length() ) ).append( hexByte( levelIndex ) );
+      out.append( Hex.ESCAPED[ (1 + level.suffix.length()) & 0xFF ] ).append( Hex.ESCAPED[ levelIndex & 0xFF ] );
       for ( int i = 0; i < level.suffix.length(); i++ )
-        out.append( hexByte( level.suffix.charAt( i ) ) );
+        out.append( Hex.ESCAPED[ level.suffix.charAt( i ) & 0xFF ] );
     }
     out.closeSemi();
 
     out.open( RtfControlWords.LEVEL_NUMBERS ).sp();
     if ( level.format != NumberFormat.BULLET )
-      out.append( hexByte( 1 ) );
+      out.append( Hex.ESCAPED[ 1 ] );
     out.closeSemi();
 
     out.cw( RtfControlWords.LEFT_INDENT ).append( level.indentTwips )
