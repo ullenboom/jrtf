@@ -55,7 +55,7 @@ public class RtfFields {
   static final String TOC_FIELD_INSTRUCTION = "TOC \\\\f \\\\h \\\\u \\\\o \"1-5\" ";
 
   /**
-   * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
+   * Inserts a field with the default string "Refresh 'F9'".
    *
    * @param fieldInstructions Field instructions.
    * @return {@link RtfText} which represents a field.
@@ -65,7 +65,7 @@ public class RtfFields {
   }
 
   /**
-   * Inserts a field with the default string &quot;Refresh &gt;F9&lt;&quot;.
+   * Inserts a field with the default string "Refresh 'F9'".
    *
    * @param fieldInstructions Field instructions.
    * @return {@link RtfText} which represents a field.

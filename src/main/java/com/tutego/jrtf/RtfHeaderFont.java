@@ -381,7 +381,7 @@ public class RtfHeaderFont extends RtfHeader {
    * @param fontnum Number of the font.
    * @return {@link RtfHeader}.
    */
-  public RtfHeader at( int fontnum ) {
+  public RtfHeaderFont at( int fontnum ) {
     if ( fontnum < 0 )
       throw new IllegalArgumentException( "Font number is not allowed to be negative" );
 

@@ -369,7 +369,7 @@ public class RtfText {
    * @param text Text to underline dotted.
    * @return New RtfText object representing this text.
    */
-  public static RtfText dottedUnderline( String text ) {
+  public static RtfText dottedUnderline( Object text ) {
     RtfText inner = text( text );
     return new RtfText( out -> {
       out.open( RtfControlWords.UNDERLINE_DOTTED ).sp();
@@ -883,7 +883,7 @@ public class RtfText {
    * @param text Text to put in quotes.
    * @return New RtfText object representing this text in quotation marks.
    */
-  public static RtfText qoute( Object text ) {
+  public static RtfText quote( Object text ) {
     RtfText inner = text( text );
     return new RtfText( out -> {
       out.ctrl( RtfControlWords.LEFT_SINGLE_QUOTE );

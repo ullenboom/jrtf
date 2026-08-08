@@ -81,9 +81,9 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
    * Returns a new instance; the original is unchanged.
    *
    * @param colorindex Index of the color.
-   * @return New {@link RtfHeader} with the assigned index.
+   * @return This color with the assigned index.
    */
-  public RtfHeader at( int colorindex ) {
+  public RtfHeaderColor at( int colorindex ) {
     if ( colorindex < 1 || colorindex > 255 )
       throw new RtfException(
           "Color index " + colorindex + " is out of range, must be between 1 and 255" );
