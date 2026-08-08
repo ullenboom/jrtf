@@ -36,9 +36,9 @@ package com.tutego.jrtf;
  * {@code \fldrslt} construct plus common field types such as hyperlinks, page numbers,
  * and table of contents.
  * <p>
- * The basic field building blocks ({@link #field(RtfPara, RtfPara)} etc.) live here
- * rather than on {@link RtfText} because the field-instruction language that goes inside
- * a field is a separate mini-language from RTF control words.
+ * The basic field building blocks ({@link RtfText#field(RtfPara, RtfPara)} etc.) live on
+ * {@link RtfText}, while the field-instruction-language constants and switches reside here
+ * because the field-instruction language is a separate mini-language from RTF control words.
  */
 public class RtfFields {
   private RtfFields() {}

@@ -158,7 +158,7 @@ public final class RtfOutput {
   // ---- Grouping (stack / push-pop) ----
 
   /**
-   * Opens an RTF group: writes {@code \{}.
+   * Opens an RTF group: writes a left brace.
    * Every call must be balanced by a matching {@link #close()}.
    */
   public RtfOutput open()  { try { out.append( '{' );  } catch ( IOException e ) { throw new RtfException( e ); } return this; }
@@ -167,7 +167,7 @@ public final class RtfOutput {
   public RtfOutput close() { try { out.append( '}' );  } catch ( IOException e ) { throw new RtfException( e ); } return this; }
 
   /**
-   * Opens an RTF group with a leading control word: writes e.g. {@code {\b}.
+   * Opens an RTF group with a leading control word, e.g. {@code \b}.
    * Every call must be balanced by a matching {@link #close()}.
    */
   public RtfOutput open( String controlWord ) {
