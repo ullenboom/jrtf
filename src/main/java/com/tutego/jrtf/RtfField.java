@@ -92,6 +92,22 @@ public final class RtfField {
   public static final RtfField TOC        = new RtfField( "TOC", null, null );
   /** Index entry. */
   public static final RtfField INDEX      = new RtfField( "INDEX", null, null );
+  /** Document creation date. */
+  public static final RtfField CREATEDATE = new RtfField( "CREATEDATE", null, null );
+  /** Document last-saved date. */
+  public static final RtfField SAVEDATE   = new RtfField( "SAVEDATE", null, null );
+  /** Custom document property. Use {@code of("DOCPROPERTY myProp")}. */
+  public static final RtfField DOCPROPERTY = new RtfField( "DOCPROPERTY", null, null );
+  /** Mail-merge field. Use {@code of("MERGEFIELD myField")}. */
+  public static final RtfField MERGEFIELD  = new RtfField( "MERGEFIELD", null, null );
+  /** Table-of-contents entry marker. Use {@code of("TC \"Entry text\"")}. */
+  public static final RtfField TC          = new RtfField( "TC", null, null );
+  /** Index entry marker. Use {@code of("XE \"Index entry\"")}. */
+  public static final RtfField XE          = new RtfField( "XE", null, null );
+  /** Include an external picture by path/URL. */
+  public static final RtfField INCLUDEPICTURE = new RtfField( "INCLUDEPICTURE", null, null );
+  /** Include external text file content. */
+  public static final RtfField INCLUDETEXT = new RtfField( "INCLUDETEXT", null, null );
 
   // ---- Well-known field switches ----
 

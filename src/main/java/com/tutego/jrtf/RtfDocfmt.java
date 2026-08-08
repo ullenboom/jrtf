@@ -170,4 +170,26 @@ public class RtfDocfmt {
   public static RtfDocfmt revisionMarking() {
     return new RtfDocfmt( out -> out.cw( RtfControlWords.REVISION_MARKING ) );
   }
+
+  /**
+   * Protects the document so that only form fields can be edited.
+   *
+   * @return New {@code RtfDocfmt} object.
+   */
+  public static RtfDocfmt formProtected() {
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.FORM_PROTECTED ) );
+  }
+
+  /**
+   * Gutter margin (extra space for binding). Adds to the inside margin
+   * on each page.
+   *
+   * @param margin Gutter width.
+   * @param unit   Measurement unit.
+   * @return New {@code RtfDocfmt} object.
+   */
+  public static RtfDocfmt gutter( double margin, RtfUnit unit ) {
+    int twips = unit.toTwips( margin );
+    return new RtfDocfmt( out -> out.cw( RtfControlWords.GUTTER, twips ) );
+  }
 }

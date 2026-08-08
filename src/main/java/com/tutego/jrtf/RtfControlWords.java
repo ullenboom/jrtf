@@ -142,6 +142,14 @@ final class RtfControlWords {
 
   static final String NESTED_TABLE_LEVEL = "itap";
 
+  // Document protection
+
+  static final String FORM_PROTECTED = "formprot";
+
+  // Gutter margin
+
+  static final String GUTTER = "gutter";
+
   // Shading patterns
 
   static final String SHADING_PATTERN_HORIZ = "bghoriz";

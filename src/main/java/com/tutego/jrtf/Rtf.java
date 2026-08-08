@@ -444,7 +444,11 @@ public class Rtf {
     // character is \ansi = Windows 1252
 
     out.cw( RtfControlWords.RTF_VERSION, 1 )
-       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT, 0 );
+       .cw( RtfControlWords.ANSI_CHARSET ).cw( RtfControlWords.DEFAULT_FONT, 0 )
+       .nl();
+
+    // Generator tag
+    out.tag( "*\\generator", " jRTF" );
 
     /*
      * <fonttbl>  := '{' \fonttbl (<fontinfo> | ('{' <fontinfo> '}'))+ '}'

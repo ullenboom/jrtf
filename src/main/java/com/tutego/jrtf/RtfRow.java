@@ -69,6 +69,16 @@ public class RtfRow extends RtfPara {
   // Row Formatting
 
   /**
+   * Keeps this row together with the following row (no page break between them).
+   *
+   * @return {@code this}-object.
+   */
+  public RtfRow keepWithNext() {
+    tbldef.append( '\\' ).append( RtfControlWords.KEEP_WITH_NEXT ).append( '\n' );
+    return this;
+  }
+
+  /**
    * Turns AutoFit on for the row, so the cell widths adapt to their content. AutoFit is off
    * by default (the {@code \cellx} boundaries are then authoritative).
    *
