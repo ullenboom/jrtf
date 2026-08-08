@@ -202,6 +202,36 @@ public class RtfTextPara extends RtfPara {
     return this;
   }
 
+  // Shading patterns
+
+  /** Patterns for paragraph shading beyond solid fill. */
+  public enum ShadingPattern {
+    HORIZ( RtfControlWords.SHADING_PATTERN_HORIZ ),
+    VERT( RtfControlWords.SHADING_PATTERN_VERT ),
+    FORWARD_DIAG( RtfControlWords.SHADING_PATTERN_FDIAG ),
+    BACKWARD_DIAG( RtfControlWords.SHADING_PATTERN_BDIAG ),
+    CROSS( RtfControlWords.SHADING_PATTERN_CROSS ),
+    DIAGONAL_CROSS( RtfControlWords.SHADING_PATTERN_DCROSS );
+
+    final String controlWord;
+    ShadingPattern( String cw ) { this.controlWord = cw; }
+  }
+
+  /**
+   * Sets the shading pattern for the paragraph background.
+   * Also applies to table cells when used on a cell's paragraph.
+   *
+   * @param pattern      Shading pattern.
+   * @param colorIndex   Background color index in the color table.
+   * @return {@code this}-object.
+   */
+  public RtfTextPara shadingPattern( ShadingPattern pattern, int colorIndex ) {
+    parfmt.append( '\\' ).append( pattern.controlWord )
+          .append( '\\' ).append( RtfControlWords.PARAGRAPH_BACKGROUND_COLOR )
+          .append( colorIndex ).append( '\n' );
+    return this;
+  }
+
   /**
    * No line numbering.
    *

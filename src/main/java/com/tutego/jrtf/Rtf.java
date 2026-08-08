@@ -84,6 +84,11 @@ public class Rtf {
   private final List<RtfList> lists = new ArrayList<>();
 
   /**
+   * Table style definitions.
+   */
+  private final List<RtfTableStyle> tableStyles = new ArrayList<>();
+
+  /**
    * Document info renderers.
    */
   private final List<Consumer<RtfOutput>> infoRenderers = new ArrayList<>();
@@ -92,6 +97,11 @@ public class Rtf {
    * Document format renderers.
    */
   private final List<Consumer<RtfOutput>> docfmtRenderers = new ArrayList<>();
+
+  /**
+   * Document variables (key-value pairs for mail-merge / metadata).
+   */
+  private final Map<String, String> documentVariables = new LinkedHashMap<>();
 
   /**
    * Section data will be stored in 2 lists: One for the section formatting and headers
@@ -221,6 +231,23 @@ public class Rtf {
   }
 
   /**
+   * Registers table style definitions, so rows can reference them with
+   * {@link RtfRow#tableStyle(RtfTableStyle)}.
+   *
+   * @param styles Table styles to register.
+   * @return {@code this}-reference.
+   */
+  public Rtf tableStyles( RtfTableStyle... styles ) {
+    for ( RtfTableStyle style : styles ) {
+      if ( tableStyles.contains( style ) )
+        continue;
+      style.assignIdIfUnassigned( tableStyles.size() );
+      tableStyles.add( style );
+    }
+    return this;
+  }
+
+  /**
    * Writes information group, which contains information about the document.
    * This can include the title, author, keywords, comments, and other information
    * specific to the file. This information is for use by a document-management utility.
@@ -242,6 +269,21 @@ public class Rtf {
    * @param documentFormattings RTF document formattings.
    * @return {@code this}-reference.
    */
+  /**
+   * Sets a document variable (key-value pair stored in the RTF file).
+   * Useful for mail-merge templates and external document processing tools.
+   *
+   * @param key   Variable name (ASCII, no spaces).
+   * @param value Variable value.
+   * @return {@code this}-reference.
+   */
+  public Rtf docvar( String key, String value ) {
+    if ( key == null || key.isEmpty() )
+      throw new IllegalArgumentException( "Document variable key must not be empty" );
+    documentVariables.put( key, value == null ? "" : value );
+    return this;
+  }
+
   public Rtf documentFormatting( RtfDocfmt... documentFormattings ) {
     for ( RtfDocfmt rtfDocfmt : documentFormattings )
       docfmtRenderers.add( rtfDocfmt::rtf );
@@ -464,6 +506,14 @@ public class Rtf {
       out.close();
     }
 
+    // Write table styles
+
+    if ( !tableStyles.isEmpty() ) {
+      for ( RtfTableStyle ts : tableStyles )
+        ts.rtf( out );
+      out.nl();
+    }
+
     out.nl();
 
     // Write <info>
@@ -479,6 +529,17 @@ public class Rtf {
 
     for ( Consumer<RtfOutput> docfmtRenderer : docfmtRenderers )
       docfmtRenderer.accept( out );
+
+    // Write document variables
+
+    if ( !documentVariables.isEmpty() ) {
+      for ( Map.Entry<String, String> var : documentVariables.entrySet() ) {
+        out.open( RtfControlWords.DOCUMENT_VARIABLE ).sp()
+           .append( var.getKey() ).sp()
+           .append( Rtf.asRtf( var.getValue() ) )
+           .close().nl();
+      }
+    }
 
     /*
      * <document> := <info>? <docfmt>* <section>+

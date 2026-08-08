@@ -55,6 +55,17 @@ public class RtfRow extends RtfPara {
       renderer.accept( out );
   }
 
+  /**
+   * Applies a registered table style to this row.
+   *
+   * @param style Table style previously registered with {@link Rtf#tableStyles(RtfTableStyle...)}.
+   * @return {@code this}-object.
+   */
+  public RtfRow tableStyle( RtfTableStyle style ) {
+    tbldef.append( '\\' ).append( RtfControlWords.TABLE_STYLE_DEFINITION ).append( style.getId() );
+    return this;
+  }
+
   // Row Formatting
 
   /**

@@ -126,6 +126,26 @@ final class RtfControlWords {
   static final String PARAGRAPH_SHADING = "shading";
   static final String PARAGRAPH_BACKGROUND_COLOR = "cbpat";
 
+  // Shading patterns
+
+  static final String SHADING_PATTERN_HORIZ = "bghoriz";
+  static final String SHADING_PATTERN_VERT = "bgvert";
+  static final String SHADING_PATTERN_FDIAG = "bgfdiag";
+  static final String SHADING_PATTERN_BDIAG = "bgbdiag";
+  static final String SHADING_PATTERN_CROSS = "bgcross";
+  static final String SHADING_PATTERN_DCROSS = "bgdcross";
+
+  // Table styles
+
+  static final String TABLE_STYLE_DEFINITION = "ts";
+  static final String TABLE_DEFINITION = "tabledef";
+  static final String TABLE_STYLE_ROW_BAND_SIZE = "tsrowb";
+  static final String TABLE_STYLE_COLUMN_BAND_SIZE = "tscellcb";
+
+  // Document variables
+
+  static final String DOCUMENT_VARIABLE = "*\\docvar";
+
   // Paragraph numbering (list items)
 
   static final String PARAGRAPH_NUMBERING = "pn";
