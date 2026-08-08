@@ -28,22 +28,22 @@ class RtfUnicodeTest {
 
   @Test void windows1252MappableCharGetsUnicodeEscapeAndByteFallback() {
     // 'e' with acute accent, U+00E9, is byte 0xE9 in windows-1252
-    assertThat( Rtf.asRtf( "é" ) ).isEqualTo( "\\u233\\ud1\\'e9" );
+    assertThat( Rtf.asRtf( "é" ) ).isEqualTo( "\\u233\\'e9" );
   }
 
   @Test void charOutsideWindows1252UsesQuestionMarkFallback() {
     // U+0100 (Latin Capital Letter A with Macron) is not representable in windows-1252
-    assertThat( Rtf.asRtf( "Ā" ) ).isEqualTo( "\\u256\\ud1?" );
+    assertThat( Rtf.asRtf( "Ā" ) ).isEqualTo( "\\u256?" );
   }
 
   @Test void highSurrogateBmpCodepointUsesSignedShortValue() {
     // U+8000 (32768) is above the signed short range and must be written as a negative value
-    assertThat( Rtf.asRtf( "耀" ) ).isEqualTo( "\\u-32768\\ud1?" );
+    assertThat( Rtf.asRtf( "耀" ) ).isEqualTo( "\\u-32768?" );
   }
 
   @Test void codepointAboveBmpIsWrittenAsTwoSignedSurrogateEscapes() {
     // U+1F600 GRINNING FACE = surrogate pair 😀
     String emoji = new String( Character.toChars( 0x1F600 ) );
-    assertThat( Rtf.asRtf( emoji ) ).isEqualTo( "\\u-10179\\ud1?\\u-8704\\ud1?" );
+    assertThat( Rtf.asRtf( emoji ) ).isEqualTo( "\\u-10179?\\u-8704?" );
   }
 }

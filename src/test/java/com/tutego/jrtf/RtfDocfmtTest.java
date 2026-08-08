@@ -29,6 +29,6 @@ class RtfDocfmtTest {
   }
 
   @Test void a4PaperFormatIsPortraitCmConvertedToTwips() {
-    assertThat( rtf( RtfDocfmt.A4 ) ).isEqualTo( "\\paperw16837\\paperh11905" );
+    assertThat( rtf( RtfDocfmt.A4 ) ).isEqualTo( "\\paperw11905\\paperh16837" );
   }
 }

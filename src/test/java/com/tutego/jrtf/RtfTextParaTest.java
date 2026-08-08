@@ -17,7 +17,7 @@ class RtfTextParaTest {
     RtfTextPara para = RtfPara.p( "y" )
         .topBorder( RtfTextPara.BorderStyle.DASHED )
         .bottomBorder( RtfTextPara.BorderStyle.HAIRLINE );
-    assertThat( rtf( para, true ) ).isEqualTo( "{\\s0 \\brdrt\\brdrdash\\brdrb\\brdrhairy\\par}\n" );
+    assertThat( rtf( para, true ) ).isEqualTo( "{\\s0 \\brdrt\\brdrdash\n\\brdrb\\brdrhair\ny\\par}\n" );
   }
 
   @Test void doubleThicknessShadowedDoubleDottedBordersRenderNotCorrupted() {
@@ -60,7 +60,7 @@ class RtfTextParaTest {
 
   @Test void borderWithWidthAndColorEmitsBrdrwAndBrdrcf() {
     RtfTextPara para = RtfPara.p( "x" ).topBorder( RtfTextPara.BorderStyle.SINGLE, 1, RtfUnit.TWIPS, 2 );
-    assertThat( rtf( para, true ) ).isEqualTo( "{\\s0 \\brdrt\\brdrs\\brdrw1\\brdrcf2x\\par}\n" );
+    assertThat( rtf( para, true ) ).isEqualTo( "{\\s0 \\brdrt\\brdrs\\brdrw1\\brdrcf2 \nx\\par}\n" );
   }
 
   @Test void borderWithoutWidthOrColorOmitsBrdrwAndBrdrcf() {

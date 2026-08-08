@@ -862,7 +862,8 @@ public class RtfTextPara extends RtfPara {
     if ( width >= 0 )
       brdrdef.append( '\\' ).append( RtfControlWords.BORDER_WIDTH ).append( unit.toTwips( width ) );
     if ( colorIndex >= 0 )
-      brdrdef.append( '\\' ).append( RtfControlWords.BORDER_COLOR ).append( colorIndex );
+      brdrdef.append( '\\' ).append( RtfControlWords.BORDER_COLOR ).append( colorIndex ).append( ' ' );
+    brdrdef.append( '\n' );
   }
 
   /**

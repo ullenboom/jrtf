@@ -277,7 +277,6 @@ final class RtfControlWords {
   // Special characters and destinations
 
   static final String UNICODE_CHAR = "u";
-  static final String UNICODE_FALLBACK = "ud";
   static final String LANGUAGE = "lang";
   static final String CURRENT_DATE = "chdate";
   static final String CURRENT_DATE_LONG = "chdpl";
