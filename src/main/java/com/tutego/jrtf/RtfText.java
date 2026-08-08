@@ -164,6 +164,24 @@ public class RtfText {
   }
 
   /**
+   * Sets the language for the given text, used by word processors for
+   * spell checking and hyphenation. Common LCIDs: 1031 (German),
+   * 1033 (US English), 1036 (French), 1040 (Italian).
+   *
+   * @param lcid Windows Language Code Identifier.
+   * @param text Text to associate with this language.
+   * @return New RtfText object.
+   */
+  public static RtfText language( int lcid, Object text ) {
+    RtfText inner = text( text );
+    return new RtfText( out -> {
+      out.open().cw( RtfControlWords.LANGUAGE, lcid ).sp();
+      inner.rtf( out );
+      out.close();
+    } );
+  }
+
+  /**
    * Sets text with a given font style.
    *
    * @param fontnum Font number according to the header.

@@ -55,7 +55,7 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
   /**
    * Index of the color.
    */
-  int colorindex;
+  final int colorindex;
 
   /**
    * Package visible constructor. The user will not instantiate this class.
@@ -65,30 +65,79 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
    * @param b Blue.
    */
   RtfHeaderColor( int r, int g, int b ) {
+    this( r, g, b, 0 );
+  }
+
+  private RtfHeaderColor( int r, int g, int b, int colorindex ) {
     this.r = r;
     this.g = g;
     this.b = b;
+    this.colorindex = colorindex;
   }
 
   /**
    * Sets a color at a certain index. The index has to be between 1 and 255 otherwise a {@code RtfException}
    * will be thrown. Index 0 is reserved for the AUTO color.
+   * Returns a new instance; the original is unchanged.
    *
    * @param colorindex Index of the color.
-   * @return {@link RtfHeader}
+   * @return New {@link RtfHeader} with the assigned index.
    */
   public RtfHeader at( int colorindex ) {
     if ( colorindex < 1 || colorindex > 255 )
       throw new RtfException(
           "Color index " + colorindex + " ist out of range, has to be between 1 and 255" );
 
-    this.colorindex = colorindex;
-
-    return this;
+    return new RtfHeaderColor( r, g, b, colorindex );
   }
 
   public int compareTo( RtfHeaderColor other ) {
     return this.colorindex - other.colorindex;
+  }
+
+  // Theme color names from RTF 1.7+
+
+  /**
+   * Pre-defined theme colors available in modern word processors.
+   * Use via {@code RtfHeaderColor.theme(ThemeColor.MAIN_DARK_1).at(1)}.
+   * <p>
+   * Theme colors adapt to the document's overall colour scheme
+   * (e.g. dark mode vs light mode).
+   */
+  public enum ThemeColor {
+    MAIN_DARK_1( "cmaindarkone" ),
+    MAIN_LIGHT_1( "cmainlightone" ),
+    MAIN_DARK_2( "cmaindarktwo" ),
+    MAIN_LIGHT_2( "cmainlighttwo" ),
+    ACCENT_1( "caccentone" ),
+    ACCENT_2( "caccenttwo" ),
+    ACCENT_3( "caccentthree" ),
+    ACCENT_4( "caccentfour" ),
+    ACCENT_5( "caccentfive" ),
+    ACCENT_6( "caccentsix" ),
+    HYPERLINK( "chyperlink" ),
+    FOLLOWED_HYPERLINK( "cfollowedhyperlink" ),
+    BACKGROUND_1( "cbackgroundone" ),
+    BACKGROUND_2( "cbackgroundtwo" ),
+    TEXT_COLOUR( "ctextcolour" );
+
+    final String controlWord;
+
+    ThemeColor( String controlWord ) {
+      this.controlWord = controlWord;
+    }
+  }
+
+  /**
+   * Creates a color reference to one of the document's theme colours
+   * instead of a fixed RGB value. The theme colour adapts to the
+   * document's overall colour scheme.
+   *
+   * @param color Theme colour.
+   * @return New {@code RtfHeaderColor} referencing the theme.
+   */
+  public static RtfHeaderColor theme( ThemeColor color ) {
+    return new ThemeRtfHeaderColor( color );
   }
 
   /**
@@ -104,5 +153,20 @@ public class RtfHeaderColor extends RtfHeader implements Comparable<RtfHeaderCol
        .cw( RtfControlWords.GREEN ).append( g )
        .cw( RtfControlWords.BLUE ).append( b )
        .semi();
+  }
+
+  // Theme color subclass
+
+  private static final class ThemeRtfHeaderColor extends RtfHeaderColor {
+    private final ThemeColor themeColor;
+
+    ThemeRtfHeaderColor( ThemeColor themeColor ) {
+      super( 0, 0, 0 );
+      this.themeColor = themeColor;
+    }
+
+    @Override void writeColordef( RtfOutput out ) {
+      out.cw( themeColor.controlWord ).semi();
+    }
   }
 }

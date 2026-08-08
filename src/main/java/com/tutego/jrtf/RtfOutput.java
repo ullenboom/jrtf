@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  * All public methods catch {@link IOException} from the underlying {@link Appendable}
  * and rethrow it as a {@link RtfException}. Callers never see a checked exception.
  */
-public final class RtfOutput {
+final class RtfOutput {
 
   private final Appendable out;
 

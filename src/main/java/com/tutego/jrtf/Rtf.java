@@ -138,8 +138,12 @@ public class Rtf {
         out.append( "\\}" );
       else if ( c < 127 )
         out.append( c );
-      else   // Use Unicode and ask the char from the String object; control word takes a signed 16-bit value per spec
-        out.cw( RtfControlWords.UNICODE_CHAR ).append( (short) c ).append( escapeWindows1252( c ) );
+      else { // Use Unicode and ask the char from the String object; control word takes a signed 16-bit value per spec
+        out.cw( RtfControlWords.UNICODE_CHAR ).append( (short) c );
+        // Unicode fallback: how many chars to skip if the unicode control word is not understood
+        out.cw( RtfControlWords.UNICODE_FALLBACK ).append( "1" );
+        out.append( escapeWindows1252( c ) );
+      }
     }
   }
 

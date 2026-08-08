@@ -45,20 +45,6 @@ public class RtfTextPara extends RtfPara {
   boolean resetDefaults;
   boolean emptyParagraph;
 
-  /**
-   * Wraps a {@link Consumer} lambda into a {@code RtfTextPara}. Internal escape hatch —
-   * the returned object keeps all its builder methods while the render body is expressed
-   * as a lambda, evaluated only when the enclosing document is written.
-   *
-   * @param renderer Render body.
-   * @return New {@code RtfTextPara} object delegating to {@code renderer}.
-   */
-  static RtfTextPara of( Consumer<RtfOutput> renderer ) {
-    RtfTextPara para = new RtfTextPara();
-    para.renderer = renderer;
-    return para;
-  }
-
   /** Package-private: called from {@link RtfPara#p} / {@link RtfPara#pard}. */
   RtfTextPara() {}
 
@@ -227,6 +213,18 @@ public class RtfTextPara extends RtfPara {
   }
 
   /**
+   * Sets the language for the entire paragraph, used for spell checking
+   * and hyphenation. Common LCIDs: 1031 (German), 1033 (US English).
+   *
+   * @param lcid Windows Language Code Identifier.
+   * @return {@code this}-object.
+   */
+  public RtfTextPara language( int lcid ) {
+    parfmt.append( '\\' ).append( RtfControlWords.LANGUAGE ).append( lcid ).append( '\n' );
+    return this;
+  }
+
+  /**
    * Break page before the paragraph.
    *
    * @return {@code this}-object.
@@ -355,8 +353,7 @@ public class RtfTextPara extends RtfPara {
    * @return {@code this}-object.
    */
   public RtfTextPara spaceBetweenLines( double space, RtfUnit unit ) {
-    space = Math.abs( space );
-
+    // Sign matters: positive = at least, negative = exactly (RTF spec)
     parfmt.append( '\\' ).append( RtfControlWords.LINE_SPACING ).append( unit.toTwips( space ) ).append( '\n' );
     return this;
   }

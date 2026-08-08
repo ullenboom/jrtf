@@ -50,21 +50,6 @@ public class RtfRow extends RtfPara {
 
   Consumer<RtfOutput> renderer;
 
-  /**
-   * Wraps a {@link Consumer} lambda into a {@code RtfRow}, so the returned object
-   * keeps all the builder methods of {@code RtfRow} (their accumulated state in
-   * {@code tbldef} is reachable via closure capture) while its render
-   * body is expressed as a lambda, evaluated only when the enclosing document is written.
-   *
-   * @param renderer Render body.
-   * @return New {@code RtfRow} object delegating to {@code renderer}.
-   */
-  static RtfRow of( Consumer<RtfOutput> renderer ) {
-    RtfRow row = new RtfRow();
-    row.renderer = renderer;
-    return row;
-  }
-
   @Override void rtf( RtfOutput out, boolean withEndingPar ) {
     if ( renderer != null )
       renderer.accept( out );

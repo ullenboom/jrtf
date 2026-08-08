@@ -257,6 +257,8 @@ final class RtfControlWords {
   // Special characters and destinations
 
   static final String UNICODE_CHAR = "u";
+  static final String UNICODE_FALLBACK = "ud";
+  static final String LANGUAGE = "lang";
   static final String CURRENT_DATE = "chdate";
   static final String CURRENT_DATE_LONG = "chdpl";
   static final String CURRENT_DATE_ABBREVIATED = "chdpa";
@@ -312,13 +314,10 @@ final class RtfControlWords {
   static final String ANNOTATION_DESTINATION = "*\\annot";
   static final String ANNOTATION_ID = "atnid";
   static final String ANNOTATION_AUTHOR = "atnauthor";
-  static final String ANNOTATION_REFERENCE_START = "atrfstart";
-  static final String ANNOTATION_REFERENCE_END = "atrfend";
 
   // Track changes / revision
 
   static final String REVISION_AUTHOR = "revauth";
-  static final String REVISION_DATE = "revdttm";
 
   // Bidirectional character-level text
 

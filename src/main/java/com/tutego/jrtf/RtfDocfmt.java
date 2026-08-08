@@ -55,7 +55,7 @@ public class RtfDocfmt {
   public static final RtfDocfmt A0 = paper( 118.9, 84.1, RtfUnit.CM );
   public static final RtfDocfmt A1 = paper( 84.1, 59.4, RtfUnit.CM );
   public static final RtfDocfmt A2 = paper( 59.4, 42.0, RtfUnit.CM );
-  public static final RtfDocfmt A3 = paper( 42.0, 21.0, RtfUnit.CM );
+  public static final RtfDocfmt A3 = paper( 42.0, 29.7, RtfUnit.CM );
   public static final RtfDocfmt A4 = paper( 29.7, 21.0, RtfUnit.CM );
   public static final RtfDocfmt A5 = paper( 21.0, 14.8, RtfUnit.CM );
   public static final RtfDocfmt A6 = paper( 14.8, 10.5, RtfUnit.CM );
