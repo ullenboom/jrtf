@@ -150,7 +150,17 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell topBorder() {
-    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_TOP ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return topBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  /**
+   * Draws a border with the given style at the top of this cell.
+   *
+   * @param borderStyle Style of the border.
+   * @return {@code this}-object.
+   */
+  public RtfCell topBorder( RtfTextPara.BorderStyle borderStyle ) {
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_TOP ).append( '\\' ).append( borderStyle );
     return this;
   }
 
@@ -160,7 +170,14 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell bottomBorder() {
-    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_BOTTOM ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return bottomBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  /**
+   * Draws a border with the given style at the bottom of this cell.
+   */
+  public RtfCell bottomBorder( RtfTextPara.BorderStyle borderStyle ) {
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_BOTTOM ).append( '\\' ).append( borderStyle );
     return this;
   }
 
@@ -170,7 +187,14 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell leftBorder() {
-    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_LEFT ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return leftBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  /**
+   * Draws a border with the given style on the left of this cell.
+   */
+  public RtfCell leftBorder( RtfTextPara.BorderStyle borderStyle ) {
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_LEFT ).append( '\\' ).append( borderStyle );
     return this;
   }
 
@@ -180,7 +204,14 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell rightBorder() {
-    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_RIGHT ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return rightBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  /**
+   * Draws a border with the given style on the right of this cell.
+   */
+  public RtfCell rightBorder( RtfTextPara.BorderStyle borderStyle ) {
+    celldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_RIGHT ).append( '\\' ).append( borderStyle );
     return this;
   }
 
@@ -190,7 +221,15 @@ public final class RtfCell {
    * @return {@code this}-object.
    */
   public RtfCell allBorders() {
-    return topBorder().bottomBorder().leftBorder().rightBorder();
+    return allBorders( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  /**
+   * Draws borders with the given style on all four sides of this cell.
+   */
+  public RtfCell allBorders( RtfTextPara.BorderStyle borderStyle ) {
+    return topBorder( borderStyle ).bottomBorder( borderStyle )
+          .leftBorder( borderStyle ).rightBorder( borderStyle );
   }
 
   // Vertical alignment of the cell content

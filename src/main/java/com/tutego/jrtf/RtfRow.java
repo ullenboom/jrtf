@@ -167,42 +167,58 @@ public class RtfRow extends RtfPara {
   // Cell Borders
 
   /**
-   * Bottom table cell border.
+   * Bottom table cell border, single-line.
    *
    * @return {@code this}-object.
    */
   public RtfRow bottomCellBorder() {
-    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_BOTTOM ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return bottomCellBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  public RtfRow bottomCellBorder( RtfTextPara.BorderStyle borderStyle ) {
+    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_BOTTOM ).append( '\\' ).append( borderStyle );
     return this;
   }
 
   /**
-   * Top table cell border.
+   * Top table cell border, single-line.
    *
    * @return {@code this}-object.
    */
   public RtfRow topCellBorder() {
-    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_TOP ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return topCellBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  public RtfRow topCellBorder( RtfTextPara.BorderStyle borderStyle ) {
+    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_TOP ).append( '\\' ).append( borderStyle );
     return this;
   }
 
   /**
-   * Left table cell border.
+   * Left table cell border, single-line.
    *
    * @return {@code this}-object.
    */
   public RtfRow leftCellBorder() {
-    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_LEFT ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return leftCellBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  public RtfRow leftCellBorder( RtfTextPara.BorderStyle borderStyle ) {
+    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_LEFT ).append( '\\' ).append( borderStyle );
     return this;
   }
 
   /**
-   * Right table cell border.
+   * Right table cell border, single-line.
    *
    * @return {@code this}-object.
    */
   public RtfRow rightCellBorder() {
-    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_RIGHT ).append( '\\' ).append( RtfControlWords.BORDER_SINGLE );
+    return rightCellBorder( RtfTextPara.BorderStyle.SINGLE );
+  }
+
+  public RtfRow rightCellBorder( RtfTextPara.BorderStyle borderStyle ) {
+    tbldef.append( '\\' ).append( RtfControlWords.CELL_BORDER_RIGHT ).append( '\\' ).append( borderStyle );
     return this;
   }
 
